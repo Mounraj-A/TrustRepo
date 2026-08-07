@@ -94,8 +94,11 @@ export const NAV_ITEMS = [
   { path: '/documentation',     label: 'Documentation',       icon: 'BookOpen',         group: 'Verification' },
   { path: '/claims',            label: 'Claim Verification',  icon: 'ClipboardCheck',   group: 'Verification' },
   { path: '/evidence',          label: 'Evidence Explorer',   icon: 'Search',           group: 'Verification' },
+  { path: '/reasoning',         label: 'Reasoning Explorer',  icon: 'Brain',            group: 'Verification' },
   { path: '/trust-score',       label: 'Trust Score',         icon: 'ShieldCheck',      group: 'Results' },
+  { path: '/benchmarks',        label: 'Benchmark Results',   icon: 'BarChart3',        group: 'Results' },
   { path: '/runtime',           label: 'Runtime Dashboard',   icon: 'Activity',         group: 'DevOps' },
+  { path: '/system-health',     label: 'System Health',       icon: 'Server',           group: 'DevOps' },
   { path: '/api-inspector',     label: 'API Inspector',       icon: 'Terminal',         group: 'DevOps' },
   { path: '/settings',          label: 'Settings',            icon: 'Settings',         group: 'System' },
 ] as const;

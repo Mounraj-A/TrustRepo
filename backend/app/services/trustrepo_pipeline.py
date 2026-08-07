@@ -22,6 +22,8 @@ Full pipeline execution order:
     RepositoryTrustReport
 """
 import time
+import os
+import psutil
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any
 
@@ -46,6 +48,8 @@ class LayerTrace:
     evidence_count: int = 0
     warnings: List[str] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
+    memory_mb: float = 0.0
+    cpu_percent: float = 0.0
     details: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
@@ -53,6 +57,8 @@ class LayerTrace:
             "layer": self.layer,
             "status": self.status,
             "time_s": round(self.time_s, 3),
+            "memory_mb": round(self.memory_mb, 2),
+            "cpu_percent": round(self.cpu_percent, 1),
             "objects_created": self.objects_created,
             "evidence_count": self.evidence_count,
             "warnings": self.warnings,
@@ -125,6 +131,8 @@ class TrustRepoPipeline:
                 print(f"  [Layer 2A] Document pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
+        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
         # ── Layer 2B: Code Understanding ──────────────────────────────────────
@@ -149,6 +157,8 @@ class TrustRepoPipeline:
             print(f"  [Layer 2B] Code pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
+        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
         # ── Layer 3: Knowledge Graph + Analytics ──────────────────────────────
@@ -179,6 +189,8 @@ class TrustRepoPipeline:
             print(f"  [Layer 3] KG pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
+        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
         # ── Code Intelligence Mode: Generate Repository Intelligence ──────────
@@ -200,6 +212,8 @@ class TrustRepoPipeline:
             print(f"  [Layer 4] Evidence pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
+        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
         # ── Layer 5: Multi-Agent Investigation + Reasoning ────────────────────
@@ -216,6 +230,8 @@ class TrustRepoPipeline:
             print(f"  [Layer 5] Investigation failed: {e}")
 
         layer_trace.time_s = time.time() - t
+        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
         # ── Layer 6: Verification Summary ─────────────────────────────────────
@@ -231,6 +247,8 @@ class TrustRepoPipeline:
             print(f"  [Layer 6] Verification failed: {e}")
 
         layer_trace.time_s = time.time() - t
+        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
         # ── Layer 7: Report Generation ────────────────────────────────────────
@@ -247,6 +265,8 @@ class TrustRepoPipeline:
             print(f"  [Layer 7] Reporting failed: {e}")
 
         layer_trace.time_s = time.time() - t
+        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
         # ── Store execution trace in context ──────────────────────────────────

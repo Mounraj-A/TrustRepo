@@ -10,6 +10,16 @@ class EvidenceStrength(str, Enum):
     SECONDARY = "SECONDARY"
     SUPPORTING = "SUPPORTING"
 
+class EvidenceType(str, Enum):
+    IMPORT = "IMPORT"
+    ANNOTATION = "ANNOTATION"
+    DEPENDENCY = "DEPENDENCY"
+    CALL = "CALL"
+    CONFIGURATION = "CONFIGURATION"
+    DECLARATION = "DECLARATION"
+    INSTANTIATION = "INSTANTIATION"
+    UNKNOWN = "UNKNOWN"
+
 class EvidenceSource(BaseModel):
     """Deep provenance metadata for reproducibility."""
     repository_id: str = "local"
@@ -26,18 +36,33 @@ class EvidenceSource(BaseModel):
     reasoning_engine_version: str = "2.0.0"
     analysis_timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+import uuid
+import hashlib
+
 class EvidenceItem(BaseModel):
     """A discrete piece of evidence derived from the UIR or Knowledge Graph."""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     source: EvidenceSource
     node_type: str = "unknown"
     symbol_kind: str = "unknown"
     symbol: str = "unknown"
     qualified_name: str = "unknown"
     context_type: str = "unknown"
+    evidence_type: EvidenceType = EvidenceType.UNKNOWN
     code_snippet: str = ""
     graph_node_id: Optional[str] = None
     graph_relationship: Optional[str] = None
     evidence_strength: EvidenceStrength = EvidenceStrength.SUPPORTING
+
+    @property
+    def hash(self) -> str:
+        """Deterministic hash for caching and deduplication."""
+        h = hashlib.sha256()
+        h.update(self.source.file_path.encode('utf-8'))
+        h.update(str(self.source.line_number or 0).encode('utf-8'))
+        h.update(self.symbol.encode('utf-8'))
+        h.update(self.evidence_type.value.encode('utf-8'))
+        return h.hexdigest()
 
 class EvidenceChain(BaseModel):
     """A full traversal path representing a complete reasoning context."""

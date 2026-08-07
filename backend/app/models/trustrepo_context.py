@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Any
+import uuid
 
 from app.models.repository_context import RepositoryContext
 from app.models.document_context import DocumentContext
@@ -12,7 +13,7 @@ from app.models.report.trust_report import RepositoryTrustReport
 
 class SemanticContext(BaseModel):
     technologies: List[str] = Field(default_factory=list)
-    technology_categories: Dict[str, str] = Field(default_factory=dict)
+    technology_categories: Dict[str, List[str]] = Field(default_factory=dict)
     features: List[str] = Field(default_factory=list)
     capabilities: List[str] = Field(default_factory=list)
     architectures: List[str] = Field(default_factory=list)
@@ -37,6 +38,10 @@ class TrustRepoContext(BaseModel):
     Master state object for the entire TrustRepo pipeline.
     Stores all intermediate artifacts to ensure perfect traceability.
     """
+    correlation_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    execution_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    
     repository_context: Optional[RepositoryContext] = None
     document_context: Optional[DocumentContext] = None
     code_context: Optional[CodeContext] = None

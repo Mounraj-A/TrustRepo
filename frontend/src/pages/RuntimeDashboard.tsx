@@ -13,13 +13,13 @@ export default function RuntimeDashboard() {
 
   const trace = analysisResult?.execution_trace ?? [];
 
-  const okCount     = trace.filter(t => t.status === 'OK').length;
+  const okCount = trace.filter(t => t.status === 'OK').length;
   const failedCount = trace.filter(t => t.status === 'FAILED').length;
-  const skippedCount= trace.filter(t => t.status === 'SKIPPED').length;
-  const totalTime   = trace.reduce((a, t) => a + t.time_s, 0);
-  const totalObjs   = trace.reduce((a, t) => a + t.objects_created, 0);
+  const skippedCount = trace.filter(t => t.status === 'SKIPPED').length;
+  const totalTime = trace.reduce((a, t) => a + t.time_s, 0);
+  const totalObjs = trace.reduce((a, t) => a + t.objects_created, 0);
   const allWarnings = trace.flatMap(t => t.warnings ?? []);
-  const allErrors   = trace.flatMap(t => t.errors ?? []);
+  const allErrors = trace.flatMap(t => t.errors ?? []);
 
   const chartData = trace.map(t => ({
     name: t.layer.replace(/^\d+[AB]?: /, ''),
@@ -35,12 +35,12 @@ export default function RuntimeDashboard() {
       </h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <MetricsCard label="Total Layers" value={trace.length}   icon={Package}       loading={isAnalyzing} />
-        <MetricsCard label="Successful"   value={okCount}        icon={CheckCircle2}  color="emerald" loading={isAnalyzing} />
-        <MetricsCard label="Failed"       value={failedCount}    icon={XCircle}       color="red"     loading={isAnalyzing} />
-        <MetricsCard label="Skipped"      value={skippedCount}   icon={Clock}         loading={isAnalyzing} />
-        <MetricsCard label="Total Time"   value={formatDuration(totalTime)} icon={Clock}  color="amber" loading={isAnalyzing} />
-        <MetricsCard label="Objects"      value={totalObjs}      icon={Package}       color="violet"  loading={isAnalyzing} />
+        <MetricsCard label="Total Layers" value={trace.length} icon={Package} loading={isAnalyzing} />
+        <MetricsCard label="Successful" value={okCount} icon={CheckCircle2} color="emerald" loading={isAnalyzing} />
+        <MetricsCard label="Failed" value={failedCount} icon={XCircle} color="red" loading={isAnalyzing} />
+        <MetricsCard label="Skipped" value={skippedCount} icon={Clock} loading={isAnalyzing} />
+        <MetricsCard label="Total Time" value={formatDuration(totalTime)} icon={Clock} color="amber" loading={isAnalyzing} />
+        <MetricsCard label="Objects" value={totalObjs} icon={Package} color="violet" loading={isAnalyzing} />
       </div>
 
       {/* Execution time chart */}

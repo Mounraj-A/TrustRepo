@@ -47,6 +47,7 @@ class AgentRole(str, Enum):
     EVIDENCE_RANKING   = "EvidenceRankingAgent"    # NEW
     EVIDENCE_FUSION    = "EvidenceFusionAgent"
     EVIDENCE_AGREEMENT = "EvidenceAgreementEngine" # NEW
+    EVIDENCE_VALIDATION = "EvidenceValidationAgent"
     COVERAGE           = "CoverageAgent"           # NEW
     CONTRADICTION      = "ContradictionAgent"      # NEW
     REASONING          = "ReasoningAgent"

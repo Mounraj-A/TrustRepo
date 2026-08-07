@@ -36,4 +36,14 @@ class ExplanationGenerator:
             trust_score=result.trust_score,
             explanation=explanation,
             provenance_chain=provenance_chain,
+            expected_features=result.expected_features,
+            observed_features=result.observed_features,
+            missing_features=result.missing_features,
+            unsupported_features=result.unsupported_features,
+            contradicted_features=result.contradicted_features,
+            evidence_count=result.evidence_count,
+            evidence_diversity=result.evidence_diversity,
+            evidence_quality=result.evidence_quality,
+            graph_connectivity=result.graph_connectivity,
+            evidence_agreement=result.evidence_agreement
         )

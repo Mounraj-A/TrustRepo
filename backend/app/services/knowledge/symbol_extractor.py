@@ -18,6 +18,17 @@ class SymbolExtractor:
         return code_context
 
     def _extract_from_ir(self, ir: IntermediateRepresentation, context: CodeContext):
+        # Create a symbol for the file itself so top-level nodes can link to it
+        file_sym = Symbol(
+            name=ir.file_path.split('/')[-1] if '/' in ir.file_path else ir.file_path.split('\\')[-1],
+            qualname=ir.file_path,
+            type="file",
+            file_path=ir.file_path,
+            start_line=1,
+            properties={"language": ir.language}
+        )
+        context.symbols.append(file_sym)
+        
         for node in ir.nodes:
             self._visit(node, ir.file_path, context)
 

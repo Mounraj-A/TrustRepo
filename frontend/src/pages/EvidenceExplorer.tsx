@@ -44,10 +44,10 @@ export default function EvidenceExplorer() {
         <h2 className="text-sm font-semibold mb-4">Evidence Pipeline Architecture</h2>
         <div className="space-y-3">
           {[
-            { icon: FileText,  step: '1. Document Parsing',   desc: 'Claims extracted from README/documentation via section parsing and atomic statement normalization.' },
-            { icon: GitGraph,  step: '2. Code Evidence',      desc: 'AST nodes (Annotations, Imports, Classes, Dependencies) matched to claim intents via the Semantic Registry.' },
-            { icon: Search,    step: '3. Evidence Retrieval', desc: 'Pre-collected evidence from the Knowledge Graph matched to each normalized claim.' },
-            { icon: Link2,     step: '4. Evidence Fusion',    desc: 'Multi-stream evidence from Code Agent, Documentation Agent, and KG Agent fused and ranked by confidence.' },
+            { icon: FileText, step: '1. Document Parsing', desc: 'Claims extracted from README/documentation via section parsing and atomic statement normalization.' },
+            { icon: GitGraph, step: '2. Code Evidence', desc: 'AST nodes (Annotations, Imports, Classes, Dependencies) matched to claim intents via the Semantic Registry.' },
+            { icon: Search, step: '3. Evidence Retrieval', desc: 'Pre-collected evidence from the Knowledge Graph matched to each normalized claim.' },
+            { icon: Link2, step: '4. Evidence Fusion', desc: 'Multi-stream evidence from Code Agent, Documentation Agent, and KG Agent fused and ranked by confidence.' },
           ].map(({ icon: Icon, step, desc }) => (
             <div key={step} className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl">
               <div className="p-2 bg-primary/10 rounded-lg shrink-0">

@@ -169,12 +169,12 @@ class ReasoningAgent:
         """Maps Decision Matrix 5-state to VerificationVerdict."""
         mapping = {
             DecisionVerdictState.VERIFIED:                  VerificationVerdict.VERIFIED,
-            DecisionVerdictState.CONTRADICTION:             VerificationVerdict.REFUTED,
-            DecisionVerdictState.MISSING_DOCUMENTATION:     VerificationVerdict.INSUFFICIENT_EVIDENCE,
-            DecisionVerdictState.UNSUPPORTED_DOCUMENTATION: VerificationVerdict.INSUFFICIENT_EVIDENCE,
-            DecisionVerdictState.PARTIAL_DOCUMENTATION:     VerificationVerdict.PARTIALLY_VERIFIED,
+            DecisionVerdictState.CONTRADICTION:             VerificationVerdict.CONTRADICTION,
+            DecisionVerdictState.MISSING_DOCUMENTATION:     VerificationVerdict.MISSING_DOCUMENTATION,
+            DecisionVerdictState.UNSUPPORTED_DOCUMENTATION: VerificationVerdict.MISSING_DOCUMENTATION,
+            DecisionVerdictState.PARTIAL_DOCUMENTATION:     VerificationVerdict.PARTIAL_DOCUMENTATION,
         }
-        return mapping.get(decision_verdict, VerificationVerdict.INSUFFICIENT_EVIDENCE)
+        return mapping.get(decision_verdict, VerificationVerdict.MISSING_DOCUMENTATION)
 
     def _infer_category(self, claim_text: str) -> VerificationCategory:
         """Infers verification category from the claim text via the Ontology."""

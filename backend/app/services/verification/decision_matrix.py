@@ -191,13 +191,13 @@ class DecisionMatrix:
         if contradictions:
             return DecisionVerdictState.CONTRADICTION
 
-        # Full coverage and high consistency
-        if coverage >= 0.9 and consistency >= 0.9 and not missing:
-            return DecisionVerdictState.VERIFIED
-
         # High coverage but some features undocumented in README
         if coverage >= 0.5 and unsupported and not missing:
             return DecisionVerdictState.UNSUPPORTED_DOCUMENTATION
+
+        # Full coverage and high consistency
+        if coverage >= 0.9 and consistency >= 0.9 and not missing:
+            return DecisionVerdictState.VERIFIED
 
         # Partial: some features verified, some missing
         if coverage >= 0.3 and missing:

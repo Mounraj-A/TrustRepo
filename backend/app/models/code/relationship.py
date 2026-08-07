@@ -6,3 +6,4 @@ class Relationship(BaseModel):
     target_qualname: str
     type: str  # e.g., DEPENDS_ON, CALLS, CONTAINS, IMPLEMENTS, EXTENDS, HAS_ANNOTATION
     properties: Dict[str, str] = Field(default_factory=dict)
+    confidence: float = 1.0

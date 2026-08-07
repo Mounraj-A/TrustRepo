@@ -67,6 +67,20 @@ class ClaimReport(BaseModel):
     trust_score: float
     explanation: str
     provenance_chain: Optional[EvidenceChain] = None
+    
+    # Expected vs Observed
+    expected_features: List[str] = Field(default_factory=list)
+    observed_features: List[str] = Field(default_factory=list)
+    missing_features: List[str] = Field(default_factory=list)
+    unsupported_features: List[str] = Field(default_factory=list)
+    contradicted_features: List[str] = Field(default_factory=list)
+    
+    # Reasoning Metrics
+    evidence_count: int = 0
+    evidence_diversity: float = 0.0
+    evidence_quality: float = 0.0
+    graph_connectivity: float = 0.0
+    evidence_agreement: float = 0.0
 
 class RepositoryTrustReport(BaseModel):
     summary: RepositorySummary

@@ -26,9 +26,9 @@ export default function Technologies() {
       <h1 className="text-2xl font-bold">Technologies</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <MetricsCard label="Technologies Detected" value={techs.length}                   icon={Cpu}        color="primary"  loading={isAnalyzing} />
-        <MetricsCard label="Categories"             value={Object.keys(categories).length} icon={Package}    color="violet"   loading={isAnalyzing} />
-        <MetricsCard label="Graph Nodes"            value={graph?.nodes}                   icon={TrendingUp} color="emerald"  loading={isAnalyzing} />
+        <MetricsCard label="Technologies Detected" value={techs.length} icon={Cpu} color="primary" loading={isAnalyzing} />
+        <MetricsCard label="Categories" value={Object.keys(categories).length} icon={Package} color="violet" loading={isAnalyzing} />
+        <MetricsCard label="Graph Nodes" value={graph?.nodes} icon={TrendingUp} color="emerald" loading={isAnalyzing} />
         <MetricsCard label="Graph Integrity"
           value={schema?.integrity_score !== undefined ? `${Math.round(schema.integrity_score * 100)}%` : '—'}
           icon={AlertTriangle} color="amber" loading={isAnalyzing}
@@ -72,7 +72,7 @@ export default function Technologies() {
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={100}
-                     paddingAngle={3} dataKey="value">
+                  paddingAngle={3} dataKey="value">
                   {pieData.map((d, i) => (
                     <Cell key={d.name} fill={d.color} stroke="transparent" />
                   ))}

@@ -4,11 +4,11 @@ import { Building2, Layers, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ARCH_DESCRIPTIONS: Record<string, string> = {
-  'REST API':            'Exposes HTTP endpoints following REST constraints. Supports CRUD operations over resources.',
+  'REST API': 'Exposes HTTP endpoints following REST constraints. Supports CRUD operations over resources.',
   'Secured Application': 'Authentication & Authorization enforced. CORS, session, or JWT-based security detected.',
-  'Layered MVC':         'Model-View-Controller pattern. Clear separation between data, logic, and presentation.',
-  'Microservices':       'Distributed service architecture. Multiple independent deployable services.',
-  'Monolith':            'Single deployable unit. All components tightly coupled in one codebase.',
+  'Layered MVC': 'Model-View-Controller pattern. Clear separation between data, logic, and presentation.',
+  'Microservices': 'Distributed service architecture. Multiple independent deployable services.',
+  'Monolith': 'Single deployable unit. All components tightly coupled in one codebase.',
 };
 
 export default function Architecture() {

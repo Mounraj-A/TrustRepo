@@ -55,6 +55,7 @@ class KnowledgeGraphPipeline:
 
         # ── Step 1: Build In-Memory Graph Model ───────────────────────────────
         graph = self.builder.build(context.code_context)
+        graph.metadata = context.repository_context.metadata
         context.graph_context.graph = graph
         print(f"  Graph Built: {len(graph.nodes)} nodes, {len(graph.edges)} edges.")
 
@@ -97,10 +98,9 @@ class KnowledgeGraphPipeline:
 
         # ── Step 5: Feature Extraction (Plugin Detectors + Fusion + Validation)
         # CRITICAL: Pass the in-memory RepositoryKnowledgeGraph — NOT RepositoryContext.
-        # All feature detector plugins query graph nodes directly (same as TechnologyDetection).
-        # Previously they attempted live Neo4j Cypher queries (always None) — now fixed.
+        # Now uses detected technologies to infer semantic features.
         try:
-            features = self.feature_extractor.extract(graph)
+            features = self.feature_extractor.extract(graph, tech_results)
             context.semantic_context.features = [f.canonical_name for f in features]
         except Exception as e:
             print(f"  [KGPipeline] Feature extraction failed: {e}")

@@ -101,6 +101,24 @@ def analyze_repository(req: AnalyzeRequest):
     graph_nodes = len(context.graph_context.graph.nodes) if context.graph_context and context.graph_context.graph else 0
     graph_edges = len(context.graph_context.graph.edges) if context.graph_context and context.graph_context.graph else 0
     graph_analytics = context.graph_context.analytics if context.graph_context else {}
+    
+    serialized_nodes = []
+    serialized_edges = []
+    if context.graph_context and context.graph_context.graph:
+        for node in context.graph_context.graph.nodes:
+            serialized_nodes.append({
+                "id": str(node.properties.get("qualname", node.label)),
+                "type": str(node.label),
+                "name": str(node.properties.get("name", node.label)),
+                **{k: v for k, v in node.properties.items() if k not in ["type", "name"]}
+            })
+        for edge in context.graph_context.graph.edges:
+            serialized_edges.append({
+                "source": str(edge.source_qualname),
+                "target": str(edge.target_qualname),
+                "type": str(edge.rel_type),
+                **edge.properties
+            })
 
     # ── Extract Code Metrics ──────────────────────────────────────────────────
     code_meta = {}
@@ -124,11 +142,11 @@ def analyze_repository(req: AnalyzeRequest):
     )
     refuted_count = sum(
         1 for r in verification_results.values()
-        if r.verdict == VerificationVerdict.REFUTED
+        if r.verdict == VerificationVerdict.CONTRADICTION
     )
     partial_count = sum(
         1 for r in verification_results.values()
-        if r.verdict == VerificationVerdict.PARTIALLY_VERIFIED
+        if r.verdict == VerificationVerdict.PARTIAL_DOCUMENTATION
     )
     insufficient_count = total_claims - verified_count - refuted_count - partial_count
 
@@ -157,6 +175,8 @@ def analyze_repository(req: AnalyzeRequest):
         "graph_metrics": {
             "nodes":                  graph_nodes,
             "edges":                  graph_edges,
+            "raw_nodes":              serialized_nodes,
+            "raw_edges":              serialized_edges,
             "technologies":           context.semantic_context.technologies if context.semantic_context else [],
             "technology_categories":  context.semantic_context.technology_categories if context.semantic_context else {},
             "features":               context.semantic_context.features if context.semantic_context else [],

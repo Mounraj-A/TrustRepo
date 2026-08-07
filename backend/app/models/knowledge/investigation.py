@@ -6,9 +6,10 @@ from app.models.knowledge.evidence import EvidenceContext, EvidenceCandidate
 
 class VerificationVerdict(str, Enum):
     VERIFIED = "VERIFIED"
-    REFUTED = "REFUTED"
-    INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
-    PARTIALLY_VERIFIED = "PARTIALLY_VERIFIED"
+    CONTRADICTION = "CONTRADICTION"
+    MISSING_DOCUMENTATION = "MISSING_DOCUMENTATION"
+    UNSUPPORTED_DOCUMENTATION = "UNSUPPORTED_DOCUMENTATION"
+    PARTIAL_DOCUMENTATION = "PARTIAL_DOCUMENTATION"
 
 class InvestigationResult(BaseModel):
     """The final output from the InvestigatorAgent."""
@@ -26,5 +27,20 @@ class VerificationResult(BaseModel):
     trust_score: float
     supporting_evidence: List[EvidenceCandidate] = Field(default_factory=list)
     reasoning_trace: List[str] = Field(default_factory=list)
+    
+    # Expected vs Observed Model Output
+    expected_features: List[str] = Field(default_factory=list)
+    observed_features: List[str] = Field(default_factory=list)
+    missing_features: List[str] = Field(default_factory=list)
+    unsupported_features: List[str] = Field(default_factory=list)
+    contradicted_features: List[str] = Field(default_factory=list)
+    
+    # Reasoning Metrics
+    evidence_count: int = 0
+    evidence_diversity: float = 0.0
+    evidence_quality: float = 0.0
+    graph_connectivity: float = 0.0
+    evidence_agreement: float = 0.0
+    
     verification_timestamp: datetime = Field(default_factory=datetime.utcnow)
-    verification_version: str = "1.0.0"
+    verification_version: str = "2.0.0"

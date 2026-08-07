@@ -93,13 +93,19 @@ class CodeUnderstandingPipeline:
                     path=rel_path,
                     language="dependency",
                     content=content,
+                    extension=os.path.splitext(rel_path)[1],
+                    size=os.path.getsize(full_path)
                 )
                 dep_ast = self.dependency_parser.parse(dep_source)
                 if dep_ast and dep_ast.children:
                     code_context.ast_nodes.append(dep_ast)
+                    dep_ir = self.ir_builder.build(dep_source, dep_ast)
+                    code_context.intermediate_representation.append(dep_ir)
                     dep_ast_count += 1
-            except Exception:
-                pass
+            except Exception as e:
+                import traceback
+                print(f"Error parsing dependency {full_path}: {e}")
+                traceback.print_exc()
 
         print("Dependency ASTs        :", dep_ast_count)
 

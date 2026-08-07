@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Any
 
 
 class RepositoryScanner:
@@ -160,8 +160,25 @@ class RepositoryScanner:
         root = Path(repository_path)
         if not root.exists():
             raise FileNotFoundError(f"Repository path does not exist: {repository_path}")
+            
+        import subprocess
+        commit_sha = "HEAD"
+        branch = "main"
+        try:
+            commit_sha = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=repository_path, text=True
+            ).strip()
+            branch = subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=repository_path, text=True
+            ).strip()
+        except Exception:
+            pass
 
-        results: Dict[str, List[str]] = {
+        results: Dict[str, Any] = {
+            "metadata": {
+                "commit_sha": commit_sha,
+                "branch": branch,
+            },
             "documentation": [],
             "source_code": [],
             "tests": [],

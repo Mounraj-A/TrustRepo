@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FolderTree, Code2, GitGraph, Cpu, Layers, Zap,
   Building2, BookOpen, ClipboardCheck, Search, ShieldCheck, Activity,
   Terminal, Settings, ChevronLeft, ChevronRight, Circle, CheckCircle2,
-  AlertCircle, Menu
+  AlertCircle, Menu, Brain, Server, BarChart3
 } from 'lucide-react';
 import { cn, formatDuration, scoreColor } from '@/lib/utils';
 import { useAnalysisStore, useUIStore } from '@/store';
@@ -16,7 +16,7 @@ import AnalyzeBar from '@/components/AnalyzeBar';
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
   LayoutDashboard, FolderTree, Code2, GitGraph, Cpu, Layers, Zap,
   Building2, BookOpen, ClipboardCheck, Search, ShieldCheck, Activity,
-  Terminal, Settings,
+  Terminal, Settings, Brain, Server, BarChart3,
 };
 
 const NAV_GROUPS = ['Overview', 'Analysis', 'Intelligence', 'Verification', 'Results', 'DevOps', 'System'];
@@ -163,7 +163,7 @@ export default function AppLayout() {
                 <CheckCircle2 size={12} className="text-emerald-400" />
                 {formatDuration(analysisResult.processing_time_seconds)}
               </span>
-              {analysisResult.code_metrics.source_files > 0 && (
+              {analysisResult.code_metrics?.source_files > 0 && (
                 <span>{analysisResult.code_metrics.source_files} files</span>
               )}
             </div>

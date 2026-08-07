@@ -91,7 +91,7 @@ class InvestigationPipeline:
                 from datetime import datetime, timezone
                 context.verification_context.verification_results[nc.claim_id] = VerificationResult(
                     claim_id=nc.claim_id,
-                    verdict=VerificationVerdict.INSUFFICIENT_EVIDENCE,
+                    verdict=VerificationVerdict.MISSING_DOCUMENTATION,
                     trust_score=0.0,
                     reasoning_trace=[f"Investigation error: {e}"],
                     verification_timestamp=datetime.now(timezone.utc),
@@ -101,9 +101,9 @@ class InvestigationPipeline:
 
             if verdict == VerificationVerdict.VERIFIED:
                 verified += 1
-            elif verdict == VerificationVerdict.REFUTED:
+            elif verdict == VerificationVerdict.CONTRADICTION:
                 refuted += 1
-            elif verdict == VerificationVerdict.PARTIALLY_VERIFIED:
+            elif verdict == VerificationVerdict.PARTIAL_DOCUMENTATION:
                 partial += 1
             else:
                 insufficient += 1

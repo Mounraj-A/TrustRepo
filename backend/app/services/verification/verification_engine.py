@@ -64,7 +64,7 @@ class VerificationEngine:
         reasoning_trace = reasoning_trace_str.split("\n")
 
         # ── Trust Score ───────────────────────────────────────────────
-        contradiction_found = (verdict == VerificationVerdict.REFUTED)
+        contradiction_found = (verdict == VerificationVerdict.CONTRADICTION)
         
         trust_score = self.scorer.calculate_claim_score(
             verdict=verdict,

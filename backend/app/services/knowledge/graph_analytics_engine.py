@@ -52,12 +52,22 @@ class CycleReport:
 
 
 @dataclass
+class GraphIntegrityReport:
+    isolated_nodes: int = 0
+    orphan_technologies: int = 0
+    orphan_features: int = 0
+    capabilities_without_features: int = 0
+    architectures_without_capabilities: int = 0
+    is_valid: bool = False
+
+@dataclass
 class GraphAnalyticsReport:
     """Aggregated output of all graph analytics algorithms."""
     centrality_nodes: List[NodeCentrality] = field(default_factory=list)
     critical_nodes: List[NodeCentrality] = field(default_factory=list)
     dependency_graph: List[DependencyNode] = field(default_factory=list)
     cycle_report: CycleReport = field(default_factory=CycleReport)
+    integrity_report: GraphIntegrityReport = field(default_factory=GraphIntegrityReport)
     total_nodes: int = 0
     total_relationships: int = 0
     graph_density: float = 0.0
@@ -88,6 +98,7 @@ class GraphAnalyticsEngine:
                                   if n.structural_importance in ("HIGH", "CRITICAL")]
         report.dependency_graph = self.analyze_dependencies()
         report.cycle_report = self.detect_cycles()
+        report.integrity_report = self.validate_integrity()
 
         return report
 
@@ -244,6 +255,44 @@ class GraphAnalyticsEngine:
             has_cycles=len(cycles) > 0,
             cycle_paths=cycles,
             total_cycle_count=len(cycles)
+        )
+
+    # ─── 7. Integrity Validation ──────────────────────────────────────────────
+    
+    def validate_integrity(self) -> GraphIntegrityReport:
+        """
+        Validates the semantic and structural integrity of the Knowledge Graph.
+        Ensures no orphan nodes and full lineage for Architecture -> Tech.
+        """
+        # Isolated Nodes
+        res = self._query("MATCH (n) WHERE NOT (n)--() RETURN count(n) as isolated", {})
+        isolated = res[0].get("isolated", 0) if res else 0
+        
+        # Orphan Technologies (No ENABLES edge to Feature)
+        res = self._query("MATCH (t:Technology) WHERE NOT (t)-[:ENABLES]->() RETURN count(t) as orphan", {})
+        orphan_tech = res[0].get("orphan", 0) if res else 0
+        
+        # Orphan Features (No IMPLEMENTS edge to Capability)
+        res = self._query("MATCH (f:FeatureInstance) WHERE NOT (f)-[:IMPLEMENTS]->() RETURN count(f) as orphan", {})
+        orphan_feat = res[0].get("orphan", 0) if res else 0
+        
+        # Capabilities without Features (No incoming IMPLEMENTS edge)
+        res = self._query("MATCH (c:Capability) WHERE NOT ()-[:IMPLEMENTS]->(c) RETURN count(c) as orphans", {})
+        caps_wo_feat = res[0].get("orphans", 0) if res else 0
+        
+        # Architectures without Capabilities (No incoming REQUIRES or SUPPORTS edge)
+        res = self._query("MATCH (a:Architecture) WHERE NOT ()-[:REQUIRES|SUPPORTS]->(a) RETURN count(a) as orphans", {})
+        archs_wo_cap = res[0].get("orphans", 0) if res else 0
+        
+        is_valid = isolated < 5 and orphan_tech == 0 and orphan_feat == 0
+        
+        return GraphIntegrityReport(
+            isolated_nodes=isolated,
+            orphan_technologies=orphan_tech,
+            orphan_features=orphan_feat,
+            capabilities_without_features=caps_wo_feat,
+            architectures_without_capabilities=archs_wo_cap,
+            is_valid=is_valid
         )
 
     # ─── Internal helpers ─────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Dict, Any
 
 class GraphNode(BaseModel):
@@ -14,3 +14,4 @@ class GraphEdge(BaseModel):
 class RepositoryKnowledgeGraph(BaseModel):
     nodes: List[GraphNode] = []
     edges: List[GraphEdge] = []
+    metadata: Dict[str, Any] = Field(default_factory=dict)

@@ -26,7 +26,5 @@ app.include_router(api_router)
 
 
 @app.get("/")
-def root():
-    return {
-        "message": f"Welcome to {settings.APP_NAME}!"
-    }
+def read_root():
+    return {"message": "TrustRepo Enterprise API Online"}

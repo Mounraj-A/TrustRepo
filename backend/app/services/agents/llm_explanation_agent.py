@@ -13,7 +13,6 @@ class LLMExplanationAgent(BaseAgent):
         
         result: VerificationResult = message.payload.get("verification_result")
         if not result:
-            message.route_to_next()
             return message
             
         # Simulated LLM generation based strictly on deterministic inputs
@@ -22,17 +21,23 @@ class LLMExplanationAgent(BaseAgent):
         
         if result.verdict.value == "VERIFIED":
             explanation.append("We found strong evidence in both the documentation and the codebase confirming this architecture.")
-        elif result.verdict.value == "REFUTED":
+        elif result.verdict.value == "CONTRADICTION":
             explanation.append("There is a direct contradiction between the documented architecture and the actual codebase implementation.")
-        elif result.verdict.value == "INSUFFICIENT_EVIDENCE":
-            explanation.append("We could not find sufficient code evidence to back up this documented claim.")
+        elif result.verdict.value in ("MISSING_DOCUMENTATION", "UNSUPPORTED_DOCUMENTATION", "PARTIAL_DOCUMENTATION"):
+            explanation.append("We could not find sufficient matching code evidence to fully back up this documented claim, or the documentation is incomplete.")
             
         synthetic_explanation = " ".join(explanation)
         
+        # PROMPT GUARD: Validate that the synthetic explanation does not alter the verdict
+        # In a real LLM scenario, we would parse the LLM output and ensure it matches the deterministic verdict.
+        if result.verdict.value not in synthetic_explanation and "VERIFIED" not in synthetic_explanation and "REFUTED" not in synthetic_explanation and "MISSING" not in synthetic_explanation and "UNSUPPORTED" not in synthetic_explanation and "PARTIAL" not in synthetic_explanation:
+            self._log(message, "PROMPT GUARD VIOLATION: Explanation did not reflect deterministic verdict. Overriding.")
+            synthetic_explanation = f"Deterministic verdict: {result.verdict.value}."
+        
         # We attach the explanation to the result object
-        result.reasoning_trace.append("Summary: " + synthetic_explanation)
+        # Since ExplanationGenerator uses explanation, we can add it there or just to trace
+        message.payload["explanation"] = synthetic_explanation
         
-        self._log(message, "Explanation synthesis complete.")
+        self._log(message, "Explanation synthesis complete with Prompt Guard verification.")
         
-        message.route_to_next()
         return message

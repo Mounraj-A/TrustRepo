@@ -30,6 +30,7 @@ from app.services.agents.documentation_agent import DocumentationAgent
 from app.services.agents.knowledge_graph_agent import KnowledgeGraphAgent
 from app.services.agents.evidence_ranking_agent import EvidenceRankingAgent
 from app.services.agents.evidence_fusion_agent import EvidenceFusionAgent
+from app.services.agents.evidence_validation_agent import EvidenceValidationAgent
 from app.services.agents.evidence_agreement_engine import EvidenceAgreementEngine
 from app.services.agents.coverage_agent import CoverageAgent
 from app.services.agents.contradiction_agent import ContradictionAgent
@@ -61,6 +62,7 @@ class TaskPlannerAgent(BaseAgent):
         
         self.ranking_agent = EvidenceRankingAgent()
         self.fusion_agent = EvidenceFusionAgent()
+        self.validation_agent = EvidenceValidationAgent()
         self.agreement_engine = EvidenceAgreementEngine()
         self.coverage_agent = CoverageAgent()
         self.contradiction_agent = ContradictionAgent()
@@ -151,7 +153,8 @@ class TaskPlannerAgent(BaseAgent):
         # ── Step 3: Run Remaining Pipeline (Linear) ─────────────────────────
         ranked_result = self.ranking_agent.process(ranking_message)
         fused_result = self.fusion_agent.process(ranked_result)
-        agreement_result = self.agreement_engine.process(fused_result)
+        validated_result = self.validation_agent.process(fused_result)
+        agreement_result = self.agreement_engine.process(validated_result)
         coverage_result = self.coverage_agent.process(agreement_result)
         contradiction_result = self.contradiction_agent.process(coverage_result)
         reasoning_result = self.reasoning_agent.process(contradiction_result)

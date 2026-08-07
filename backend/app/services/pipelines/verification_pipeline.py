@@ -29,7 +29,7 @@ class VerificationPipeline:
         )
         refuted = sum(
             1 for r in results.values()
-            if r.verdict == VerificationVerdict.REFUTED
+            if r.verdict == VerificationVerdict.CONTRADICTION
         )
         insufficient = len(results) - verified - refuted
 

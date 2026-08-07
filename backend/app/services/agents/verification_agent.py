@@ -12,17 +12,17 @@ class VerificationAgent(BaseAgent):
     def process(self, message: AgentMessage) -> AgentMessage:
         self._log(message, "Packaging final Verification Result.")
         
-        verdict_str = message.payload.get("verdict", "INSUFFICIENT_EVIDENCE")
+        verdict_str = message.payload.get("verdict", "MISSING_DOCUMENTATION")
         
         # Map to VerificationVerdict Enum
         mapping = {
             "VERIFIED": VerificationVerdict.VERIFIED,
-            "CONTRADICTION": VerificationVerdict.REFUTED,
-            "MISSING_DOCUMENTATION": VerificationVerdict.INSUFFICIENT_EVIDENCE,
-            "UNSUPPORTED_DOCUMENTATION": VerificationVerdict.INSUFFICIENT_EVIDENCE,
-            "PARTIAL_DOCUMENTATION": VerificationVerdict.PARTIALLY_VERIFIED,
+            "CONTRADICTION": VerificationVerdict.CONTRADICTION,
+            "MISSING_DOCUMENTATION": VerificationVerdict.MISSING_DOCUMENTATION,
+            "UNSUPPORTED_DOCUMENTATION": VerificationVerdict.UNSUPPORTED_DOCUMENTATION,
+            "PARTIAL_DOCUMENTATION": VerificationVerdict.PARTIAL_DOCUMENTATION,
         }
-        verdict = mapping.get(verdict_str, VerificationVerdict.INSUFFICIENT_EVIDENCE)
+        verdict = mapping.get(verdict_str, VerificationVerdict.MISSING_DOCUMENTATION)
         
         # Determine category based on intent
         intent = message.payload.get("intent", "").lower()
@@ -46,7 +46,17 @@ class VerificationAgent(BaseAgent):
             verdict=verdict,
             trust_score=message.confidence * 100,  # Assuming confidence is 0-1
             supporting_evidence=[],  # This can be populated if needed
-            reasoning_trace=decision_trace
+            reasoning_trace=decision_trace,
+            expected_features=message.payload.get("expected_features", []),
+            observed_features=message.payload.get("observed_features", []),
+            missing_features=message.payload.get("missing_features", []),
+            unsupported_features=message.payload.get("unsupported_features", []),
+            contradicted_features=message.payload.get("contradicted_features", []),
+            evidence_count=message.payload.get("evidence_count", 0),
+            evidence_diversity=message.payload.get("evidence_diversity", 0.0),
+            evidence_quality=message.payload.get("evidence_quality", 0.0),
+            graph_connectivity=message.payload.get("graph_connectivity", 0.0),
+            evidence_agreement=message.payload.get("evidence_agreement", 0.0)
         )
         
         message.payload["verification_result"] = result

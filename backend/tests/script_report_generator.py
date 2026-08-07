@@ -21,7 +21,7 @@ def test_phase5():
         ),
         VerificationResult(
             claim_id="mock-2",
-            verdict=VerificationVerdict.REFUTED,
+            verdict=VerificationVerdict.CONTRADICTION,
             trust_score=15.0,
             reasoning_trace=[
                 "Evidence strongly contradicts the claim.",
@@ -33,7 +33,7 @@ def test_phase5():
         ),
         VerificationResult(
             claim_id="mock-3",
-            verdict=VerificationVerdict.INSUFFICIENT_EVIDENCE,
+            verdict=VerificationVerdict.MISSING_DOCUMENTATION,
             trust_score=45.0,
             reasoning_trace=[
                 "Missing critical evidence regarding API rate limits.",

@@ -57,20 +57,33 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
 
 /* ── Components ──────────────────────────────────────────────── */
 .glass {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border);
 }
 
 .dark .glass {
-  background: rgba(17,24,39,0.7);
+  background: rgba(17, 24, 39, 0.7);
   border: 1px solid var(--border);
 }
 
@@ -90,7 +103,7 @@ body {
 }
 
 .metric-card {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
@@ -167,18 +180,35 @@ body {
 
 /* ── Animations ──────────────────────────────────────────────── */
 @keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-in {
@@ -207,16 +237,33 @@ body {
   color: var(--muted-foreground);
   line-height: 1.75;
 }
-.prose h1, .prose h2, .prose h3, .prose h4 {
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
   color: var(--foreground);
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
 }
-.prose h1 { font-size: 1.5rem; }
-.prose h2 { font-size: 1.25rem; }
-.prose h3 { font-size: 1.125rem; }
-.prose p { margin-bottom: 0.75rem; }
+
+.prose h1 {
+  font-size: 1.5rem;
+}
+
+.prose h2 {
+  font-size: 1.25rem;
+}
+
+.prose h3 {
+  font-size: 1.125rem;
+}
+
+.prose p {
+  margin-bottom: 0.75rem;
+}
+
 .prose code {
   color: var(--primary);
   background: var(--muted);
@@ -225,6 +272,7 @@ body {
   font-size: 0.875em;
   font-family: 'JetBrains Mono', monospace;
 }
+
 .prose pre {
   background: var(--muted);
   border: 1px solid var(--border);
@@ -233,18 +281,56 @@ body {
   overflow-x: auto;
   margin: 1rem 0;
 }
-.prose pre code { background: transparent; padding: 0; }
-.prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
-.prose li { margin-bottom: 0.25rem; }
-.prose a { color: var(--primary); text-decoration: underline; }
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose li {
+  margin-bottom: 0.25rem;
+}
+
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
 .prose blockquote {
   border-left: 3px solid var(--primary);
   padding-left: 1rem;
   color: var(--muted-foreground);
   font-style: italic;
 }
-.prose hr { border-color: var(--border); }
-.prose strong { color: var(--foreground); }
-.prose table { width: 100%; border-collapse: collapse; }
-.prose th, .prose td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
-.prose th { background: var(--muted); font-weight: 600; color: var(--foreground); }
+
+.prose hr {
+  border-color: var(--border);
+}
+
+.prose strong {
+  color: var(--foreground);
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.prose th {
+  background: var(--muted);
+  font-weight: 600;
+  color: var(--foreground);
+}

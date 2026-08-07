@@ -9,8 +9,8 @@ interface PipelineTimelineProps {
 }
 
 const STATUS_ICON = {
-  OK:      CheckCircle2,
-  FAILED:  XCircle,
+  OK: CheckCircle2,
+  FAILED: XCircle,
   SKIPPED: SkipForward,
   PENDING: Clock,
 };
@@ -43,10 +43,10 @@ export default function PipelineTimeline({ traces, className }: PipelineTimeline
             <div className="flex items-start gap-3">
               {/* Icon */}
               <div className={cn('mt-0.5 p-1.5 rounded-lg shrink-0',
-                trace.status === 'OK'      ? 'bg-emerald-500/10' :
-                trace.status === 'FAILED'  ? 'bg-red-500/10' :
-                trace.status === 'SKIPPED' ? 'bg-slate-500/10' :
-                'bg-amber-500/10'
+                trace.status === 'OK' ? 'bg-emerald-500/10' :
+                  trace.status === 'FAILED' ? 'bg-red-500/10' :
+                    trace.status === 'SKIPPED' ? 'bg-slate-500/10' :
+                      'bg-amber-500/10'
               )}>
                 <Icon size={13} className={statusColor(trace.status)} />
               </div>

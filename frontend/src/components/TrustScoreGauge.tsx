@@ -10,7 +10,7 @@ interface TrustScoreGaugeProps {
 }
 
 const SIZES = {
-  sm: { outer: 96,  stroke: 8,  fontSize: 'text-xl', icon: 14 },
+  sm: { outer: 96, stroke: 8, fontSize: 'text-xl', icon: 14 },
   md: { outer: 140, stroke: 10, fontSize: 'text-3xl', icon: 18 },
   lg: { outer: 200, stroke: 14, fontSize: 'text-5xl', icon: 24 },
 };
@@ -80,8 +80,8 @@ export default function TrustScoreGauge({
           <p className={cn('font-semibold', scoreColor(pct))}>
             {displayScore >= 80 ? 'Highly Trustworthy'
               : displayScore >= 60 ? 'Moderately Trustworthy'
-              : displayScore >= 40 ? 'Low Trust'
-              : 'Untrusted'}
+                : displayScore >= 40 ? 'Low Trust'
+                  : 'Untrusted'}
           </p>
           <p className="text-xs text-muted-foreground">Repository Trust Score</p>
         </div>

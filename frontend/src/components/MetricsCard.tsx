@@ -16,9 +16,9 @@ interface MetricsCardProps {
 const colorMap = {
   primary: 'text-primary bg-primary/10',
   emerald: 'text-emerald-400 bg-emerald-500/10',
-  amber:   'text-amber-400  bg-amber-500/10',
-  red:     'text-red-400    bg-red-500/10',
-  violet:  'text-violet-400 bg-violet-500/10',
+  amber: 'text-amber-400  bg-amber-500/10',
+  red: 'text-red-400    bg-red-500/10',
+  violet: 'text-violet-400 bg-violet-500/10',
 };
 
 export default function MetricsCard({

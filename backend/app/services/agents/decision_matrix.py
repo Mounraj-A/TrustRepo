@@ -26,6 +26,23 @@ class DecisionMatrix(BaseAgent):
         message.payload["decision_trace"] = result.reasoning_trace
         message.payload["coverage_score"] = result.coverage_score
         message.payload["consistency_score"] = result.consistency_score
+        message.payload["expected_features"] = result.expected_features
+        message.payload["observed_features"] = result.observed_features
+        message.payload["missing_features"] = result.missing_features
+        message.payload["unsupported_features"] = result.unsupported_features
+        message.payload["contradicted_features"] = result.contradicted_features
+        
+        # Populate new reasoning metrics
+        fused = message.payload.get("fused_evidence", [])
+        message.payload["evidence_count"] = len(fused)
+        
+        types = set(e.get("chain_type", "") for e in fused)
+        message.payload["evidence_diversity"] = min(len(types) * 0.25, 1.0)
+        
+        avg_quality = sum(e.get("confidence", 0.0) for e in fused) / max(len(fused), 1)
+        message.payload["evidence_quality"] = avg_quality
+        message.payload["graph_connectivity"] = message.payload.get("coverage_score", 0.0)
+        message.payload["evidence_agreement"] = message.payload.get("consistency_score", 0.0)
         
         self._log(message, f"Decision Matrix verdict: {result.final_verdict.value}")
         

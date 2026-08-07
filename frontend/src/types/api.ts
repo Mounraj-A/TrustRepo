@@ -43,7 +43,7 @@ export interface TrustReport {
 export interface ClaimVerification {
   claim_id: string;
   claim_text: string;
-  verdict: 'VERIFIED' | 'REFUTED' | 'PARTIALLY_VERIFIED' | 'INSUFFICIENT_EVIDENCE';
+  verdict: 'VERIFIED' | 'CONTRADICTION' | 'MISSING_DOCUMENTATION' | 'UNSUPPORTED_DOCUMENTATION' | 'PARTIAL_DOCUMENTATION';
   trust_score: number;
   confidence: number;
   reasoning_trace: string[];
@@ -73,6 +73,8 @@ export interface CodeMetrics {
 export interface GraphMetrics {
   nodes: number;
   edges: number;
+  raw_nodes?: any[];
+  raw_edges?: any[];
   technologies: string[];
   technology_categories: Record<string, string[]>;
   features: string[];

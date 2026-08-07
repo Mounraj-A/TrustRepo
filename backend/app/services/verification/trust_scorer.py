@@ -68,35 +68,42 @@ class TrustScorer:
     def calculate_claim_score(
         self,
         verdict: "VerificationVerdict",
-        evidence_count: int,
-        evidence_quality: float,
-        evidence_diversity: float,
-        verification_confidence: float,
-        contradiction_found: bool,
+        evidence_sources: list,  # list of dicts with source_weight, evidence_quality, parser_confidence
+        graph_connectivity: float,
+        agreement_score: float,
+        freshness_score: float,
+        conflict_count: int
     ) -> float:
         """
-        Claim-Level: TrustScore = Σ(wᵢ × metricᵢ) − Σ(penaltyⱼ)
-        
-        All metrics in [0.0, 1.0]; weights sum to 1.0.
-        Final score is in [0.0, 100.0].
+        Claim-Level: Confidence = Σ(SourceWeight × EvidenceQuality × ParserConfidence) 
+                     × GraphConnectivity × AgreementScore × FreshnessScore ÷ ConflictPenalty
         """
-        # Feature coverage: inferred from evidence count (capped at 5 for max score)
-        feature_coverage = min(evidence_count / 5.0, 1.0)
-
+        sigma_evidence = 0.0
+        for ev in evidence_sources:
+            sw = ev.get("source_weight", 1.0)
+            eq = ev.get("evidence_quality", 0.5)
+            pc = ev.get("parser_confidence", 1.0)
+            sigma_evidence += (sw * eq * pc)
+            
+        if sigma_evidence == 0:
+            sigma_evidence = 0.1 # prevent zero multiplication if no evidence
+            
+        conflict_penalty = max(1.0, conflict_count * 1.5)
+        
         raw_score = (
-            (self.CLAIM_WEIGHTS["evidence_quality"] * evidence_quality) +
-            (self.CLAIM_WEIGHTS["evidence_diversity"] * evidence_diversity) +
-            (self.CLAIM_WEIGHTS["verification_confidence"] * verification_confidence) +
-            (self.CLAIM_WEIGHTS["feature_coverage"] * feature_coverage)
-        ) * 100.0
-
-        # Apply penalties
-        if evidence_count == 0:
-            raw_score -= self.NO_EVIDENCE_PENALTY
-        if contradiction_found:
-            raw_score -= self.CONTRADICTION_PENALTY
-
-        return round(max(raw_score, 0.0), 2)
+            sigma_evidence * 
+            max(graph_connectivity, 0.1) * 
+            max(agreement_score, 0.1) * 
+            max(freshness_score, 0.1)
+        ) / conflict_penalty
+        
+        # Normalize to 0-100
+        normalized = min(raw_score * 100.0, 100.0)
+        
+        if len(evidence_sources) == 0:
+            normalized -= self.NO_EVIDENCE_PENALTY
+            
+        return round(max(normalized, 0.0), 2)
 
     def calculate_repository_score(
         self,
@@ -141,11 +148,14 @@ class TrustScorer:
     def calculate_score(self, investigation, verdict) -> float:
         evidence_count = len(investigation.evidence_context.candidates)
         from app.models.knowledge.investigation import VerificationVerdict
+        # Map old signature to new formula inputs for backwards compatibility
+        evidences = [{"source_weight": 1.0, "evidence_quality": 0.5, "parser_confidence": investigation.confidence} for _ in range(evidence_count)]
+        
         return self.calculate_claim_score(
             verdict=verdict,
-            evidence_count=evidence_count,
-            evidence_quality=0.5,
-            evidence_diversity=0.3,
-            verification_confidence=investigation.confidence,
-            contradiction_found=(verdict == VerificationVerdict.REFUTED)
+            evidence_sources=evidences,
+            graph_connectivity=0.8,
+            agreement_score=0.9,
+            freshness_score=1.0,
+            conflict_count=1 if verdict == VerificationVerdict.CONTRADICTION else 0
         )

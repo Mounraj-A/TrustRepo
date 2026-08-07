@@ -11,8 +11,11 @@ import Architecture from '@/pages/Architecture';
 import DocumentationAnalysis from '@/pages/DocumentationAnalysis';
 import ClaimVerification from '@/pages/ClaimVerification';
 import EvidenceExplorer from '@/pages/EvidenceExplorer';
+import ReasoningExplorer from '@/pages/ReasoningExplorer';
 import TrustScore from '@/pages/TrustScore';
+import BenchmarkResults from '@/pages/BenchmarkResults';
 import RuntimeDashboard from '@/pages/RuntimeDashboard';
+import SystemHealth from '@/pages/SystemHealth';
 import ApiInspector from '@/pages/ApiInspector';
 import Settings from '@/pages/Settings';
 
@@ -31,8 +34,11 @@ export default function AppRouter() {
         <Route path="/documentation"   element={<DocumentationAnalysis />} />
         <Route path="/claims"          element={<ClaimVerification />} />
         <Route path="/evidence"        element={<EvidenceExplorer />} />
+        <Route path="/reasoning"       element={<ReasoningExplorer />} />
         <Route path="/trust-score"     element={<TrustScore />} />
+        <Route path="/benchmarks"      element={<BenchmarkResults />} />
         <Route path="/runtime"         element={<RuntimeDashboard />} />
+        <Route path="/system-health"   element={<SystemHealth />} />
         <Route path="/api-inspector"   element={<ApiInspector />} />
         <Route path="/settings"        element={<Settings />} />
         <Route path="*"                element={<Navigate to="/" replace />} />

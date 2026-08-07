@@ -36,7 +36,7 @@ class ReportGenerator:
             
             if res.verdict == VerificationVerdict.VERIFIED:
                 verified_count += 1
-            elif res.verdict == VerificationVerdict.REFUTED:
+            elif res.verdict == VerificationVerdict.CONTRADICTION:
                 refuted_count += 1
             else:
                 insufficient_count += 1
@@ -120,7 +120,7 @@ class ReportGenerator:
                 documented_features_count += 1
                 
         for cr in claim_reports:
-            if cr.verdict == VerificationVerdict.REFUTED:
+            if cr.verdict == VerificationVerdict.CONTRADICTION:
                 recommendations.append(Recommendation(
                     priority=RecommendationPriority.HIGH,
                     message=f"Contradiction: Update documentation stating '{cr.claim_text}' to reflect actual implementation."
@@ -265,8 +265,8 @@ class ReportGenerator:
         ])
         
         verified_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.VERIFIED]
-        refuted_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.REFUTED]
-        unsupported_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.INSUFFICIENT_EVIDENCE]
+        refuted_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.CONTRADICTION]
+        unsupported_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.MISSING_DOCUMENTATION]
         
         def format_chain(chain: EvidenceChain) -> str:
             if not chain: return "No explicit evidence chain available."

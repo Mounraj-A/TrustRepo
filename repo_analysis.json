@@ -1,0 +1,2816 @@
+{
+  ".": {
+    "files": {
+      ".env": {
+        "type": "other"
+      },
+      ".gitignore": {
+        "type": "other"
+      },
+      "docker-compose.yml": {
+        "type": "other"
+      },
+      "README.md": {
+        "type": "other"
+      }
+    }
+  },
+  "backend": {
+    "files": {
+      "requirements.txt": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\.pytest_cache": {
+    "files": {
+      ".gitignore": {
+        "type": "other"
+      },
+      "CACHEDIR.TAG": {
+        "type": "other"
+      },
+      "README.md": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\.pytest_cache\\v": {
+    "files": {}
+  },
+  "backend\\.pytest_cache\\v\\cache": {
+    "files": {
+      "lastfailed": {
+        "type": "other"
+      },
+      "nodeids": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\app": {
+    "files": {
+      "main.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "root"
+        ]
+      }
+    }
+  },
+  "backend\\app\\api": {
+    "files": {
+      "router.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "__init__.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\api\\endpoints": {
+    "files": {
+      "health.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "health_check"
+        ]
+      },
+      "report.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "reports"
+        ]
+      },
+      "repository.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "AnalyzeRequest",
+            "methods": []
+          }
+        ],
+        "functions": [
+          "list_repositories",
+          "analyze_repository"
+        ]
+      },
+      "verification.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "verification_status"
+        ]
+      },
+      "__init__.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\core": {
+    "files": {
+      "config.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "Settings",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "__init__.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\database": {
+    "files": {
+      "models.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryDB",
+            "methods": []
+          },
+          {
+            "name": "ClaimDB",
+            "methods": []
+          },
+          {
+            "name": "EvidenceDB",
+            "methods": []
+          },
+          {
+            "name": "VerificationDB",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "neo4j.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "Neo4jConnection",
+            "methods": [
+              "__init__",
+              "close",
+              "query"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "postgres.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "get_db"
+        ]
+      }
+    }
+  },
+  "backend\\app\\models": {
+    "files": {
+      "atomic_statement.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "AtomicStatement",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "claim.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "Claim",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "claim_repository.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ClaimRepository",
+            "methods": [
+              "add",
+              "extend",
+              "clear",
+              "__len__",
+              "__iter__",
+              "__getitem__"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "claim_type.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ClaimType",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "document_context.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "Document",
+            "methods": []
+          },
+          {
+            "name": "DocumentContext",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "document_section.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentSection",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "document_understanding_context.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentUnderstandingContext",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "normalized_claim.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "processed_document.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ProcessedDocument",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "repository_context.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryContext",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "trustrepo_context.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "TrustRepoContext",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "verification_status.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "VerificationStatus",
+            "methods": []
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\models\\code": {
+    "files": {
+      "ast_node.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ASTNode",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "code_context.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "CodeContext",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "intermediate_representation.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "IRNode",
+            "methods": []
+          },
+          {
+            "name": "IntermediateRepresentation",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "relationship.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "Relationship",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "source_file.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "SourceFile",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "symbol.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "Symbol",
+            "methods": []
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\models\\knowledge": {
+    "files": {
+      "evidence.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "EvidenceCandidate",
+            "methods": []
+          },
+          {
+            "name": "EvidenceContext",
+            "methods": [
+              "add_candidates"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "investigation.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "VerificationVerdict",
+            "methods": []
+          },
+          {
+            "name": "InvestigationResult",
+            "methods": []
+          },
+          {
+            "name": "VerificationResult",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "repository_knowledge_graph.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "GraphNode",
+            "methods": []
+          },
+          {
+            "name": "GraphEdge",
+            "methods": []
+          },
+          {
+            "name": "RepositoryKnowledgeGraph",
+            "methods": []
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\models\\report": {
+    "files": {
+      "trust_report.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RecommendationPriority",
+            "methods": []
+          },
+          {
+            "name": "Recommendation",
+            "methods": []
+          },
+          {
+            "name": "UndocumentedFeature",
+            "methods": []
+          },
+          {
+            "name": "DocumentationCoverage",
+            "methods": []
+          },
+          {
+            "name": "RepositorySummary",
+            "methods": []
+          },
+          {
+            "name": "EvidenceProvenance",
+            "methods": []
+          },
+          {
+            "name": "ClaimReport",
+            "methods": []
+          },
+          {
+            "name": "RepositoryTrustReport",
+            "methods": []
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\repositories": {
+    "files": {
+      "claim_repository.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ClaimRepository",
+            "methods": [
+              "__init__",
+              "create",
+              "get_by_repository"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "evidence_repository.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "EvidenceRepository",
+            "methods": [
+              "__init__",
+              "create",
+              "get_by_claim"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "graph_repository.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "GraphRepository",
+            "methods": [
+              "__init__",
+              "create_entity",
+              "clear_graph",
+              "save_graph",
+              "create_relationship",
+              "create_relationship_by_qualname",
+              "get_all_entities_by_label"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "repository_repository.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryRepository",
+            "methods": [
+              "__init__",
+              "get_by_url",
+              "create"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "verification_repository.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "VerificationRepository",
+            "methods": [
+              "__init__",
+              "create",
+              "get_by_claim"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\schemas": {
+    "files": {}
+  },
+  "backend\\app\\services": {
+    "files": {
+      "trustrepo_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "TrustRepoPipeline",
+            "methods": [
+              "__init__",
+              "run"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "__init__.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\agents": {
+    "files": {
+      "base_agent.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "AgentRole",
+            "methods": []
+          },
+          {
+            "name": "AgentMessage",
+            "methods": []
+          },
+          {
+            "name": "BaseAgent",
+            "methods": [
+              "process",
+              "_log"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "claim_extractor.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "code_agent.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "CodeAgent",
+            "methods": [
+              "__init__",
+              "process",
+              "_query_nodes",
+              "_query_annotations",
+              "_query_imports"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "documentation_agent.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentationAgent",
+            "methods": [
+              "process"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "evidence_fusion_agent.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "EvidenceFusionAgent",
+            "methods": [
+              "process"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "investigator_agent.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "InvestigatorAgent",
+            "methods": [
+              "__init__",
+              "investigate"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "knowledge_graph_agent.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "KnowledgeGraphAgent",
+            "methods": [
+              "__init__",
+              "process",
+              "_query_dependencies",
+              "_query_inheritance",
+              "_query_annotation_relationships"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "repository_memory.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryMemory",
+            "methods": [
+              "__init__",
+              "store",
+              "retrieve"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "task_planner_agent.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "TaskPlannerAgent",
+            "methods": [
+              "__init__",
+              "plan_and_execute",
+              "_clone_message"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\analysis": {
+    "files": {
+      "architecture_detection.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ArchitectureDetection",
+            "methods": [
+              "__init__",
+              "detect",
+              "_count_annotations",
+              "_count_annotation_group",
+              "_query_packages",
+              "_analyze_packages"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "claim_candidate_generator.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ClaimCandidateGenerator",
+            "methods": [
+              "generate",
+              "_classify"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "claim_deduplicator.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ClaimDeduplicator",
+            "methods": [
+              "deduplicate"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "claim_normalization_layer.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "NormalizedClaim",
+            "methods": []
+          },
+          {
+            "name": "ClaimNormalizationLayer",
+            "methods": [
+              "__init__",
+              "normalize",
+              "_normalize_single",
+              "_clean_text",
+              "_build_canonical"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "claim_normalizer.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ClaimNormalizer",
+            "methods": [
+              "normalize"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "claim_repository_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ClaimRepositoryBuilder",
+            "methods": [
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "document_collector.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentCollector",
+            "methods": [
+              "collect",
+              "_detect_document_type"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "document_preprocessor.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentPreprocessor",
+            "methods": [
+              "preprocess",
+              "_extract_headings",
+              "_extract_code_blocks",
+              "_remove_code_blocks",
+              "_remove_markdown",
+              "_normalize_whitespace"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "document_segmenter.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentSegmenter",
+            "methods": [
+              "segment"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "document_understanding_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentUnderstandingPipeline",
+            "methods": [
+              "__init__",
+              "process"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "evidence_collector.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "EvidenceCollector",
+            "methods": [
+              "__init__",
+              "collect"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "evidence_fusion.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "EvidenceFusion",
+            "methods": [
+              "fuse"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "statement_extractor.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "StatementExtractor",
+            "methods": [
+              "extract",
+              "_extract_statements"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "technology_detection.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "TechnologyDetection",
+            "methods": [
+              "__init__",
+              "detect",
+              "_query_all_imports",
+              "_query_all_annotations"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\analysis\\graph_algorithms": {
+    "files": {
+      "call_graph_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "CallGraphBuilder",
+            "methods": [
+              "__init__",
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "dependency_graph_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DependencyGraphBuilder",
+            "methods": [
+              "__init__",
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "inheritance_graph_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "InheritanceGraphBuilder",
+            "methods": [
+              "__init__",
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "module_graph_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ModuleGraphBuilder",
+            "methods": [
+              "__init__",
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "package_graph_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "PackageGraphBuilder",
+            "methods": [
+              "__init__",
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\clustering": {
+    "files": {}
+  },
+  "backend\\app\\services\\code": {
+    "files": {
+      "ast_builder.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "language_detector.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "LanguageDetector",
+            "methods": [
+              "detect"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "parser_manager.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ParserManager",
+            "methods": [
+              "__init__",
+              "register_parser",
+              "get_parser",
+              "parse"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "repository_loader.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "source_file_collector.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "SourceFileCollector",
+            "methods": [
+              "collect"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\code\\builders": {
+    "files": {
+      "ir_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "IRBuilder",
+            "methods": [
+              "build",
+              "_visit",
+              "_map_type"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\code\\detectors": {
+    "files": {}
+  },
+  "backend\\app\\services\\code\\extractors": {
+    "files": {
+      "relationship_extractor.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "symbol_extractor.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\code\\parsers": {
+    "files": {
+      "base_parser.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "BaseParser",
+            "methods": [
+              "parse"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "javascript_parser.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "JavaScriptParser",
+            "methods": [
+              "parse"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "java_parser.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "JavaParser",
+            "methods": [
+              "parse"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "python_parser.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "PythonParser",
+            "methods": [
+              "parse",
+              "_get_name"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "typescript_parser.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\code\\pipeline": {
+    "files": {
+      "code_understanding_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "CodeUnderstandingPipeline",
+            "methods": [
+              "__init__",
+              "process"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\confidence": {
+    "files": {}
+  },
+  "backend\\app\\services\\ingestion": {
+    "files": {
+      "code_parser.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "context_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryContextBuilder",
+            "methods": [
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "documentation_parser.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "repository_ingestion_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryIngestionPipeline",
+            "methods": [
+              "__init__",
+              "ingest"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "repository_normalizer.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryNormalizer",
+            "methods": [
+              "normalize"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "repository_scanner.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryScanner",
+            "methods": [
+              "scan_repository"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "repository_service.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RepositoryService",
+            "methods": [
+              "__init__",
+              "validate_repository_url",
+              "repository_exists",
+              "clone_repository",
+              "get_repository_metadata",
+              "delete_repository"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\knowledge": {
+    "files": {
+      "code_retrieval.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "CodeRetrievalEngine",
+            "methods": [
+              "__init__",
+              "retrieve"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "documentation_retrieval.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DocumentationRetrievalEngine",
+            "methods": [
+              "__init__",
+              "retrieve"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "entities.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "entity_extractor.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "graph.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "graph_builder.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "GraphBuilder",
+            "methods": [
+              "build"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "graph_retrieval.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "GraphRetrievalEngine",
+            "methods": [
+              "__init__",
+              "retrieve"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "graph_storage.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "relationships.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RelationshipType",
+            "methods": []
+          },
+          {
+            "name": "GraphRelationship",
+            "methods": []
+          }
+        ],
+        "functions": []
+      },
+      "relationship_extractor.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "RelationshipExtractor",
+            "methods": [
+              "extract",
+              "_extract_from_ir",
+              "_visit",
+              "_infer_relationship"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "semantic_retrieval.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "SemanticRetrievalEngine",
+            "methods": [
+              "__init__",
+              "add_documents",
+              "retrieve"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "symbol_extractor.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "SymbolExtractor",
+            "methods": [
+              "extract",
+              "_extract_from_ir",
+              "_visit"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\learning": {
+    "files": {}
+  },
+  "backend\\app\\services\\pipelines": {
+    "files": {
+      "evidence_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "EvidencePipeline",
+            "methods": [
+              "__init__",
+              "run"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "investigation_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "InvestigationPipeline",
+            "methods": [
+              "__init__",
+              "run"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "knowledge_graph_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "KnowledgeGraphPipeline",
+            "methods": [
+              "__init__",
+              "run"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "reporting_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ReportingPipeline",
+            "methods": [
+              "__init__",
+              "run"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "verification_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "VerificationPipeline",
+            "methods": [
+              "__init__",
+              "run"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\planning": {
+    "files": {}
+  },
+  "backend\\app\\services\\reporting": {
+    "files": {
+      "explanation_generator.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ExplanationGenerator",
+            "methods": [
+              "generate"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "report_generator.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "ReportGenerator",
+            "methods": [
+              "__init__",
+              "generate_report",
+              "to_markdown"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\trust": {
+    "files": {
+      "report_generator.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\services\\verification": {
+    "files": {
+      "evidence_retriever.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "trust_scorer.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "TrustScorer",
+            "methods": [
+              "calculate_claim_score",
+              "calculate_repository_score",
+              "calculate_score"
+            ]
+          }
+        ],
+        "functions": []
+      },
+      "verification_engine.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "VerificationEngine",
+            "methods": [
+              "__init__",
+              "verify",
+              "_match_features",
+              "_detect_contradictions",
+              "_determine_verdict"
+            ]
+          }
+        ],
+        "functions": []
+      }
+    }
+  },
+  "backend\\app\\utils": {
+    "files": {}
+  },
+  "backend\\infrastructure": {
+    "files": {}
+  },
+  "backend\\infrastructure\\config": {
+    "files": {}
+  },
+  "backend\\infrastructure\\database": {
+    "files": {}
+  },
+  "backend\\infrastructure\\database\\neo4j": {
+    "files": {}
+  },
+  "backend\\infrastructure\\database\\postgres": {
+    "files": {}
+  },
+  "backend\\infrastructure\\docker": {
+    "files": {}
+  },
+  "backend\\repositories": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management": {
+    "files": {
+      ".gitignore": {
+        "type": "other"
+      },
+      "README.md": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp": {
+    "files": {
+      "jest.config.js": {
+        "type": "other"
+      },
+      "package-lock.json": {
+        "type": "other"
+      },
+      "package.json": {
+        "type": "other"
+      },
+      "postcss.config.js": {
+        "type": "other"
+      },
+      "seed.js": {
+        "type": "other"
+      },
+      "tailwind.config.js": {
+        "type": "other"
+      },
+      "test-results.json": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\build": {
+    "files": {
+      "asset-manifest.json": {
+        "type": "other"
+      },
+      "favicon.ico": {
+        "type": "other"
+      },
+      "index.html": {
+        "type": "other"
+      },
+      "logo192.png": {
+        "type": "other"
+      },
+      "logo512.png": {
+        "type": "other"
+      },
+      "manifest.json": {
+        "type": "other"
+      },
+      "robots.txt": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\build\\static": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\build\\static\\css": {
+    "files": {
+      "main.6dafc5b2.css": {
+        "type": "other"
+      },
+      "main.6dafc5b2.css.map": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\build\\static\\js": {
+    "files": {
+      "453.9ee576b5.chunk.js": {
+        "type": "other"
+      },
+      "453.9ee576b5.chunk.js.map": {
+        "type": "other"
+      },
+      "main.364c3b77.js": {
+        "type": "other"
+      },
+      "main.364c3b77.js.LICENSE.txt": {
+        "type": "other"
+      },
+      "main.364c3b77.js.map": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\public": {
+    "files": {
+      "favicon.ico": {
+        "type": "other"
+      },
+      "index.html": {
+        "type": "other"
+      },
+      "logo192.png": {
+        "type": "other"
+      },
+      "logo512.png": {
+        "type": "other"
+      },
+      "manifest.json": {
+        "type": "other"
+      },
+      "robots.txt": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src": {
+    "files": {
+      "App.css": {
+        "type": "other"
+      },
+      "App.js": {
+        "type": "other"
+      },
+      "index.css": {
+        "type": "other"
+      },
+      "index.js": {
+        "type": "other"
+      },
+      "setupTests.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\api": {
+    "files": {
+      "index.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\assets": {
+    "files": {
+      "ct.jpeg": {
+        "type": "other"
+      },
+      "hero-background.jpg": {
+        "type": "other"
+      },
+      "images-college.png": {
+        "type": "other"
+      },
+      "sports.jpg": {
+        "type": "other"
+      },
+      "work.jpg": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\components": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\components\\layout": {
+    "files": {
+      "Footer.js": {
+        "type": "other"
+      },
+      "Layout.js": {
+        "type": "other"
+      },
+      "Navbar.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\components\\ui": {
+    "files": {
+      "Button.js": {
+        "type": "other"
+      },
+      "Card.js": {
+        "type": "other"
+      },
+      "Confetti.js": {
+        "type": "other"
+      },
+      "ContactForm.js": {
+        "type": "other"
+      },
+      "Input.js": {
+        "type": "other"
+      },
+      "Modal.js": {
+        "type": "other"
+      },
+      "PageWrapper.js": {
+        "type": "other"
+      },
+      "Spinner.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\context": {
+    "files": {
+      "AuthContext.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\hooks": {
+    "files": {
+      "useConfetti.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\pages": {
+    "files": {
+      "AdminDashboardPage.js": {
+        "type": "other"
+      },
+      "AdminLoginPage.js": {
+        "type": "other"
+      },
+      "ContactPage.js": {
+        "type": "other"
+      },
+      "EventDetailsPage.js": {
+        "type": "other"
+      },
+      "EventsPage.js": {
+        "type": "other"
+      },
+      "HomePage.js": {
+        "type": "other"
+      },
+      "NotFoundPage.js": {
+        "type": "other"
+      },
+      "StudentDashboardPage.js": {
+        "type": "other"
+      },
+      "StudentLoginPage.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\tests": {
+    "files": {
+      "App.test.js": {
+        "type": "other"
+      },
+      "EventDetails.test.js": {
+        "type": "other"
+      },
+      "EventList.test.js": {
+        "type": "other"
+      },
+      "StudentDashboard.test.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\reactapp\\src\\utils": {
+    "files": {
+      "api.js": {
+        "type": "other"
+      },
+      "constants.js": {
+        "type": "other"
+      },
+      "helpers.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp": {
+    "files": {
+      ".gitattributes": {
+        "type": "other"
+      },
+      ".gitignore": {
+        "type": "other"
+      },
+      "mvnw": {
+        "type": "other"
+      },
+      "mvnw.cmd": {
+        "type": "other"
+      },
+      "package-lock.json": {
+        "type": "other"
+      },
+      "pom.xml": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\.mvn": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\.mvn\\wrapper": {
+    "files": {
+      "maven-wrapper.properties": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly": {
+    "files": {}
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp": {
+    "files": {
+      "CollegeEventManagementSystemApplication.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp\\config": {
+    "files": {
+      "CorsConfig.java": {
+        "type": "other"
+      },
+      "JWTUtil.java": {
+        "type": "other"
+      },
+      "SecurityConfig.java": {
+        "type": "other"
+      },
+      "SwaggerConfig.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp\\controller": {
+    "files": {
+      "EventController.java": {
+        "type": "other"
+      },
+      "RegistrationController.java": {
+        "type": "other"
+      },
+      "StudentController.java": {
+        "type": "other"
+      },
+      "UserController.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp\\dto": {
+    "files": {
+      "EventRequest.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp\\exception": {
+    "files": {
+      "GlobalExceptionHandler.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp\\model": {
+    "files": {
+      "Event.java": {
+        "type": "other"
+      },
+      "EventCategory.java": {
+        "type": "other"
+      },
+      "Registration.java": {
+        "type": "other"
+      },
+      "Student.java": {
+        "type": "other"
+      },
+      "User.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp\\repository": {
+    "files": {
+      "EventRepository.java": {
+        "type": "other"
+      },
+      "RegistrationRepository.java": {
+        "type": "other"
+      },
+      "StudentRepository.java": {
+        "type": "other"
+      },
+      "UserRepository.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\java\\com\\examly\\springapp\\service": {
+    "files": {
+      "EventService.java": {
+        "type": "other"
+      },
+      "RegistrationService.java": {
+        "type": "other"
+      },
+      "StudentService.java": {
+        "type": "other"
+      },
+      "UserService.java": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\College_Event_Management\\springapp\\src\\main\\resources": {
+    "files": {
+      "application.properties": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio": {
+    "files": {
+      ".firebaserc": {
+        "type": "other"
+      },
+      ".gitignore": {
+        "type": "other"
+      },
+      "firebase.json": {
+        "type": "other"
+      },
+      "firestore.indexes.json": {
+        "type": "other"
+      },
+      "firestore.rules": {
+        "type": "other"
+      },
+      "index.html": {
+        "type": "other"
+      },
+      "package-lock.json": {
+        "type": "other"
+      },
+      "package.json": {
+        "type": "other"
+      },
+      "postcss.config.js": {
+        "type": "other"
+      },
+      "README.md": {
+        "type": "other"
+      },
+      "tailwind.config.js": {
+        "type": "other"
+      },
+      "vercel.json": {
+        "type": "other"
+      },
+      "vite.config.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\.refact": {
+    "files": {}
+  },
+  "backend\\repositories\\Portfolio\\.refact\\buddy": {
+    "files": {
+      "main_prompt.md": {
+        "type": "other"
+      },
+      "memory_ops.jsonl": {
+        "type": "other"
+      },
+      "runtime_queue.jsonl": {
+        "type": "other"
+      },
+      "settings.json": {
+        "type": "other"
+      },
+      "state.json": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\.refact\\buddy\\chats": {
+    "files": {}
+  },
+  "backend\\repositories\\Portfolio\\.refact\\buddy\\chats\\workflows": {
+    "files": {
+      "buddy_architecture_drift_watcher.json": {
+        "type": "other"
+      },
+      "buddy_dependency_radar.json": {
+        "type": "other"
+      },
+      "buddy_docs_gardener.json": {
+        "type": "other"
+      },
+      "buddy_security_whisperer.json": {
+        "type": "other"
+      },
+      "buddy_setup_coach.json": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\public": {
+    "files": {
+      "logo.png": {
+        "type": "other"
+      },
+      "resume.pdf": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src": {
+    "files": {
+      "App.jsx": {
+        "type": "other"
+      },
+      "main.jsx": {
+        "type": "other"
+      },
+      "Root.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin": {
+    "files": {}
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components": {
+    "files": {
+      "AdminPageTransition.jsx": {
+        "type": "other"
+      },
+      "AdminSidebar.jsx": {
+        "type": "other"
+      },
+      "AdminStatCard.jsx": {
+        "type": "other"
+      },
+      "AdminTopbar.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components\\achievements": {
+    "files": {
+      "AchievementDeleteModal.jsx": {
+        "type": "other"
+      },
+      "AchievementFormModal.jsx": {
+        "type": "other"
+      },
+      "AdminAchievementCard.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components\\certificates": {
+    "files": {
+      "AdminCertificateCard.jsx": {
+        "type": "other"
+      },
+      "CertificateDeleteModal.jsx": {
+        "type": "other"
+      },
+      "CertificateFormModal.jsx": {
+        "type": "other"
+      },
+      "CertificatePreviewModal.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components\\contact": {
+    "files": {
+      "FooterSocialFormModal.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components\\projects": {
+    "files": {
+      "AdminProjectCard.jsx": {
+        "type": "other"
+      },
+      "ProjectDeleteModal.jsx": {
+        "type": "other"
+      },
+      "ProjectFormModal.jsx": {
+        "type": "other"
+      },
+      "ProjectPreviewModal.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components\\services": {
+    "files": {
+      "AdminServiceCard.jsx": {
+        "type": "other"
+      },
+      "ServiceDeleteModal.jsx": {
+        "type": "other"
+      },
+      "ServiceFormModal.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components\\skills": {
+    "files": {
+      "AdminSkillGroupCard.jsx": {
+        "type": "other"
+      },
+      "SkillFormModal.jsx": {
+        "type": "other"
+      },
+      "SkillGroupFormModal.jsx": {
+        "type": "other"
+      },
+      "SkillsDeleteModal.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\components\\timeline": {
+    "files": {
+      "AdminTimelineCard.jsx": {
+        "type": "other"
+      },
+      "TimelineDeleteModal.jsx": {
+        "type": "other"
+      },
+      "TimelineFormModal.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\layouts": {
+    "files": {
+      "AdminLayout.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\admin\\pages": {
+    "files": {
+      "AdminAboutPage.jsx": {
+        "type": "other"
+      },
+      "AdminAchievementsPage.jsx": {
+        "type": "other"
+      },
+      "AdminCertificatesPage.jsx": {
+        "type": "other"
+      },
+      "AdminContactPage.jsx": {
+        "type": "other"
+      },
+      "AdminDashboardPage.jsx": {
+        "type": "other"
+      },
+      "AdminLoginPage.jsx": {
+        "type": "other"
+      },
+      "AdminProjectsPage.jsx": {
+        "type": "other"
+      },
+      "AdminServicesPage.jsx": {
+        "type": "other"
+      },
+      "AdminSettingsPage.jsx": {
+        "type": "other"
+      },
+      "AdminSkillsPage.jsx": {
+        "type": "other"
+      },
+      "AdminTimelinePage.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\api": {
+    "files": {
+      "cloudinary.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\assets": {
+    "files": {}
+  },
+  "backend\\repositories\\Portfolio\\src\\assets\\images": {
+    "files": {
+      "am.png": {
+        "type": "other"
+      },
+      "cert-ai-workshop.svg": {
+        "type": "other"
+      },
+      "cert-coursera.svg": {
+        "type": "other"
+      },
+      "cert-data-science-internship.svg": {
+        "type": "other"
+      },
+      "cert-infosys-java.svg": {
+        "type": "other"
+      },
+      "cert-nptel.svg": {
+        "type": "other"
+      },
+      "project-accounting.svg": {
+        "type": "other"
+      },
+      "project-av-snacks.svg": {
+        "type": "other"
+      },
+      "project-museum-chatbot.svg": {
+        "type": "other"
+      },
+      "project-price-prediction.svg": {
+        "type": "other"
+      },
+      "project-smart-inventory.svg": {
+        "type": "other"
+      },
+      "project-tractor.svg": {
+        "type": "other"
+      },
+      "resume-preview.svg": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components": {
+    "files": {
+      "DevToolsGuard.jsx": {
+        "type": "other"
+      },
+      "GlassCard.jsx": {
+        "type": "other"
+      },
+      "GlowButton.jsx": {
+        "type": "other"
+      },
+      "MotionReveal.jsx": {
+        "type": "other"
+      },
+      "SectionHeader.jsx": {
+        "type": "other"
+      },
+      "TiltCard.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\About": {
+    "files": {
+      "About.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Achievements": {
+    "files": {
+      "Achievements.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Certifications": {
+    "files": {
+      "Certifications.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Contact": {
+    "files": {
+      "Contact.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Footer": {
+    "files": {
+      "Footer.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Hero": {
+    "files": {
+      "Hero.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Navbar": {
+    "files": {
+      "Navbar.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Projects": {
+    "files": {
+      "ProjectModal.jsx": {
+        "type": "other"
+      },
+      "Projects.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Resume": {
+    "files": {
+      "Resume.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Services": {
+    "files": {
+      "Services.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Skills": {
+    "files": {
+      "Skills.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\components\\Timeline": {
+    "files": {
+      "Timeline.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\context": {
+    "files": {
+      "AuthContext.jsx": {
+        "type": "other"
+      },
+      "PortfolioContext.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\data": {
+    "files": {
+      "defaultPortfolio.js": {
+        "type": "other"
+      },
+      "projects.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\firebase": {
+    "files": {
+      "firebase.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\hooks": {
+    "files": {
+      "useInactivityLogout.js": {
+        "type": "other"
+      },
+      "useSecurity.js": {
+        "type": "other"
+      },
+      "useTypewriter.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\routes": {
+    "files": {
+      "AppRouter.jsx": {
+        "type": "other"
+      },
+      "ProtectedRoute.jsx": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\services": {
+    "files": {
+      "aboutService.js": {
+        "type": "other"
+      },
+      "achievementService.js": {
+        "type": "other"
+      },
+      "certificateService.js": {
+        "type": "other"
+      },
+      "contactService.js": {
+        "type": "other"
+      },
+      "firestoreUtils.js": {
+        "type": "other"
+      },
+      "metaService.js": {
+        "type": "other"
+      },
+      "portfolioSyncService.js": {
+        "type": "other"
+      },
+      "projectService.js": {
+        "type": "other"
+      },
+      "resumeService.js": {
+        "type": "other"
+      },
+      "serviceService.js": {
+        "type": "other"
+      },
+      "settingsService.js": {
+        "type": "other"
+      },
+      "skillsService.js": {
+        "type": "other"
+      },
+      "timelineService.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\storage": {
+    "files": {
+      "storage.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\styles": {
+    "files": {
+      "globals.css": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Portfolio\\src\\utils": {
+    "files": {
+      "iconRegistry.js": {
+        "type": "other"
+      },
+      "ids.js": {
+        "type": "other"
+      },
+      "projectIconRegistry.js": {
+        "type": "other"
+      },
+      "scrollToId.js": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\repositories\\Under-Development": {
+    "files": {
+      "index.html": {
+        "type": "other"
+      }
+    }
+  },
+  "backend\\tests": {
+    "files": {
+      "test_ast_builder.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_claim_candidate_generator.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_claim_deduplicator.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_claim_models.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_claim_normalizer.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_claim_repository.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_code_context.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_code_understanding_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "MockPythonParser",
+            "methods": [
+              "parse"
+            ]
+          }
+        ],
+        "functions": [
+          "test_pipeline"
+        ]
+      },
+      "test_document_collector.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_document_preprocessor.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_document_segmenter.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_document_understanding_pipeline.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_evidence_collector.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_phase3"
+        ]
+      },
+      "test_graph_builder.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_graph_builder_memory_model"
+        ]
+      },
+      "test_graph_repository.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_graph_repository"
+        ]
+      },
+      "test_imports.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_imports"
+        ]
+      },
+      "test_ir_builder.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_ir_builder"
+        ]
+      },
+      "test_language_detector.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_parser_manager.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "DummyPythonParser",
+            "methods": [
+              "parse"
+            ]
+          }
+        ],
+        "functions": [
+          "test_parser_manager"
+        ]
+      },
+      "test_report_generator.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_phase5"
+        ]
+      },
+      "test_repository_ingestion_pipeline.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_repository_knowledge_graph_pipeline.py": {
+        "type": "python",
+        "classes": [
+          {
+            "name": "MockPythonParser",
+            "methods": [
+              "parse"
+            ]
+          }
+        ],
+        "functions": [
+          "test_pipeline"
+        ]
+      },
+      "test_repository_loader.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_repository_normalizer.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_repository_scanner.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_repository_service.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      },
+      "test_source_file_collector.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_source_file_model.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "main"
+        ]
+      },
+      "test_trustrepo_pipeline.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_pipeline"
+        ]
+      },
+      "test_verification_engine.py": {
+        "type": "python",
+        "classes": [],
+        "functions": [
+          "test_phase4"
+        ]
+      },
+      "__init__.py": {
+        "type": "python",
+        "classes": [],
+        "functions": []
+      }
+    }
+  },
+  "docker": {
+    "files": {}
+  },
+  "docker\\Neo4j": {
+    "files": {}
+  },
+  "docker\\pgAdmin": {
+    "files": {}
+  },
+  "docker\\PostgreSQL": {
+    "files": {}
+  },
+  "docs": {
+    "files": {}
+  },
+  "docs\\architecture": {
+    "files": {
+      "improved-architecture.md.pdf": {
+        "type": "other"
+      }
+    }
+  },
+  "docs\\research": {
+    "files": {
+      "Reversa Limitation & Gap.txt": {
+        "type": "other"
+      }
+    }
+  },
+  "docs\\research\\papers": {
+    "files": {
+      "A_Review_of_Trustworthy_and_Explainable_Artificial_Intelligence_XAI.pdf": {
+        "type": "other"
+      },
+      "ETF (ACL 2025).pdf": {
+        "type": "other"
+      },
+      "ReFEree.pdf": {
+        "type": "other"
+      },
+      "RepoAgent (EMNLP 2024).pdf": {
+        "type": "other"
+      },
+      "RepoDoc (2026).pdf": {
+        "type": "other"
+      },
+      "RepoGraph (ICLR 2025).pdf": {
+        "type": "other"
+      },
+      "Reversa.pdf": {
+        "type": "other"
+      },
+      "SWD-Bench.pdf": {
+        "type": "other"
+      }
+    }
+  },
+  "frontend": {
+    "files": {
+      "index.html": {
+        "type": "other"
+      }
+    }
+  }
+}

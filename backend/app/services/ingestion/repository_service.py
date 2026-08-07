@@ -29,6 +29,9 @@ class RepositoryService:
     # ---------------------------------------------------------
 
     def validate_repository_url(self, url: str) -> bool:
+        if url.startswith("local://"):
+            return True
+            
         pattern = (
             r"^https://github\.com/"
             r"[A-Za-z0-9_.-]+/"
@@ -49,11 +52,25 @@ class RepositoryService:
     # ---------------------------------------------------------
 
     def clone_repository(self, url: str) -> dict:
-
         if not self.validate_repository_url(url):
-            raise ValueError("Invalid GitHub repository URL.")
+            return {
+                "status": "error",
+                "message": "Invalid GitHub repository URL."
+            }
 
-        repository_name = url.rstrip("/").split("/")[-1]
+        if url.startswith("local://"):
+            repo_name = url.replace("local://", "")
+            # Assume it is already cloned in repositories folder or mapped directly
+            repo_path = self.repositories_dir / repo_name
+            # For self-testing trustrepo itself, we can point it to the parent directory if local://trustrepo
+            if repo_name == "trustrepo":
+                repo_path = Path("..").resolve()
+            return {
+                "status": "already_exists",
+                "local_path": str(repo_path)
+            }
+
+        repository_name = url.split("/")[-1].split("/")[-1]
 
         destination = self.repositories_dir / repository_name
 

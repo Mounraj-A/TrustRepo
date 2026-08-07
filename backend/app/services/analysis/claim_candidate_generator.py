@@ -98,11 +98,7 @@ class ClaimCandidateGenerator:
                 source_document=statement.document_path,
                 source_section=statement.section_title,
                 claim_type=claim_type,
-                confidence=0.50,
-                metadata={
-                    "statement_index": statement.statement_index,
-                    "document_type": statement.document_type,
-                },
+                confidence=0.50
             )
 
             document_context.candidate_claims.append(claim)

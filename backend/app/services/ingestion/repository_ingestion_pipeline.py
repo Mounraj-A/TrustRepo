@@ -36,16 +36,20 @@ class RepositoryIngestionPipeline:
         """
 
         # ---------------------------------------------------------
-        # Step 1 - Clone Repository
+        # Step 1 - Clone Repository (or skip if local path)
         # ---------------------------------------------------------
-        clone_result = self.repository_service.clone_repository(repository_url)
+        import os
+        if os.path.exists(repository_url) and os.path.isdir(repository_url):
+            repository_path = repository_url
+        else:
+            clone_result = self.repository_service.clone_repository(repository_url)
 
-        if clone_result["status"] not in ("cloned", "already_exists"):
-            raise Exception(
-                f"Repository cloning failed: {clone_result.get('message', 'Unknown error')}"
-            )
+            if clone_result["status"] not in ("cloned", "already_exists"):
+                raise Exception(
+                    f"Repository cloning failed: {clone_result.get('message', 'Unknown error')}"
+                )
 
-        repository_path = clone_result["local_path"]
+            repository_path = clone_result["local_path"]
 
         # ---------------------------------------------------------
         # Step 2 - Extract Repository Metadata

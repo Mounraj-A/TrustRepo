@@ -122,4 +122,12 @@ class DocumentUnderstandingPipeline:
             }
         )
 
+        if len(document_context.claim_repository) == 0 and len(document_context.documents) > 0:
+            raise RuntimeError(
+                "Document pipeline produced zero claims.\n"
+                "Reason: No claims could be extracted or normalized from the provided documents.\n"
+                "Layer: Layer 2A (Document Understanding Pipeline)\n"
+                "Possible Cause: The document format was unrecognized, statement extraction failed, or claim builder crashed silently."
+            )
+
         return document_context

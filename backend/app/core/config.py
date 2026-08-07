@@ -11,8 +11,13 @@ class Settings(BaseSettings):
     HOST: str
     PORT: int
 
+    DATABASE_URL: str
+    NEO4J_URI: str
+    NEO4J_USERNAME: str
+    NEO4J_PASSWORD_BACKEND: str
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file="../.env",
         extra="ignore"
     )
 

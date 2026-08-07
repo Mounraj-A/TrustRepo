@@ -1,0 +1,9 @@
+RUNTIME TRACE AUDIT LOGS
+
+{'stage': 'DocumentUnderstanding', 'status': 'SUCCESS', 'execution_time_sec': 0.146, 'footprint': {'repo_meta': 5}}
+{'stage': 'CodeUnderstanding', 'status': 'SUCCESS', 'execution_time_sec': 2.322, 'footprint': {'repo_meta': 5, 'ast_nodes': 339}}
+{'stage': 'KnowledgeGraph', 'status': 'SUCCESS', 'execution_time_sec': 0.942, 'footprint': {'repo_meta': 5, 'ast_nodes': 339, 'graph_nodes': 3020}}
+{'stage': 'EvidenceRetrieval', 'status': 'SUCCESS', 'execution_time_sec': 0.092, 'footprint': {'repo_meta': 5, 'ast_nodes': 339, 'graph_nodes': 3020}}
+{'stage': 'Investigation', 'status': 'SUCCESS', 'execution_time_sec': 0.047, 'footprint': {'repo_meta': 5, 'ast_nodes': 339, 'graph_nodes': 3020}}
+{'stage': 'Verification', 'status': 'SUCCESS', 'execution_time_sec': 0.0, 'footprint': {'repo_meta': 5, 'ast_nodes': 339, 'graph_nodes': 3020}}
+{'stage': 'Reporting', 'status': 'SUCCESS', 'execution_time_sec': 0.01, 'footprint': {'repo_meta': 5, 'ast_nodes': 339, 'graph_nodes': 3020}}

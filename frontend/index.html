@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustRepo — Evidence-Based Repository Verification</title>
+    <meta name="description" content="TrustRepo autonomously verifies software repository documentation using static analysis, knowledge graph traversal, and multi-agent reasoning.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #a855f7;
+            --bg: #0a0f1e;
+            --surface: rgba(15, 23, 42, 0.8);
+            --surface2: rgba(30, 41, 59, 0.6);
+            --border: rgba(255,255,255,0.08);
+            --border2: rgba(99,102,241,0.3);
+            --text: #f1f5f9;
+            --muted: #64748b;
+            --verified: #10b981;
+            --partial: #f59e0b;
+            --refuted: #ef4444;
+            --insufficient: #6b7280;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 40%, rgba(99,102,241,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 10%, rgba(168,85,247,0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* ── Landing ─────────────────────────────────────── */
+        #landing-section {
+            max-width: 640px;
+            margin: 8vh auto;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border2);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 0 60px rgba(99,102,241,0.15), 0 25px 50px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        #landing-section:hover { transform: translateY(-4px); }
+
+        .logo-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 0.5rem; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--primary)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { text-align: center; color: var(--muted); margin-bottom: 2.5rem; line-height: 1.6; font-size: 0.95rem; }
+
+        input[type="text"] {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 1rem;
+        }
+        input[type="text"]:focus { border-color: var(--primary); }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
+        .spinner.visible { display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #error-box { display: none; margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(239,68,68,0.1); border: 1px solid var(--refuted); border-radius: 8px; color: var(--refuted); font-size: 0.9rem; white-space: pre-wrap; }
+
+        /* ── Dashboard ───────────────────────────────────── */
+        #dashboard-section { display: none; }
+
+        .meta-banner {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex; flex-wrap: wrap; gap: 1rem;
+            font-size: 0.85rem; color: var(--muted);
+        }
+        .meta-item span { color: var(--text); font-weight: 500; }
+
+        .section-card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── Score ───────────────────────────────────────── */
+        .score-row { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .score-circle {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) calc(var(--pct, 0) * 1%), var(--border) 0);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; flex-shrink: 0;
+        }
+        .score-inner {
+            width: 90px; height: 90px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .score-value { font-size: 1.4rem; font-weight: 700; }
+        .score-label { font-size: 0.65rem; color: var(--muted); }
+        .score-meta { flex: 1; }
+        .score-meta h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-trusted { background: rgba(16,185,129,0.15); color: var(--verified); border: 1px solid rgba(16,185,129,0.3); }
+        .status-warning { background: rgba(245,158,11,0.15); color: var(--partial); border: 1px solid rgba(245,158,11,0.3); }
+        .status-risky { background: rgba(239,68,68,0.15); color: var(--refuted); border: 1px solid rgba(239,68,68,0.3); }
+
+        /* ── Metrics Grid ────────────────────────────────── */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
+        .metric-box { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; }
+        .metric-title { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+        .metric-value { font-size: 1.6rem; font-weight: 700; }
+        .metric-value.ok { color: var(--verified); }
+        .metric-value.warn { color: var(--partial); }
+        .metric-value.bad { color: var(--refuted); }
+        .metric-value.neutral { color: var(--primary); }
+
+        /* ── Tags ────────────────────────────────────────── */
+        .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .tag { padding: 0.3rem 0.75rem; background: rgba(99,102,241,0.12); border: 1px solid var(--border2); border-radius: 20px; font-size: 0.8rem; color: var(--primary); font-weight: 500; }
+        .tag.arch { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.3); color: var(--accent); }
+
+        /* ── Claim Reports ───────────────────────────────── */
+        .claim-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 0.75rem; overflow: hidden; }
+        .claim-header { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.25rem; cursor: pointer; user-select: none; transition: background 0.15s; }
+        .claim-header:hover { background: rgba(255,255,255,0.03); }
+        .verdict-pill { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; flex-shrink: 0; }
+        .v-VERIFIED { background: rgba(16,185,129,0.15); color: var(--verified); }
+        .v-REFUTED { background: rgba(239,68,68,0.15); color: var(--refuted); }
+        .v-PARTIALLY_VERIFIED { background: rgba(245,158,11,0.15); color: var(--partial); }
+        .v-INSUFFICIENT_EVIDENCE { background: rgba(107,114,128,0.15); color: var(--insufficient); }
+        .claim-text { flex: 1; font-size: 0.9rem; }
+        .claim-score { font-size: 0.9rem; font-weight: 600; color: var(--muted); flex-shrink: 0; }
+        .claim-body { display: none; padding: 0 1.25rem 1rem; font-size: 0.85rem; line-height: 1.6; border-top: 1px solid var(--border); }
+        .claim-body.open { display: block; }
+        .claim-body pre { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.75rem; font-family: var(--mono); font-size: 0.8rem; overflow-x: auto; white-space: pre-wrap; margin-top: 0.5rem; }
+
+        /* ── Undocumented Features ───────────────────────── */
+        .feature-item { border-left: 3px solid var(--refuted); padding: 1rem 1.25rem; background: rgba(239,68,68,0.04); border-radius: 0 8px 8px 0; margin-bottom: 0.75rem; }
+        .feature-name { font-weight: 600; color: var(--refuted); margin-bottom: 0.4rem; }
+        .feature-verdict { font-size: 0.8rem; color: var(--muted); }
+        .evidence-trace { margin-top: 0.75rem; }
+        .evidence-node { margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.25); border-radius: 6px; border-left: 2px solid var(--border2); font-family: var(--mono); font-size: 0.8rem; }
+
+        /* ── Recommendations ─────────────────────────────── */
+        .rec-item { display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 1rem; border-left: 3px solid; border-radius: 0 8px 8px 0; margin-bottom: 0.5rem; background: rgba(0,0,0,0.15); font-size: 0.88rem; }
+        .rec-priority { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; min-width: 65px; padding-top: 2px; }
+
+        /* ── Code + Graph Metrics ────────────────────────── */
+        .analytics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 700px) { .analytics-row { grid-template-columns: 1fr; } }
+        .analytics-block { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+        .analytics-block h4 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+        .kv-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .kv-row:last-child { border-bottom: none; }
+        .kv-key { color: var(--muted); }
+        .kv-val { font-weight: 600; font-family: var(--mono); font-size: 0.82rem; }
+
+        /* ── Actions ─────────────────────────────────────── */
+        .actions-row { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; padding-bottom: 3rem; }
+        .btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--primary); padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        .btn-outline:hover { background: rgba(99,102,241,0.1); }
+
+        .chevron { transition: transform 0.2s; font-size: 0.75rem; color: var(--muted); }
+        .chevron.open { transform: rotate(180deg); }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ── Landing ─────────────────────────────────── -->
+    <div id="landing-section">
+        <div class="logo-row">
+            <div class="logo-icon">🔍</div>
+            <h1>TrustRepo</h1>
+        </div>
+        <p class="subtitle">Evidence-Based Repository Verification<br>Parse · Reason · Verify · Report</p>
+
+        <input type="text" id="repo-url"
+               placeholder="https://github.com/user/repository"
+               autocomplete="off">
+
+        <button class="btn-primary" id="analyze-btn" onclick="triggerAnalysis()">
+            <span id="btn-text">Generate Trust Report</span>
+            <div id="btn-spinner" class="spinner"></div>
+        </button>
+        <div id="error-box"></div>
+    </div>
+
+    <!-- ── Dashboard ───────────────────────────────── -->
+    <div id="dashboard-section">
+
+        <!-- Meta Banner -->
+        <div class="meta-banner">
+            <div class="meta-item">Repository: <span id="meta-url">—</span></div>
+            <div class="meta-item">Branch: <span id="meta-branch">—</span></div>
+            <div class="meta-item">Commit: <span id="meta-commit">—</span></div>
+            <div class="meta-item">Processing: <span id="meta-time">—</span>s</div>
+            <div class="meta-item">Engine: <span id="meta-version">v2.0.0</span></div>
+        </div>
+
+        <!-- Trust Score -->
+        <div class="section-card">
+            <div class="section-title">Repository Trust Score</div>
+            <div class="score-row">
+                <div class="score-circle" id="score-circle">
+                    <div class="score-inner">
+                        <div class="score-value" id="global-score">—</div>
+                        <div class="score-label">/ 100</div>
+                    </div>
+                </div>
+                <div class="score-meta">
+                    <div class="status-badge" id="global-status">Analyzing</div>
+                    <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <div style="font-size:0.85rem; color:var(--muted);">Verified Claims</div>
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--verified);" id="stat-verified">—</div>
+                        <div style="font-size:0.85rem; color:var(--muted);">Partial Claims</div>
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--partial);" id="stat-partial">—</div>
+                        <div style="font-size:0.85rem; color:var(--muted);">Refuted Claims</div>
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--refuted);" id="stat-refuted">—</div>
+                        <div style="font-size:0.85rem; color:var(--muted);">Insufficient</div>
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--insufficient);" id="stat-insufficient">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coverage Metrics -->
+        <div class="section-card">
+            <div class="section-title">Documentation Coverage</div>
+            <div class="metrics-grid" id="coverage-grid">
+                <div class="metric-box"><div class="metric-title">Coverage</div><div class="metric-value neutral" id="val-coverage">0%</div></div>
+                <div class="metric-box"><div class="metric-title">Detected</div><div class="metric-value neutral" id="val-detected">0</div></div>
+                <div class="metric-box"><div class="metric-title">Documented</div><div class="metric-value ok" id="val-documented">0</div></div>
+                <div class="metric-box"><div class="metric-title">Verified</div><div class="metric-value ok" id="val-verified">0</div></div>
+                <div class="metric-box"><div class="metric-title">Missing</div><div class="metric-value warn" id="val-missing">0</div></div>
+                <div class="metric-box"><div class="metric-title">Contradicted</div><div class="metric-value bad" id="val-contradicted">0</div></div>
+            </div>
+        </div>
+
+        <!-- Technology Stack -->
+        <div class="section-card">
+            <div class="section-title">Detected Technology Stack</div>
+            <div style="margin-bottom:0.5rem; font-size:0.85rem; color:var(--muted);">Architecture</div>
+            <div class="tags" id="arch-tags"></div>
+            <div style="margin-top:1rem; margin-bottom:0.5rem; font-size:0.85rem; color:var(--muted);">Technologies</div>
+            <div class="tags" id="tech-tags"></div>
+            <div style="margin-top:1rem; margin-bottom:0.5rem; font-size:0.85rem; color:var(--muted);">Capabilities</div>
+            <div class="tags" id="cap-tags"></div>
+        </div>
+
+        <!-- Code + Graph Analytics -->
+        <div class="section-card">
+            <div class="section-title">Analysis Pipeline Metrics</div>
+            <div class="analytics-row">
+                <div class="analytics-block">
+                    <h4>Code Understanding</h4>
+                    <div class="kv-row"><span class="kv-key">Source Files</span><span class="kv-val" id="m-source">—</span></div>
+                    <div class="kv-row"><span class="kv-key">Parsed ASTs</span><span class="kv-val" id="m-ast">—</span></div>
+                    <div class="kv-row"><span class="kv-key">UIR Files</span><span class="kv-val" id="m-uir">—</span></div>
+                    <div class="kv-row"><span class="kv-key">Symbols</span><span class="kv-val" id="m-symbols">—</span></div>
+                    <div class="kv-row"><span class="kv-key">Relationships</span><span class="kv-val" id="m-rels">—</span></div>
+                </div>
+                <div class="analytics-block">
+                    <h4>Knowledge Graph</h4>
+                    <div class="kv-row"><span class="kv-key">KG Nodes</span><span class="kv-val" id="m-nodes">—</span></div>
+                    <div class="kv-row"><span class="kv-key">KG Edges</span><span class="kv-val" id="m-edges">—</span></div>
+                    <div class="kv-row"><span class="kv-key">Graph Density</span><span class="kv-val" id="m-density">—</span></div>
+                    <div class="kv-row"><span class="kv-key">Critical Nodes</span><span class="kv-val" id="m-critical">—</span></div>
+                    <div class="kv-row"><span class="kv-key">Cycles Detected</span><span class="kv-val" id="m-cycles">—</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Results (Claim Reports) -->
+        <div class="section-card" id="claims-section">
+            <div class="section-title">Claim Verification Results</div>
+            <div id="claims-container"></div>
+        </div>
+
+        <!-- Undocumented Features -->
+        <div class="section-card" id="undocumented-section">
+            <div class="section-title">Undocumented Code Features</div>
+            <div id="undocumented-container"></div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="section-card" id="recommendations-section">
+            <div class="section-title">Recommendations</div>
+            <div id="recommendations-container"></div>
+        </div>
+
+        <div class="actions-row">
+            <button class="btn-outline" onclick="exportMarkdown()">Export Markdown Report</button>
+            <button class="btn-outline" onclick="location.reload()">Analyze Another Repository</button>
+        </div>
+    </div>
+
+</div>
+<script>
+    const API_BASE = 'http://127.0.0.1:8000';
+    let rawMarkdown = '';
+
+    async function triggerAnalysis() {
+        const url = document.getElementById('repo-url').value.trim();
+        const btn  = document.getElementById('analyze-btn');
+        const errBox = document.getElementById('error-box');
+        const btnText = document.getElementById('btn-text');
+        const spinner = document.getElementById('btn-spinner');
+
+        if (!url) { showError('Please enter a repository URL.'); return; }
+        errBox.style.display = 'none';
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        spinner.classList.add('visible');
+
+        try {
+            const res = await fetch(`${API_BASE}/repositories/analyze`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ repository_url: url })
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            const data = await res.json();
+
+            if (data.status === 'error') {
+                throw new Error(data.message + (data.detail ? '\n\n' + data.detail : ''));
+            }
+
+            renderDashboard(data);
+
+        } catch (e) {
+            showError(e.message);
+        } finally {
+            btn.disabled = false;
+            btnText.style.display = 'inline';
+            spinner.classList.remove('visible');
+        }
+    }
+
+    function showError(msg) {
+        const box = document.getElementById('error-box');
+        box.textContent = msg;
+        box.style.display = 'block';
+    }
+
+    function renderDashboard(data) {
+        document.getElementById('landing-section').style.display = 'none';
+        document.getElementById('dashboard-section').style.display = 'block';
+
+        rawMarkdown = data.markdown || '';
+        const report = data.report || {};
+        const summary = report.summary || {};
+        const coverage = report.coverage || {};
+        const gm = data.graph_metrics || {};
+        const cm = data.code_metrics || {};
+        const vs = data.verification_summary || {};
+        const analytics = gm.analytics || {};
+
+        // Meta
+        document.getElementById('meta-url').textContent     = summary.repository_url || url;
+        document.getElementById('meta-branch').textContent  = summary.branch || 'main';
+        document.getElementById('meta-commit').textContent  = (summary.commit_sha || 'HEAD').substring(0,7);
+        document.getElementById('meta-time').textContent    = data.processing_time_seconds || '—';
+        document.getElementById('meta-version').textContent = summary.verification_version || 'v2.0.0';
+
+        // Trust Score Circle
+        const score = summary.repository_trust_score || 0;
+        document.getElementById('global-score').textContent = score;
+        document.getElementById('score-circle').style.setProperty('--pct', score);
+
+        const statusEl = document.getElementById('global-status');
+        statusEl.textContent = summary.status || 'Unknown';
+        statusEl.className = 'status-badge';
+        if (score >= 70) statusEl.classList.add('status-trusted');
+        else if (score >= 40) statusEl.classList.add('status-warning');
+        else statusEl.classList.add('status-risky');
+
+        // Verification Stats
+        document.getElementById('stat-verified').textContent    = vs.verified || 0;
+        document.getElementById('stat-partial').textContent     = vs.partially_verified || 0;
+        document.getElementById('stat-refuted').textContent     = vs.refuted || 0;
+        document.getElementById('stat-insufficient').textContent = vs.insufficient || 0;
+
+        // Coverage Metrics
+        document.getElementById('val-coverage').textContent    = (coverage.coverage_percentage || 0) + '%';
+        document.getElementById('val-detected').textContent    = coverage.detected_features  || 0;
+        document.getElementById('val-documented').textContent  = coverage.documented_features || 0;
+        document.getElementById('val-verified').textContent    = coverage.verified_features || 0;
+        document.getElementById('val-missing').textContent     = coverage.missing_features   || 0;
+        document.getElementById('val-contradicted').textContent = coverage.contradicted_features || 0;
+
+        // Tech Stack
+        const archTags = document.getElementById('arch-tags');
+        const techTags = document.getElementById('tech-tags');
+        const capTags = document.getElementById('cap-tags');
+        archTags.innerHTML = '';
+        techTags.innerHTML = '';
+        capTags.innerHTML = '';
+        (summary.architecture || []).forEach(a => {
+            archTags.innerHTML += `<span class="tag arch">${a}</span>`;
+        });
+        (summary.technologies || []).forEach(t => {
+            techTags.innerHTML += `<span class="tag">${t}</span>`;
+        });
+        (summary.capabilities || []).forEach(c => {
+            capTags.innerHTML += `<span class="tag" style="background: rgba(16,185,129,0.12); color: var(--verified); border-color: rgba(16,185,129,0.3);">${c}</span>`;
+        });
+        if (!archTags.innerHTML) archTags.innerHTML = '<span style="color:var(--muted); font-size:0.85rem">Not detected</span>';
+        if (!techTags.innerHTML) techTags.innerHTML = '<span style="color:var(--muted); font-size:0.85rem">None</span>';
+        if (!capTags.innerHTML) capTags.innerHTML = '<span style="color:var(--muted); font-size:0.85rem">None</span>';
+
+        // Code Metrics
+        document.getElementById('m-source').textContent  = cm.source_files  || 0;
+        document.getElementById('m-ast').textContent     = cm.ast_nodes     || 0;
+        document.getElementById('m-uir').textContent     = cm.uir_files     || 0;
+        document.getElementById('m-symbols').textContent = cm.symbols       || 0;
+        document.getElementById('m-rels').textContent    = cm.relationships  || 0;
+
+        // Graph Analytics
+        document.getElementById('m-nodes').textContent   = gm.nodes    || 0;
+        document.getElementById('m-edges').textContent   = gm.edges    || 0;
+        document.getElementById('m-density').textContent = analytics.graph_density  != null ? analytics.graph_density.toFixed(4) : '—';
+        document.getElementById('m-critical').textContent = (analytics.critical_nodes || []).length;
+        document.getElementById('m-cycles').textContent  = analytics.cycle_detected ? `YES (${analytics.cycle_count})` : 'No';
+
+        // Claim Reports
+        renderClaimReports(report.claim_reports || []);
+
+        // Undocumented Features
+        renderUndocumented(report.undocumented_features || []);
+
+        // Recommendations
+        renderRecommendations(report.recommendations || []);
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderClaimReports(claims) {
+        const container = document.getElementById('claims-container');
+        container.innerHTML = '';
+        if (!claims.length) {
+            container.innerHTML = '<div style="color:var(--muted); font-size:0.9rem">No claims extracted.</div>';
+            return;
+        }
+        claims.forEach((cr, i) => {
+            const id = `claim-body-${i}`;
+            const scoreColor = cr.trust_score >= 60 ? 'var(--verified)' : cr.trust_score >= 30 ? 'var(--partial)' : 'var(--refuted)';
+            container.innerHTML += `
+            <div class="claim-item">
+                <div class="claim-header" onclick="toggleClaim('${id}', this)">
+                    <span class="verdict-pill v-${cr.verdict}">${cr.verdict}</span>
+                    <span class="claim-text">${esc(cr.claim_text)}</span>
+                    <span style="font-size: 0.75rem; color: var(--muted); margin-left: auto; margin-right: 1rem;">${esc(cr.verification_category)}</span>
+                    <span class="claim-score" style="color:${scoreColor}">${cr.trust_score.toFixed(0)}/100</span>
+                    <span class="chevron" id="chev-${id}">▼</span>
+                </div>
+                <div class="claim-body" id="${id}">
+                    <div style="margin-top:0.75rem; color:var(--muted); line-height:1.6;">${esc(cr.explanation)}</div>
+                    ${cr.provenance_chain ? renderProvenance(cr.provenance_chain) : ''}
+                </div>
+            </div>`;
+        });
+    }
+
+    function renderProvenance(chain) {
+        if (!chain || !chain.sequence || !chain.sequence.length) return '';
+        const nodes = chain.sequence.map(item => `
+            <div class="evidence-node">
+                <div style="color:var(--primary);">📄 ${esc(item.source.file_path)}${item.source.line_number ? ':' + item.source.line_number : ''}</div>
+                ${item.code_snippet ? `<div style="margin-top:4px; color:var(--muted);">${esc(item.code_snippet.substring(0,120))}</div>` : ''}
+            </div>`).join('');
+        return `<div class="evidence-trace" style="margin-top:0.75rem;">
+            <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.4rem;">EVIDENCE CHAIN (${chain.chain_type || 'Graph Traversal'})</div>
+            ${nodes}
+        </div>`;
+    }
+
+    function renderUndocumented(features) {
+        const container = document.getElementById('undocumented-container');
+        container.innerHTML = '';
+        if (!features.length) {
+            document.getElementById('undocumented-section').style.display = 'none';
+            return;
+        }
+        features.forEach(uf => {
+            let chainHtml = '';
+            if (uf.evidence_chain && uf.evidence_chain.sequence) {
+                chainHtml = '<div class="evidence-trace" style="margin-top:0.75rem;">';
+                chainHtml += `<div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.4rem;">EVIDENCE CHAIN</div>`;
+                uf.evidence_chain.sequence.forEach(item => {
+                    chainHtml += `<div class="evidence-node">
+                        <div style="color:var(--primary);">📄 ${esc(item.source.file_path)}</div>
+                        ${item.code_snippet ? `<div style="margin-top:4px; color:var(--muted);">${esc(item.code_snippet.substring(0,120))}</div>` : ''}
+                    </div>`;
+                });
+                chainHtml += '</div>';
+            }
+            container.innerHTML += `
+            <div class="feature-item">
+                <div class="feature-name">⚠ ${esc(uf.feature_name)}</div>
+                <div class="feature-verdict">${esc(uf.verdict)} · Confidence: ${((uf.confidence || 0) * 100).toFixed(0)}%</div>
+                <div style="margin-top:0.6rem; font-size:0.85rem; color:var(--muted); line-height: 1.5;"><strong>Reason:</strong> ${esc(uf.reason)}</div>
+                ${uf.documentation_analysis ? `<div style="margin-top:0.4rem; font-size:0.85rem; color:var(--muted); line-height: 1.5; white-space: pre-wrap;"><strong>Doc Analysis:</strong><br>${esc(uf.documentation_analysis)}</div>` : ''}
+                ${chainHtml}
+                <div style="margin-top:0.6rem; font-size:0.82rem; color:var(--partial);">→ ${esc(uf.recommendation)}</div>
+            </div>`;
+        });
+    }
+
+    function renderRecommendations(recs) {
+        const container = document.getElementById('recommendations-container');
+        container.innerHTML = '';
+        if (!recs.length) {
+            container.innerHTML = '<div style="color:var(--verified); font-size:0.9rem">✓ No critical issues. Repository is well-documented.</div>';
+            return;
+        }
+        const colors = { Critical: 'var(--refuted)', High: 'var(--refuted)', Medium: 'var(--partial)', Low: 'var(--primary)' };
+        recs.forEach(rec => {
+            const c = colors[rec.priority] || 'var(--primary)';
+            container.innerHTML += `
+            <div class="rec-item" style="border-left-color:${c}">
+                <span class="rec-priority" style="color:${c}">${rec.priority}</span>
+                <span>${esc(rec.message)}</span>
+            </div>`;
+        });
+    }
+
+    function toggleClaim(id, header) {
+        const body = document.getElementById(id);
+        const chev = document.getElementById('chev-' + id);
+        body.classList.toggle('open');
+        chev.classList.toggle('open');
+    }
+
+    function esc(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+    }
+
+    function exportMarkdown() {
+        if (!rawMarkdown) { alert('No report available.'); return; }
+        const blob = new Blob([rawMarkdown], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'TrustReport.md'; a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+</body>
+</html>

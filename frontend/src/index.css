@@ -2,43 +2,26 @@
 
 /* ── Design Tokens (CSS Variables) ───────────────────────────── */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #e2e8f0;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #4f46e5;
-  --radius: 0.625rem;
+  --background: #F0F4F8;
+  --foreground: #1F2937;
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
+  --primary: #6C5CE7;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F8FAFC;
+  --secondary-foreground: #1F2937;
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+  --accent: #F3F4F6;
+  --accent-foreground: #1F2937;
+  --destructive: #EF4444;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #6C5CE7;
+  --radius: 1rem;
 }
 
-.dark {
-  --background: #0c1220;
-  --foreground: #e2e8f0;
-  --card: #111827;
-  --card-foreground: #e2e8f0;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #e2e8f0;
-  --muted: #1e293b;
-  --muted-foreground: #64748b;
-  --accent: #1e293b;
-  --accent-foreground: #e2e8f0;
-  --destructive: #ef4444;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #6366f1;
-}
+
 
 /* ── Base ─────────────────────────────────────────────────────── */
 * {
@@ -77,23 +60,18 @@ body {
 
 /* ── Components ──────────────────────────────────────────────── */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
+  background: var(--card);
   border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
-.dark .glass {
-  background: rgba(17, 24, 39, 0.7);
-  border: 1px solid var(--border);
-}
+
 
 .gradient-trust {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
 
-.dark .gradient-trust {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-}
+
 
 .gradient-text {
   background: linear-gradient(135deg, var(--primary), #8b5cf6);
@@ -103,10 +81,11 @@ body {
 }
 
 .metric-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
   transition: all 0.3s ease;
 }
 
@@ -135,8 +114,9 @@ body {
 
 .nav-item.active {
   color: var(--primary);
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: #EEE9FF;
+  border-right: 3px solid var(--primary);
+  border-radius: 0.5rem 0 0 0.5rem;
 }
 
 .status-badge {

@@ -30,9 +30,10 @@ export default function AnalyzeBar() {
           placeholder="https://github.com/owner/repo  or  D:\path\to\repo"
           disabled={isAnalyzing}
           className={cn(
-            'w-full pl-8 pr-3 py-2 text-sm rounded-lg border bg-background/60',
-            'border-border focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary',
-            'placeholder:text-muted-foreground/50 transition-all duration-200',
+            'w-full pl-9 pr-4 py-2.5 text-sm rounded-xl bg-white text-slate-600',
+            'shadow-sm border border-slate-200',
+            'focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary',
+            'placeholder:text-slate-400 transition-all duration-200',
             'disabled:opacity-60 disabled:cursor-not-allowed'
           )}
         />

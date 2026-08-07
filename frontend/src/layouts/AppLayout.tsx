@@ -5,10 +5,10 @@ import {
   LayoutDashboard, FolderTree, Code2, GitGraph, Cpu, Layers, Zap,
   Building2, BookOpen, ClipboardCheck, Search, ShieldCheck, Activity,
   Terminal, Settings, ChevronLeft, ChevronRight, Circle, CheckCircle2,
-  AlertCircle, Menu, Brain, Server, BarChart3
+  AlertCircle, Menu, Brain, Server, BarChart3, Sun, Moon
 } from 'lucide-react';
 import { cn, formatDuration, scoreColor } from '@/lib/utils';
-import { useAnalysisStore, useUIStore } from '@/store';
+import { useAnalysisStore, useUIStore, useSettingsStore } from '@/store';
 import { useHealth } from '@/hooks/useAnalysis';
 import { NAV_ITEMS } from '@/config/app';
 import AnalyzeBar from '@/components/AnalyzeBar';
@@ -34,17 +34,17 @@ export default function AppLayout() {
   const repoName = analysisResult?.report?.repository_name;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-background text-slate-900 selection:bg-indigo-500/30">
       {/* ── Sidebar ─────────────────────────────────────────────── */}
       <motion.aside
         initial={false}
         animate={{ width: sidebarOpen ? 260 : 60 }}
         transition={{ duration: 0.25, ease: 'easeInOut' }}
-        className="relative flex flex-col border-r border-border bg-card/50 backdrop-blur-sm shrink-0 z-20"
+        className="relative flex flex-col bg-[#FCFCFD] shadow-[0_8px_24px_rgba(15,23,42,0.06)] shrink-0 z-20"
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 py-4 border-b border-border min-h-[56px]">
-          <div className="w-7 h-7 rounded-lg gradient-trust flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3 px-6 py-6 min-h-[56px]">
+          <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/20">
             <ShieldCheck size={14} className="text-white" />
           </div>
           <AnimatePresence>
@@ -55,8 +55,8 @@ export default function AppLayout() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
               >
-                <p className="text-sm font-bold tracking-tight gradient-text">TrustRepo</p>
-                <p className="text-[10px] text-muted-foreground">v3.0 Intelligence Platform</p>
+                <p className="text-sm font-bold tracking-tight text-slate-900">TrustRepo</p>
+                <p className="text-[10px] text-slate-500 font-medium">v3.0 Intelligence Platform</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -109,7 +109,7 @@ export default function AppLayout() {
 
         {/* Sidebar footer — status + score */}
         {sidebarOpen && (
-          <div className="border-t border-border px-3 py-3 space-y-2">
+          <div className="px-3 py-3 space-y-2">
             <div className="flex items-center gap-2">
               <Circle
                 size={8}
@@ -133,45 +133,32 @@ export default function AppLayout() {
         {/* Collapse button */}
         <button
           onClick={toggleSidebar}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-card border border-border
-                     flex items-center justify-center text-muted-foreground hover:text-foreground
-                     hover:border-primary/40 transition-all duration-200 z-30"
+          className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-md border border-slate-100
+                     flex items-center justify-center text-slate-400 hover:text-indigo-600
+                     transition-all duration-200 z-30 active:scale-95"
         >
-          {sidebarOpen ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+          {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
         </button>
       </motion.aside>
 
       {/* ── Main Content ─────────────────────────────────────────── */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 bg-white">
         {/* Header */}
-        <header className="flex items-center gap-4 px-6 border-b border-border bg-card/50 backdrop-blur-sm min-h-[56px] shrink-0">
+        <header className="flex items-center gap-6 px-8 py-6 shrink-0 bg-transparent">
           <button
             onClick={toggleSidebar}
-            className="md:hidden p-1.5 rounded-lg hover:bg-accent transition-colors"
+            className="md:hidden p-2 rounded-xl bg-white shadow-sm border border-slate-100 hover:text-indigo-600 transition-colors"
           >
-            <Menu size={16} />
+            <Menu size={18} />
           </button>
 
-          <div className="flex-1">
+          <div className="flex-1 max-w-2xl">
             <AnalyzeBar />
           </div>
-
-          {/* Header right — status indicators */}
-          {analysisResult && (
-            <div className="hidden md:flex items-center gap-3 text-xs text-muted-foreground shrink-0">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 size={12} className="text-emerald-400" />
-                {formatDuration(analysisResult.processing_time_seconds)}
-              </span>
-              {analysisResult.code_metrics?.source_files > 0 && (
-                <span>{analysisResult.code_metrics.source_files} files</span>
-              )}
-            </div>
-          )}
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto px-4 md:px-8 pb-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

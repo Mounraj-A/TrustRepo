@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useSettingsStore } from '@/store';
-import { Settings, Sun, Moon, Server, Database, Download, AlertTriangle } from 'lucide-react';
+import { Settings, Server, Database, Download, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
   const {
-    theme, backendUrl, timeout, maxRetries,
-    setTheme, setBackendUrl, setTimeout, setMaxRetries,
+    backendUrl, timeout, maxRetries,
+    setBackendUrl, setTimeout, setMaxRetries,
   } = useSettingsStore();
 
   const [localUrl, setLocalUrl] = useState(backendUrl);
@@ -22,30 +22,6 @@ export default function SettingsPage() {
   };
 
   const sections = [
-    {
-      title: 'Appearance',
-      icon: Sun,
-      content: (
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setTheme('dark')}
-            className={cn('flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all',
-              theme === 'dark' ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <Moon size={14} /> Dark Mode
-          </button>
-          <button
-            onClick={() => setTheme('light')}
-            className={cn('flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all',
-              theme === 'light' ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <Sun size={14} /> Light Mode
-          </button>
-        </div>
-      ),
-    },
     {
       title: 'Backend Connection',
       icon: Server,

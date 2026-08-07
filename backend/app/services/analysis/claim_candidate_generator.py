@@ -103,9 +103,6 @@ class ClaimCandidateGenerator:
 
             document_context.candidate_claims.append(claim)
 
-        document_context.metadata["candidate_claims"] = len(
-            document_context.candidate_claims
-        )
 
         return document_context
 

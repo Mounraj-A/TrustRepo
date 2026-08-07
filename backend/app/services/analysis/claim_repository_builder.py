@@ -22,20 +22,6 @@ class ClaimRepositoryBuilder:
             document_context.deduplicated_claims
         )
 
-        repository.metadata = {
-            "total_claims": len(repository),
-            "claim_types": len(
-                {
-                    claim.claim_type.value
-                    for claim in repository.claims
-                }
-            ),
-        }
-
         document_context.claim_repository = repository
-
-        document_context.metadata[
-            "claim_repository"
-        ] = len(repository)
 
         return document_context

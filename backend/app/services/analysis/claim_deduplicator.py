@@ -32,8 +32,4 @@ class ClaimDeduplicator:
 
             document_context.deduplicated_claims.append(claim)
 
-        document_context.metadata[
-            "deduplicated_claims"
-        ] = len(document_context.deduplicated_claims)
-
         return document_context

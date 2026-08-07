@@ -40,9 +40,6 @@ class StatementExtractor:
                     )
                 )
 
-        document_context.metadata["atomic_statements"] = len(
-            document_context.atomic_statements
-        )
 
         return document_context
 

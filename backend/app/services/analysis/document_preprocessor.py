@@ -45,9 +45,6 @@ class DocumentPreprocessor:
                 )
             )
 
-        document_context.metadata["processed_documents"] = len(
-            document_context.processed_documents
-        )
 
         return document_context
 

@@ -89,39 +89,6 @@ class DocumentUnderstandingPipeline:
         document_context = self.claim_repository_builder.build(document_context)
         print("Repository Claims      :", len(document_context.claim_repository))
 
-        # ==========================================================
-        # Pipeline Statistics
-        # ==========================================================
-
-        document_context.metadata.update(
-            {
-                "documents": len(
-                    document_context.documents
-                ),
-                "processed_documents": len(
-                    document_context.processed_documents
-                ),
-                "sections": len(
-                    document_context.sections
-                ),
-                "atomic_statements": len(
-                    document_context.atomic_statements
-                ),
-                "candidate_claims": len(
-                    document_context.candidate_claims
-                ),
-                "normalized_claims": len(
-                    document_context.normalized_claims
-                ),
-                "deduplicated_claims": len(
-                    document_context.deduplicated_claims
-                ),
-                "claim_repository": len(
-                    document_context.claim_repository
-                ),
-            }
-        )
-
         if len(document_context.claim_repository) == 0 and len(document_context.documents) > 0:
             raise RuntimeError(
                 "Document pipeline produced zero claims.\n"

@@ -43,8 +43,6 @@ class InvestigationPipeline:
 
         # Step 1: Full claim normalization (deduplication + intent + features)
         normalized_claims = self.normalizer.normalize(context.claims)
-        if context.document_context:
-            context.document_context.metadata["normalized_claims_count"] = len(normalized_claims)
 
         print(f"  {len(normalized_claims)} unique normalized claims after deduplication.")
 

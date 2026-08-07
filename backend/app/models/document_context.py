@@ -18,8 +18,6 @@ class Document:
     document_type: str
     content: str = ""
 
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 @dataclass
 class DocumentContext:
@@ -94,20 +92,4 @@ class DocumentContext:
 
     claim_repository: ClaimRepository = field(
         default_factory=ClaimRepository
-    )
-
-    # ==========================================================
-    # Future Stages
-    # ==========================================================
-
-    extracted_claims: List[Claim] = field(default_factory=list)
-
-    classified_claims: List[Claim] = field(default_factory=list)
-
-    embeddings: List[Any] = field(default_factory=list)
-
-    # ==========================================================
-    # Pipeline Metadata
-    # ==========================================================
-
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    )

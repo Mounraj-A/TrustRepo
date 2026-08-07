@@ -95,7 +95,16 @@ def analyze_repository(req: AnalyzeRequest):
     graph_analytics = context.graph_context.analytics if context.graph_context else {}
 
     # ── Extract Code Metrics ──────────────────────────────────────────────────
-    code_meta = context.code_context.metadata if context.code_context else {}
+    code_meta = {}
+    if context.code_context:
+        code_meta = {
+            "source_files": len(context.code_context.source_files) if getattr(context.code_context, "source_files", None) else 0,
+            "parsed_files": len(context.code_context.parsed_files) if getattr(context.code_context, "parsed_files", None) else 0,
+            "ast_nodes": len(context.code_context.ast_nodes) if getattr(context.code_context, "ast_nodes", None) else 0,
+            "uir_files": len(context.code_context.intermediate_representation) if getattr(context.code_context, "intermediate_representation", None) else 0,
+            "symbols": len(context.code_context.symbols) if getattr(context.code_context, "symbols", None) else 0,
+            "relationships": len(context.code_context.relationships) if getattr(context.code_context, "relationships", None) else 0,
+        }
 
     # ── Extract Claim Statistics ──────────────────────────────────────────────
     verification_results = context.verification_context.verification_results if context.verification_context else {}

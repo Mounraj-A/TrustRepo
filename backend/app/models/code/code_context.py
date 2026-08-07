@@ -50,9 +50,3 @@ class CodeContext:
     # ==========================================================
 
     intermediate_representation: Any = None
-
-    # ==========================================================
-    # Pipeline Metadata
-    # ==========================================================
-
-    metadata: Dict[str, Any] = field(default_factory=dict)

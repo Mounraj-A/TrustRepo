@@ -53,8 +53,9 @@ class ReportGenerator:
         if context.repository_context:
             repo_metadata = {
                 "url": getattr(context.repository_context, "repository_url", "local://repository"),
-                "commit_sha": context.repository_context.metadata.get("commit_hash", "HEAD"),
-                "branch": context.repository_context.metadata.get("branch", "main"),
+                "commit_sha": "HEAD",
+                "branch": "main",
+
                 "technologies": context.semantic_context.technologies if context.semantic_context else [],
                 "architecture": context.semantic_context.architectures if context.semantic_context else [],
                 "capabilities": context.semantic_context.capabilities if context.semantic_context else []

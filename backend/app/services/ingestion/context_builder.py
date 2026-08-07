@@ -27,7 +27,6 @@ class RepositoryContextBuilder:
         context.repository_name = metadata.get("repository_name", "")
 
         # Repository Metadata
-        context.metadata = metadata
 
         # Normalized Repository Files
         context.documentation_files = normalized_results.get("documentation", [])

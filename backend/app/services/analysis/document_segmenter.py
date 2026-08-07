@@ -65,8 +65,5 @@ class DocumentSegmenter:
                     )
                 )
 
-        document_context.metadata["sections"] = len(
-            document_context.sections
-        )
 
         return document_context

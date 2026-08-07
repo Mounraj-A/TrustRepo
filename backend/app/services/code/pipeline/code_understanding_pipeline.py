@@ -58,14 +58,4 @@ class CodeUnderstandingPipeline:
         code_context = self.relationship_extractor.extract(code_context)
         print("Extracted Relationships:", len(code_context.relationships))
 
-        # Metadata Statistics
-        code_context.metadata.update({
-            "source_files": len(code_context.source_files),
-            "parsed_files": len(code_context.parsed_files),
-            "ast_nodes": len(code_context.ast_nodes),
-            "uir_files": len(code_context.intermediate_representation),
-            "symbols": len(code_context.symbols),
-            "relationships": len(code_context.relationships)
-        })
-
         return code_context

@@ -1,0 +1,2162 @@
+{
+  "app\\main.py": {
+    "classes": [],
+    "imports": [
+      "fastapi",
+      "sys",
+      "os",
+      "app.api.router",
+      "app.core.config",
+      "fastapi.middleware.cors"
+    ]
+  },
+  "app\\api\\router.py": {
+    "classes": [],
+    "imports": [
+      "fastapi",
+      "app.api.endpoints.health",
+      "app.api.endpoints.repository",
+      "app.api.endpoints.verification",
+      "app.api.endpoints.report"
+    ]
+  },
+  "app\\api\\__init__.py": {
+    "classes": [],
+    "imports": []
+  },
+  "app\\api\\endpoints\\health.py": {
+    "classes": [],
+    "imports": [
+      "fastapi"
+    ]
+  },
+  "app\\api\\endpoints\\report.py": {
+    "classes": [],
+    "imports": [
+      "fastapi"
+    ]
+  },
+  "app\\api\\endpoints\\repository.py": {
+    "classes": [
+      {
+        "name": "AnalyzeRequest",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "fastapi",
+      "pydantic",
+      "time",
+      "logging",
+      "app.services.ingestion.repository_ingestion_pipeline",
+      "app.services.trustrepo_pipeline",
+      "app.services.reporting.report_generator",
+      "app.models.knowledge.investigation"
+    ]
+  },
+  "app\\api\\endpoints\\verification.py": {
+    "classes": [],
+    "imports": [
+      "fastapi"
+    ]
+  },
+  "app\\api\\endpoints\\__init__.py": {
+    "classes": [],
+    "imports": []
+  },
+  "app\\core\\config.py": {
+    "classes": [
+      {
+        "name": "Settings",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic_settings"
+    ]
+  },
+  "app\\core\\__init__.py": {
+    "classes": [],
+    "imports": []
+  },
+  "app\\models\\atomic_statement.py": {
+    "classes": [
+      {
+        "name": "AtomicStatement",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing",
+      "uuid"
+    ]
+  },
+  "app\\models\\claim.py": {
+    "classes": [
+      {
+        "name": "Claim",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing",
+      "app.models.claim_type",
+      "app.models.verification_status"
+    ]
+  },
+  "app\\models\\claim_repository.py": {
+    "classes": [
+      {
+        "name": "ClaimRepository",
+        "methods": [
+          "add",
+          "extend",
+          "clear",
+          "__len__",
+          "__iter__",
+          "__getitem__"
+        ]
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing",
+      "app.models.claim"
+    ]
+  },
+  "app\\models\\claim_type.py": {
+    "classes": [
+      {
+        "name": "ClaimType",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "enum"
+    ]
+  },
+  "app\\models\\document_context.py": {
+    "classes": [
+      {
+        "name": "Document",
+        "methods": []
+      },
+      {
+        "name": "DocumentContext",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing",
+      "app.models.atomic_statement",
+      "app.models.claim",
+      "app.models.claim_repository",
+      "app.models.document_section",
+      "app.models.processed_document"
+    ]
+  },
+  "app\\models\\document_section.py": {
+    "classes": [
+      {
+        "name": "DocumentSection",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\processed_document.py": {
+    "classes": [
+      {
+        "name": "ProcessedDocument",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\repository_context.py": {
+    "classes": [
+      {
+        "name": "RepositoryContext",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\trustrepo_context.py": {
+    "classes": [
+      {
+        "name": "SemanticContext",
+        "methods": []
+      },
+      {
+        "name": "GraphContext",
+        "methods": []
+      },
+      {
+        "name": "EvidenceContextData",
+        "methods": []
+      },
+      {
+        "name": "VerificationContext",
+        "methods": []
+      },
+      {
+        "name": "ReportContext",
+        "methods": []
+      },
+      {
+        "name": "TrustRepoContext",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing",
+      "app.models.repository_context",
+      "app.models.document_context",
+      "app.models.code.code_context",
+      "app.models.claim",
+      "app.models.knowledge.repository_knowledge_graph",
+      "app.models.knowledge.evidence",
+      "app.models.knowledge.investigation",
+      "app.models.report.trust_report"
+    ]
+  },
+  "app\\models\\verification_status.py": {
+    "classes": [
+      {
+        "name": "VerificationStatus",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "enum"
+    ]
+  },
+  "app\\models\\code\\ast_node.py": {
+    "classes": [
+      {
+        "name": "ASTNode",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\code\\code_context.py": {
+    "classes": [
+      {
+        "name": "CodeContext",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing",
+      "app.models.code.source_file"
+    ]
+  },
+  "app\\models\\code\\intermediate_representation.py": {
+    "classes": [
+      {
+        "name": "IRNode",
+        "methods": []
+      },
+      {
+        "name": "IntermediateRepresentation",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\code\\relationship.py": {
+    "classes": [
+      {
+        "name": "Relationship",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing"
+    ]
+  },
+  "app\\models\\code\\source_file.py": {
+    "classes": [
+      {
+        "name": "SourceFile",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\code\\symbol.py": {
+    "classes": [
+      {
+        "name": "Symbol",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing"
+    ]
+  },
+  "app\\models\\knowledge\\capability.py": {
+    "classes": [
+      {
+        "name": "Capability",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\knowledge\\evidence.py": {
+    "classes": [
+      {
+        "name": "EvidenceStrength",
+        "methods": []
+      },
+      {
+        "name": "EvidenceSource",
+        "methods": []
+      },
+      {
+        "name": "EvidenceItem",
+        "methods": []
+      },
+      {
+        "name": "EvidenceChain",
+        "methods": []
+      },
+      {
+        "name": "EvidenceCandidate",
+        "methods": []
+      },
+      {
+        "name": "EvidenceContext",
+        "methods": [
+          "add_candidates"
+        ]
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing",
+      "enum",
+      "datetime",
+      "app.models.claim"
+    ]
+  },
+  "app\\models\\knowledge\\feature_instance.py": {
+    "classes": [
+      {
+        "name": "FeatureInstance",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\models\\knowledge\\investigation.py": {
+    "classes": [
+      {
+        "name": "VerificationVerdict",
+        "methods": []
+      },
+      {
+        "name": "InvestigationResult",
+        "methods": []
+      },
+      {
+        "name": "VerificationResult",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing",
+      "enum",
+      "datetime",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\models\\knowledge\\repository_knowledge_graph.py": {
+    "classes": [
+      {
+        "name": "GraphNode",
+        "methods": []
+      },
+      {
+        "name": "GraphEdge",
+        "methods": []
+      },
+      {
+        "name": "RepositoryKnowledgeGraph",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing"
+    ]
+  },
+  "app\\models\\knowledge\\technology.py": {
+    "classes": [
+      {
+        "name": "Technology",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "typing"
+    ]
+  },
+  "app\\models\\report\\trust_report.py": {
+    "classes": [
+      {
+        "name": "VerificationCategory",
+        "methods": []
+      },
+      {
+        "name": "RecommendationPriority",
+        "methods": []
+      },
+      {
+        "name": "Recommendation",
+        "methods": []
+      },
+      {
+        "name": "UndocumentedFeature",
+        "methods": []
+      },
+      {
+        "name": "DocumentationCoverage",
+        "methods": []
+      },
+      {
+        "name": "RepositorySummary",
+        "methods": []
+      },
+      {
+        "name": "ClaimReport",
+        "methods": []
+      },
+      {
+        "name": "RepositoryTrustReport",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing",
+      "datetime",
+      "app.models.knowledge.investigation",
+      "enum",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\repositories\\graph_repository.py": {
+    "classes": [
+      {
+        "name": "GraphRepository",
+        "methods": [
+          "__init__",
+          "create_entity",
+          "clear_graph",
+          "setup_indexes",
+          "save_graph",
+          "create_relationship",
+          "create_relationship_by_qualname",
+          "get_all_entities_by_label"
+        ]
+      }
+    ],
+    "imports": [
+      "database.neo4j"
+    ]
+  },
+  "app\\services\\trustrepo_pipeline.py": {
+    "classes": [
+      {
+        "name": "TrustRepoPipeline",
+        "methods": [
+          "__init__",
+          "run"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.trustrepo_context",
+      "app.models.repository_context",
+      "app.services.analysis.document_understanding_pipeline",
+      "app.services.code.pipeline.code_understanding_pipeline",
+      "app.services.pipelines.knowledge_graph_pipeline",
+      "app.services.pipelines.evidence_pipeline",
+      "app.services.pipelines.investigation_pipeline",
+      "app.services.pipelines.verification_pipeline",
+      "app.services.pipelines.reporting_pipeline"
+    ]
+  },
+  "app\\services\\__init__.py": {
+    "classes": [],
+    "imports": []
+  },
+  "app\\services\\agents\\base_agent.py": {
+    "classes": [
+      {
+        "name": "AgentRole",
+        "methods": []
+      },
+      {
+        "name": "MessageType",
+        "methods": []
+      },
+      {
+        "name": "AgentMessage",
+        "methods": [
+          "route_to_next"
+        ]
+      },
+      {
+        "name": "BaseAgent",
+        "methods": [
+          "process",
+          "_log",
+          "_forward"
+        ]
+      }
+    ],
+    "imports": [
+      "__future__",
+      "dataclasses",
+      "typing",
+      "enum",
+      "uuid",
+      "datetime",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\agents\\code_agent.py": {
+    "classes": [
+      {
+        "name": "CodeAgent",
+        "methods": [
+          "__init__",
+          "process",
+          "_query_feature_instances"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.services.agents.base_agent",
+      "app.models.knowledge.evidence",
+      "app.repositories.graph_repository"
+    ]
+  },
+  "app\\services\\agents\\contradiction_agent.py": {
+    "classes": [
+      {
+        "name": "ContradictionAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent"
+    ]
+  },
+  "app\\services\\agents\\coverage_agent.py": {
+    "classes": [
+      {
+        "name": "CoverageAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent"
+    ]
+  },
+  "app\\services\\agents\\decision_matrix.py": {
+    "classes": [
+      {
+        "name": "DecisionMatrix",
+        "methods": [
+          "__init__",
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent",
+      "app.services.verification.decision_matrix"
+    ]
+  },
+  "app\\services\\agents\\documentation_agent.py": {
+    "classes": [
+      {
+        "name": "DocumentationAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent",
+      "app.models.knowledge.evidence",
+      "app.services.knowledge.semantic_registry",
+      "re"
+    ]
+  },
+  "app\\services\\agents\\evidence_agreement_engine.py": {
+    "classes": [
+      {
+        "name": "EvidenceAgreementEngine",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent"
+    ]
+  },
+  "app\\services\\agents\\evidence_fusion_agent.py": {
+    "classes": [
+      {
+        "name": "EvidenceFusionAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "__future__",
+      "typing",
+      "app.services.agents.base_agent",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\agents\\evidence_ranking_agent.py": {
+    "classes": [
+      {
+        "name": "EvidenceRankingAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\agents\\investigator_agent.py": {
+    "classes": [
+      {
+        "name": "InvestigatorAgent",
+        "methods": [
+          "__init__",
+          "investigate"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.claim",
+      "app.models.knowledge.investigation",
+      "app.services.agents.base_agent",
+      "app.services.agents.repository_memory",
+      "app.services.analysis.evidence_collector"
+    ]
+  },
+  "app\\services\\agents\\knowledge_graph_agent.py": {
+    "classes": [
+      {
+        "name": "KnowledgeGraphAgent",
+        "methods": [
+          "__init__",
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent",
+      "app.models.knowledge.evidence",
+      "app.repositories.graph_repository",
+      "app.services.knowledge.graph_analytics_engine"
+    ]
+  },
+  "app\\services\\agents\\llm_explanation_agent.py": {
+    "classes": [
+      {
+        "name": "LLMExplanationAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent",
+      "app.models.knowledge.investigation"
+    ]
+  },
+  "app\\services\\agents\\reasoning_agent.py": {
+    "classes": [
+      {
+        "name": "ReasoningAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent"
+    ]
+  },
+  "app\\services\\agents\\recommendation_engine.py": {
+    "classes": [
+      {
+        "name": "RecommendationEngine",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent"
+    ]
+  },
+  "app\\services\\agents\\repository_memory.py": {
+    "classes": [
+      {
+        "name": "RepositoryMemory",
+        "methods": [
+          "__init__",
+          "store",
+          "retrieve"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.knowledge.evidence",
+      "typing"
+    ]
+  },
+  "app\\services\\agents\\task_planner_agent.py": {
+    "classes": [
+      {
+        "name": "TaskPlannerAgent",
+        "methods": [
+          "__init__",
+          "plan_and_execute",
+          "_clone_message"
+        ]
+      }
+    ],
+    "imports": [
+      "__future__",
+      "typing",
+      "app.services.agents.base_agent",
+      "app.services.agents.code_agent",
+      "app.services.agents.documentation_agent",
+      "app.services.agents.knowledge_graph_agent",
+      "app.services.agents.evidence_ranking_agent",
+      "app.services.agents.evidence_fusion_agent",
+      "app.services.agents.evidence_agreement_engine",
+      "app.services.agents.coverage_agent",
+      "app.services.agents.contradiction_agent",
+      "app.services.agents.reasoning_agent",
+      "app.services.agents.decision_matrix",
+      "app.services.agents.verification_agent",
+      "app.services.agents.recommendation_engine",
+      "app.services.agents.llm_explanation_agent",
+      "app.services.verification.intent_resolver",
+      "app.models.claim"
+    ]
+  },
+  "app\\services\\agents\\verification_agent.py": {
+    "classes": [
+      {
+        "name": "VerificationAgent",
+        "methods": [
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.services.agents.base_agent",
+      "app.models.knowledge.investigation",
+      "app.models.report.trust_report"
+    ]
+  },
+  "app\\services\\analysis\\architecture_detection.py": {
+    "classes": [
+      {
+        "name": "ArchitectureDetection",
+        "methods": [
+          "__init__",
+          "detect",
+          "_count_annotations",
+          "_count_annotation_group",
+          "_query_packages",
+          "_analyze_packages"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.repository_context",
+      "app.repositories.graph_repository",
+      "typing",
+      "app.models.knowledge.feature_instance"
+    ]
+  },
+  "app\\services\\analysis\\claim_candidate_generator.py": {
+    "classes": [
+      {
+        "name": "ClaimCandidateGenerator",
+        "methods": [
+          "generate",
+          "_classify"
+        ]
+      }
+    ],
+    "imports": [
+      "uuid",
+      "app.models.claim",
+      "app.models.claim_type",
+      "app.models.document_context"
+    ]
+  },
+  "app\\services\\analysis\\claim_deduplicator.py": {
+    "classes": [
+      {
+        "name": "ClaimDeduplicator",
+        "methods": [
+          "deduplicate"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.document_context"
+    ]
+  },
+  "app\\services\\analysis\\claim_normalization_layer.py": {
+    "classes": [
+      {
+        "name": "NormalizedClaim",
+        "methods": []
+      },
+      {
+        "name": "ClaimNormalizationLayer",
+        "methods": [
+          "__init__",
+          "normalize",
+          "_normalize_single",
+          "_clean_text",
+          "_build_canonical"
+        ]
+      }
+    ],
+    "imports": [
+      "__future__",
+      "re",
+      "dataclasses",
+      "typing",
+      "app.models.claim"
+    ]
+  },
+  "app\\services\\analysis\\claim_normalizer.py": {
+    "classes": [
+      {
+        "name": "ClaimNormalizer",
+        "methods": [
+          "normalize"
+        ]
+      }
+    ],
+    "imports": [
+      "re",
+      "app.models.document_context"
+    ]
+  },
+  "app\\services\\analysis\\claim_repository_builder.py": {
+    "classes": [
+      {
+        "name": "ClaimRepositoryBuilder",
+        "methods": [
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.claim_repository",
+      "app.models.document_context"
+    ]
+  },
+  "app\\services\\analysis\\document_collector.py": {
+    "classes": [
+      {
+        "name": "DocumentCollector",
+        "methods": [
+          "collect",
+          "_detect_document_type"
+        ]
+      }
+    ],
+    "imports": [
+      "pathlib",
+      "app.models.document_context",
+      "app.models.repository_context"
+    ]
+  },
+  "app\\services\\analysis\\document_preprocessor.py": {
+    "classes": [
+      {
+        "name": "DocumentPreprocessor",
+        "methods": [
+          "preprocess",
+          "_extract_headings",
+          "_extract_code_blocks",
+          "_remove_code_blocks",
+          "_remove_markdown",
+          "_normalize_whitespace"
+        ]
+      }
+    ],
+    "imports": [
+      "re",
+      "app.models.document_context",
+      "app.models.processed_document"
+    ]
+  },
+  "app\\services\\analysis\\document_segmenter.py": {
+    "classes": [
+      {
+        "name": "DocumentSegmenter",
+        "methods": [
+          "segment"
+        ]
+      }
+    ],
+    "imports": [
+      "re",
+      "app.models.document_context",
+      "app.models.document_section"
+    ]
+  },
+  "app\\services\\analysis\\document_understanding_pipeline.py": {
+    "classes": [
+      {
+        "name": "DocumentUnderstandingPipeline",
+        "methods": [
+          "__init__",
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.document_context",
+      "app.models.repository_context",
+      "app.services.analysis.document_collector",
+      "app.services.analysis.document_preprocessor",
+      "app.services.analysis.document_segmenter",
+      "app.services.analysis.statement_extractor",
+      "app.services.analysis.claim_candidate_generator",
+      "app.services.analysis.claim_normalizer",
+      "app.services.analysis.claim_deduplicator",
+      "app.services.analysis.claim_repository_builder"
+    ]
+  },
+  "app\\services\\analysis\\evidence_collector.py": {
+    "classes": [
+      {
+        "name": "EvidenceCollector",
+        "methods": [
+          "__init__",
+          "collect"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.claim",
+      "app.models.knowledge.evidence",
+      "app.services.knowledge.graph_retrieval",
+      "app.services.knowledge.semantic_retrieval",
+      "app.services.knowledge.code_retrieval",
+      "app.services.knowledge.documentation_retrieval",
+      "app.services.analysis.evidence_fusion"
+    ]
+  },
+  "app\\services\\analysis\\evidence_fusion.py": {
+    "classes": [
+      {
+        "name": "EvidenceFusion",
+        "methods": [
+          "fuse"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\analysis\\statement_extractor.py": {
+    "classes": [
+      {
+        "name": "StatementExtractor",
+        "methods": [
+          "extract",
+          "_extract_statements"
+        ]
+      }
+    ],
+    "imports": [
+      "re",
+      "app.models.atomic_statement",
+      "app.models.document_context"
+    ]
+  },
+  "app\\services\\analysis\\technology_detection.py": {
+    "classes": [
+      {
+        "name": "TechnologyDetection",
+        "methods": [
+          "__init__",
+          "_detect_language_from_path",
+          "detect",
+          "_query_import_evidence",
+          "_query_annotation_evidence",
+          "_query_dependency_evidence",
+          "_build_evidence_chain"
+        ]
+      }
+    ],
+    "imports": [
+      "uuid",
+      "typing",
+      "app.models.repository_context",
+      "app.repositories.graph_repository",
+      "app.models.knowledge.evidence",
+      "app.services.knowledge.technology_kb",
+      "app.models.knowledge.repository_knowledge_graph"
+    ]
+  },
+  "app\\services\\analysis\\graph_algorithms\\call_graph_builder.py": {
+    "classes": [
+      {
+        "name": "CallGraphBuilder",
+        "methods": [
+          "__init__",
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.repositories.graph_repository"
+    ]
+  },
+  "app\\services\\analysis\\graph_algorithms\\dependency_graph_builder.py": {
+    "classes": [
+      {
+        "name": "DependencyGraphBuilder",
+        "methods": [
+          "__init__",
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.repositories.graph_repository"
+    ]
+  },
+  "app\\services\\analysis\\graph_algorithms\\inheritance_graph_builder.py": {
+    "classes": [
+      {
+        "name": "InheritanceGraphBuilder",
+        "methods": [
+          "__init__",
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.repositories.graph_repository"
+    ]
+  },
+  "app\\services\\analysis\\graph_algorithms\\module_graph_builder.py": {
+    "classes": [
+      {
+        "name": "ModuleGraphBuilder",
+        "methods": [
+          "__init__",
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.repositories.graph_repository"
+    ]
+  },
+  "app\\services\\analysis\\graph_algorithms\\package_graph_builder.py": {
+    "classes": [
+      {
+        "name": "PackageGraphBuilder",
+        "methods": [
+          "__init__",
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.repositories.graph_repository"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\capability_detector.py": {
+    "classes": [
+      {
+        "name": "CapabilityDetector",
+        "methods": [
+          "detect"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.repository_context",
+      "app.models.knowledge.feature_instance",
+      "app.services.knowledge.semantic_registry"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\feature_confidence_engine.py": {
+    "classes": [
+      {
+        "name": "FeatureConfidenceEngine",
+        "methods": [
+          "calculate",
+          "_compute_confidence"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.knowledge.feature_instance",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\feature_extractor.py": {
+    "classes": [
+      {
+        "name": "FeatureExtractor",
+        "methods": [
+          "__init__",
+          "extract"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.repository_context",
+      "app.models.knowledge.feature_instance",
+      "app.repositories.graph_repository",
+      "app.services.analysis.semantic.detectors.api_detector",
+      "app.services.analysis.semantic.detectors.security_detector",
+      "app.services.analysis.semantic.detectors.database_detector",
+      "app.services.analysis.semantic.detectors.configuration_detector",
+      "app.services.analysis.semantic.feature_fusion_engine",
+      "app.services.analysis.semantic.feature_validation_layer",
+      "app.services.analysis.semantic.feature_confidence_engine"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\feature_fusion_engine.py": {
+    "classes": [
+      {
+        "name": "FeatureFusionEngine",
+        "methods": [
+          "fuse"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.knowledge.feature_instance"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\feature_validation_layer.py": {
+    "classes": [
+      {
+        "name": "FeatureValidationLayer",
+        "methods": [
+          "validate",
+          "_is_valid"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.knowledge.feature_instance",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\graph_enrichment_engine.py": {
+    "classes": [
+      {
+        "name": "GraphEnrichmentEngine",
+        "methods": [
+          "__init__",
+          "enrich"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.knowledge.feature_instance",
+      "app.repositories.graph_repository",
+      "app.services.knowledge.semantic_registry"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\detectors\\api_detector.py": {
+    "classes": [
+      {
+        "name": "ApiDetector",
+        "methods": [
+          "detect",
+          "_find_rest_evidence",
+          "_find_graphql_evidence"
+        ]
+      }
+    ],
+    "imports": [
+      "uuid",
+      "typing",
+      "app.models.repository_context",
+      "app.models.knowledge.feature_instance",
+      "app.models.knowledge.evidence",
+      "app.services.analysis.semantic.detectors.base_feature_detector",
+      "app.services.knowledge.semantic_registry"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\detectors\\base_feature_detector.py": {
+    "classes": [
+      {
+        "name": "BaseFeatureDetector",
+        "methods": [
+          "__init__",
+          "detect"
+        ]
+      }
+    ],
+    "imports": [
+      "abc",
+      "typing",
+      "app.models.repository_context",
+      "app.models.knowledge.feature_instance",
+      "app.repositories.graph_repository"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\detectors\\configuration_detector.py": {
+    "classes": [
+      {
+        "name": "ConfigurationDetector",
+        "methods": [
+          "detect",
+          "_find_docker_evidence"
+        ]
+      }
+    ],
+    "imports": [
+      "uuid",
+      "os",
+      "typing",
+      "app.models.repository_context",
+      "app.models.knowledge.feature_instance",
+      "app.models.knowledge.evidence",
+      "app.services.analysis.semantic.detectors.base_feature_detector",
+      "app.services.knowledge.semantic_registry"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\detectors\\database_detector.py": {
+    "classes": [
+      {
+        "name": "DatabaseDetector",
+        "methods": [
+          "detect",
+          "_find_orm_evidence"
+        ]
+      }
+    ],
+    "imports": [
+      "uuid",
+      "typing",
+      "app.models.repository_context",
+      "app.models.knowledge.feature_instance",
+      "app.models.knowledge.evidence",
+      "app.services.analysis.semantic.detectors.base_feature_detector",
+      "app.services.knowledge.semantic_registry"
+    ]
+  },
+  "app\\services\\analysis\\semantic\\detectors\\security_detector.py": {
+    "classes": [
+      {
+        "name": "SecurityDetector",
+        "methods": [
+          "detect",
+          "_find_rbac_evidence",
+          "_find_cors_evidence"
+        ]
+      }
+    ],
+    "imports": [
+      "uuid",
+      "typing",
+      "app.models.repository_context",
+      "app.models.knowledge.feature_instance",
+      "app.models.knowledge.evidence",
+      "app.services.analysis.semantic.detectors.base_feature_detector",
+      "app.services.knowledge.semantic_registry"
+    ]
+  },
+  "app\\services\\code\\language_detector.py": {
+    "classes": [
+      {
+        "name": "LanguageDetector",
+        "methods": [
+          "detect"
+        ]
+      }
+    ],
+    "imports": [
+      "pathlib",
+      "app.models.code.code_context"
+    ]
+  },
+  "app\\services\\code\\parser_manager.py": {
+    "classes": [
+      {
+        "name": "ParserManager",
+        "methods": [
+          "__init__",
+          "register_parser",
+          "get_parser",
+          "parse"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.code.source_file",
+      "app.models.code.ast_node",
+      "app.services.code.parsers.base_parser",
+      "app.services.code.parsers.java_parser",
+      "app.services.code.parsers.python_parser",
+      "app.services.code.parsers.javascript_parser",
+      "app.services.code.parsers.dependency_parser"
+    ]
+  },
+  "app\\services\\code\\source_file_collector.py": {
+    "classes": [
+      {
+        "name": "SourceFileCollector",
+        "methods": [
+          "collect"
+        ]
+      }
+    ],
+    "imports": [
+      "pathlib",
+      "app.models.code.code_context",
+      "app.models.code.source_file",
+      "app.models.repository_context"
+    ]
+  },
+  "app\\services\\code\\builders\\ir_builder.py": {
+    "classes": [
+      {
+        "name": "IRBuilder",
+        "methods": [
+          "build",
+          "_visit",
+          "_map_type"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.code.ast_node",
+      "app.models.code.intermediate_representation",
+      "app.models.code.source_file"
+    ]
+  },
+  "app\\services\\code\\parsers\\base_parser.py": {
+    "classes": [
+      {
+        "name": "BaseParser",
+        "methods": [
+          "parse"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.code.source_file",
+      "app.models.code.ast_node",
+      "typing"
+    ]
+  },
+  "app\\services\\code\\parsers\\dependency_parser.py": {
+    "classes": [
+      {
+        "name": "DependencyParser",
+        "methods": [
+          "parse",
+          "_parse_package_json",
+          "_parse_requirements",
+          "_parse_toml_dependencies"
+        ]
+      }
+    ],
+    "imports": [
+      "json",
+      "re",
+      "pathlib",
+      "typing",
+      "app.models.code.source_file",
+      "app.models.code.ast_node",
+      "app.services.code.parsers.base_parser"
+    ]
+  },
+  "app\\services\\code\\parsers\\javascript_parser.py": {
+    "classes": [
+      {
+        "name": "JavaScriptParser",
+        "methods": [
+          "parse"
+        ]
+      }
+    ],
+    "imports": [
+      "re",
+      "app.models.code.source_file",
+      "app.models.code.ast_node",
+      "app.services.code.parsers.base_parser"
+    ]
+  },
+  "app\\services\\code\\parsers\\java_parser.py": {
+    "classes": [
+      {
+        "name": "JavaParser",
+        "methods": [
+          "parse"
+        ]
+      }
+    ],
+    "imports": [
+      "javalang",
+      "app.models.code.source_file",
+      "app.models.code.ast_node",
+      "app.services.code.parsers.base_parser"
+    ]
+  },
+  "app\\services\\code\\parsers\\python_parser.py": {
+    "classes": [
+      {
+        "name": "PythonParser",
+        "methods": [
+          "parse",
+          "_get_name"
+        ]
+      }
+    ],
+    "imports": [
+      "ast",
+      "app.models.code.source_file",
+      "app.models.code.ast_node",
+      "app.services.code.parsers.base_parser"
+    ]
+  },
+  "app\\services\\code\\pipeline\\code_understanding_pipeline.py": {
+    "classes": [
+      {
+        "name": "CodeUnderstandingPipeline",
+        "methods": [
+          "__init__",
+          "process"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.repository_context",
+      "app.models.code.code_context",
+      "app.services.code.source_file_collector",
+      "app.services.code.language_detector",
+      "app.services.code.parser_manager",
+      "app.services.code.builders.ir_builder",
+      "app.services.knowledge.symbol_extractor",
+      "app.services.knowledge.relationship_extractor"
+    ]
+  },
+  "app\\services\\ingestion\\context_builder.py": {
+    "classes": [
+      {
+        "name": "RepositoryContextBuilder",
+        "methods": [
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.repository_context"
+    ]
+  },
+  "app\\services\\ingestion\\repository_ingestion_pipeline.py": {
+    "classes": [
+      {
+        "name": "RepositoryIngestionPipeline",
+        "methods": [
+          "__init__",
+          "ingest"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.repository_context",
+      "app.services.ingestion.context_builder",
+      "app.services.ingestion.repository_normalizer",
+      "app.services.ingestion.repository_scanner",
+      "app.services.ingestion.repository_service",
+      "os"
+    ]
+  },
+  "app\\services\\ingestion\\repository_normalizer.py": {
+    "classes": [
+      {
+        "name": "RepositoryNormalizer",
+        "methods": [
+          "normalize"
+        ]
+      }
+    ],
+    "imports": [
+      "pathlib"
+    ]
+  },
+  "app\\services\\ingestion\\repository_scanner.py": {
+    "classes": [
+      {
+        "name": "RepositoryScanner",
+        "methods": [
+          "scan_repository"
+        ]
+      }
+    ],
+    "imports": [
+      "pathlib"
+    ]
+  },
+  "app\\services\\ingestion\\repository_service.py": {
+    "classes": [
+      {
+        "name": "RepositoryService",
+        "methods": [
+          "__init__",
+          "validate_repository_url",
+          "repository_exists",
+          "clone_repository",
+          "get_repository_metadata",
+          "delete_repository"
+        ]
+      }
+    ],
+    "imports": [
+      "pathlib",
+      "shutil",
+      "re",
+      "git"
+    ]
+  },
+  "app\\services\\knowledge\\code_retrieval.py": {
+    "classes": [
+      {
+        "name": "CodeRetrievalEngine",
+        "methods": [
+          "__init__",
+          "retrieve"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.claim",
+      "app.models.knowledge.evidence",
+      "typing"
+    ]
+  },
+  "app\\services\\knowledge\\documentation_retrieval.py": {
+    "classes": [
+      {
+        "name": "DocumentationRetrievalEngine",
+        "methods": [
+          "__init__",
+          "retrieve"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.claim",
+      "app.models.knowledge.evidence",
+      "typing"
+    ]
+  },
+  "app\\services\\knowledge\\graph_analytics_engine.py": {
+    "classes": [
+      {
+        "name": "NodeCentrality",
+        "methods": []
+      },
+      {
+        "name": "PathResult",
+        "methods": []
+      },
+      {
+        "name": "DependencyNode",
+        "methods": []
+      },
+      {
+        "name": "CycleReport",
+        "methods": []
+      },
+      {
+        "name": "GraphAnalyticsReport",
+        "methods": []
+      },
+      {
+        "name": "GraphAnalyticsEngine",
+        "methods": [
+          "__init__",
+          "run_full_analytics",
+          "compute_degree_centrality",
+          "compute_betweenness_approximation",
+          "shortest_path",
+          "check_reachability",
+          "analyze_dependencies",
+          "detect_cycles",
+          "_query",
+          "_count_nodes",
+          "_count_relationships"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "dataclasses"
+    ]
+  },
+  "app\\services\\knowledge\\graph_builder.py": {
+    "classes": [
+      {
+        "name": "GraphBuilder",
+        "methods": [
+          "build"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.code.code_context",
+      "app.models.knowledge.repository_knowledge_graph"
+    ]
+  },
+  "app\\services\\knowledge\\graph_retrieval.py": {
+    "classes": [
+      {
+        "name": "GraphRetrievalEngine",
+        "methods": [
+          "__init__",
+          "retrieve"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.claim",
+      "app.models.knowledge.evidence",
+      "app.repositories.graph_repository",
+      "typing"
+    ]
+  },
+  "app\\services\\knowledge\\relationships.py": {
+    "classes": [
+      {
+        "name": "RelationshipType",
+        "methods": []
+      },
+      {
+        "name": "GraphRelationship",
+        "methods": []
+      }
+    ],
+    "imports": [
+      "dataclasses",
+      "enum",
+      "typing",
+      "uuid"
+    ]
+  },
+  "app\\services\\knowledge\\relationship_extractor.py": {
+    "classes": [
+      {
+        "name": "RelationshipExtractor",
+        "methods": [
+          "extract",
+          "_extract_from_ir",
+          "_visit",
+          "_infer_relationship"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.code.code_context",
+      "app.models.code.intermediate_representation",
+      "app.models.code.relationship"
+    ]
+  },
+  "app\\services\\knowledge\\semantic_registry.py": {
+    "classes": [
+      {
+        "name": "FeatureDefinition",
+        "methods": []
+      },
+      {
+        "name": "SemanticFeatureRegistry",
+        "methods": [
+          "__init__",
+          "_build_registry",
+          "_add",
+          "get_by_id",
+          "resolve",
+          "get_all"
+        ]
+      }
+    ],
+    "imports": [
+      "pydantic",
+      "typing"
+    ]
+  },
+  "app\\services\\knowledge\\semantic_retrieval.py": {
+    "classes": [
+      {
+        "name": "SemanticRetrievalEngine",
+        "methods": [
+          "__init__",
+          "add_documents",
+          "retrieve"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.claim",
+      "app.models.knowledge.evidence",
+      "typing"
+    ]
+  },
+  "app\\services\\knowledge\\symbol_extractor.py": {
+    "classes": [
+      {
+        "name": "SymbolExtractor",
+        "methods": [
+          "extract",
+          "_extract_from_ir",
+          "_visit"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.code.code_context",
+      "app.models.code.intermediate_representation",
+      "app.models.code.symbol"
+    ]
+  },
+  "app\\services\\knowledge\\technology_kb.py": {
+    "classes": [],
+    "imports": [
+      "typing",
+      "app.models.knowledge.technology",
+      "app.models.knowledge.capability"
+    ]
+  },
+  "app\\services\\pipelines\\evidence_pipeline.py": {
+    "classes": [
+      {
+        "name": "EvidencePipeline",
+        "methods": [
+          "__init__",
+          "run"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.trustrepo_context",
+      "app.services.analysis.evidence_collector"
+    ]
+  },
+  "app\\services\\pipelines\\investigation_pipeline.py": {
+    "classes": [
+      {
+        "name": "InvestigationPipeline",
+        "methods": [
+          "__init__",
+          "run"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.trustrepo_context",
+      "app.models.knowledge.evidence",
+      "app.models.knowledge.investigation",
+      "app.services.analysis.claim_normalization_layer",
+      "app.services.agents.task_planner_agent",
+      "app.models.claim",
+      "datetime"
+    ]
+  },
+  "app\\services\\pipelines\\knowledge_graph_pipeline.py": {
+    "classes": [
+      {
+        "name": "KnowledgeGraphPipeline",
+        "methods": [
+          "__init__",
+          "run"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.trustrepo_context",
+      "app.services.knowledge.graph_builder",
+      "app.repositories.graph_repository",
+      "app.services.analysis.graph_algorithms.call_graph_builder",
+      "app.services.analysis.graph_algorithms.dependency_graph_builder",
+      "app.services.analysis.graph_algorithms.inheritance_graph_builder",
+      "app.services.analysis.graph_algorithms.package_graph_builder",
+      "app.services.analysis.graph_algorithms.module_graph_builder",
+      "app.services.analysis.technology_detection",
+      "app.services.analysis.architecture_detection",
+      "app.services.knowledge.graph_analytics_engine",
+      "app.services.analysis.semantic.feature_extractor",
+      "app.services.analysis.semantic.capability_detector",
+      "app.services.analysis.semantic.graph_enrichment_engine"
+    ]
+  },
+  "app\\services\\pipelines\\reporting_pipeline.py": {
+    "classes": [
+      {
+        "name": "ReportingPipeline",
+        "methods": [
+          "__init__",
+          "run"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.trustrepo_context",
+      "app.services.reporting.report_generator"
+    ]
+  },
+  "app\\services\\pipelines\\verification_pipeline.py": {
+    "classes": [
+      {
+        "name": "VerificationPipeline",
+        "methods": [
+          "__init__",
+          "run"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.trustrepo_context",
+      "app.models.knowledge.investigation"
+    ]
+  },
+  "app\\services\\reporting\\explanation_generator.py": {
+    "classes": [
+      {
+        "name": "ExplanationGenerator",
+        "methods": [
+          "generate"
+        ]
+      }
+    ],
+    "imports": [
+      "app.models.knowledge.investigation",
+      "app.models.report.trust_report"
+    ]
+  },
+  "app\\services\\reporting\\report_generator.py": {
+    "classes": [
+      {
+        "name": "ReportGenerator",
+        "methods": [
+          "__init__",
+          "generate_report",
+          "to_markdown"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "datetime",
+      "app.models.knowledge.investigation",
+      "app.models.report.trust_report",
+      "app.services.reporting.explanation_generator",
+      "app.models.trustrepo_context",
+      "app.models.knowledge.evidence",
+      "app.services.verification.trust_scorer"
+    ]
+  },
+  "app\\services\\verification\\decision_matrix.py": {
+    "classes": [
+      {
+        "name": "DecisionVerdictState",
+        "methods": []
+      },
+      {
+        "name": "FeatureComparison",
+        "methods": []
+      },
+      {
+        "name": "DecisionMatrixResult",
+        "methods": []
+      },
+      {
+        "name": "DecisionMatrix",
+        "methods": [
+          "evaluate",
+          "_detect_contradictions",
+          "_select_verdict",
+          "_build_trace"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "dataclasses",
+      "enum"
+    ]
+  },
+  "app\\services\\verification\\evidence_fusion_engine.py": {
+    "classes": [
+      {
+        "name": "FusionStream",
+        "methods": []
+      },
+      {
+        "name": "FusionResult",
+        "methods": []
+      },
+      {
+        "name": "EvidenceFusionEngine",
+        "methods": [
+          "fuse",
+          "_deduplicate",
+          "_rank",
+          "build_doc_chains"
+        ]
+      }
+    ],
+    "imports": [
+      "uuid",
+      "typing",
+      "dataclasses",
+      "app.models.knowledge.evidence",
+      "app.models.claim",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\verification\\evidence_quality_assessor.py": {
+    "classes": [
+      {
+        "name": "EvidenceQualityResult",
+        "methods": []
+      },
+      {
+        "name": "EvidenceQualityAssessor",
+        "methods": [
+          "assess",
+          "assess_all",
+          "aggregate_quality",
+          "_compute_completeness",
+          "_compute_provenance_richness",
+          "_classify"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "dataclasses",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\verification\\evidence_validation_engine.py": {
+    "classes": [
+      {
+        "name": "ValidationOutcome",
+        "methods": []
+      },
+      {
+        "name": "ValidationRuleResult",
+        "methods": []
+      },
+      {
+        "name": "EvidenceValidationResult",
+        "methods": []
+      },
+      {
+        "name": "EvidenceValidationEngine",
+        "methods": [
+          "validate",
+          "validate_all",
+          "filter_valid",
+          "_rule_non_empty",
+          "_rule_known_source",
+          "_rule_ranking_threshold",
+          "_rule_false_positive_check",
+          "_rule_completeness_policy"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "dataclasses",
+      "enum",
+      "app.models.knowledge.evidence"
+    ]
+  },
+  "app\\services\\verification\\intent_resolver.py": {
+    "classes": [
+      {
+        "name": "ResolvedIntent",
+        "methods": []
+      },
+      {
+        "name": "IntentResolver",
+        "methods": [
+          "resolve"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "pydantic",
+      "app.services.knowledge.semantic_registry"
+    ]
+  },
+  "app\\services\\verification\\ontology.py": {
+    "classes": [
+      {
+        "name": "Ontology",
+        "methods": [
+          "normalize",
+          "get_technology_category",
+          "get_architecture_features"
+        ]
+      }
+    ],
+    "imports": [
+      "typing"
+    ]
+  },
+  "app\\services\\verification\\reasoning_agent.py": {
+    "classes": [
+      {
+        "name": "ReasoningAgent",
+        "methods": [
+          "__init__",
+          "evaluate",
+          "_extract_observed_features",
+          "_map_verdict",
+          "_infer_category"
+        ]
+      }
+    ],
+    "imports": [
+      "typing",
+      "app.models.claim",
+      "app.models.knowledge.investigation",
+      "app.models.report.trust_report",
+      "app.models.knowledge.evidence",
+      "app.services.verification.ontology",
+      "app.services.verification.decision_matrix",
+      "app.services.verification.evidence_quality_assessor",
+      "app.services.verification.evidence_validation_engine"
+    ]
+  },
+  "app\\services\\verification\\trust_scorer.py": {
+    "classes": [
+      {
+        "name": "TrustScorer",
+        "methods": [
+          "calculate_claim_score",
+          "calculate_repository_score",
+          "calculate_score"
+        ]
+      }
+    ],
+    "imports": [
+      "__future__",
+      "typing",
+      "app.models.knowledge.investigation",
+      "app.models.knowledge.investigation"
+    ]
+  },
+  "app\\services\\verification\\verification_engine.py": {
+    "classes": [
+      {
+        "name": "VerificationEngine",
+        "methods": [
+          "__init__",
+          "verify"
+        ]
+      }
+    ],
+    "imports": [
+      "__future__",
+      "datetime",
+      "typing",
+      "app.models.knowledge.investigation",
+      "app.models.knowledge.evidence",
+      "app.services.verification.trust_scorer",
+      "app.services.verification.reasoning_agent",
+      "app.services.agents.base_agent",
+      "app.services.analysis.claim_normalization_layer",
+      "app.models.claim",
+      "app.models.knowledge.evidence"
+    ]
+  }
+}

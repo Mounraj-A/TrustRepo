@@ -35,7 +35,7 @@ class GraphEnrichmentEngine:
                 "category": def_node.category,
                 "confidence": feat.confidence
             }
-            self.repo.conn.execute(query, params)
+            self.repo.conn.query(query, params)
             
             # Connect Capabilities
             for cap in def_node.capabilities:
@@ -44,7 +44,7 @@ class GraphEnrichmentEngine:
                 MERGE (c:Capability {name: $cap})
                 MERGE (fi)-[:IMPLEMENTS]->(c)
                 """
-                self.repo.conn.execute(cap_query, {"id": feat.id, "cap": cap})
+                self.repo.conn.query(cap_query, {"id": feat.id, "cap": cap})
                 
             # Connect to Evidence Nodes (Annotations, Files, etc.)
             for chain in feat.evidence:
@@ -58,7 +58,7 @@ class GraphEnrichmentEngine:
                         try:
                             # graph_node_id is usually stringified integer ID in neo4j
                             node_id = int(item.graph_node_id)
-                            self.repo.conn.execute(ev_query, {"id": feat.id, "node_id": node_id})
+                            self.repo.conn.query(ev_query, {"id": feat.id, "node_id": node_id})
                         except (ValueError, TypeError):
                             pass
                             
@@ -70,4 +70,4 @@ class GraphEnrichmentEngine:
                 MERGE (t:Technology {name: $tech})
                 MERGE (t)-[:ENABLES]->(fi)
                 """
-                self.repo.conn.execute(tech_query, {"id": feat.id, "tech": tech})
+                self.repo.conn.query(tech_query, {"id": feat.id, "tech": tech})

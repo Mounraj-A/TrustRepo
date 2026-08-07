@@ -12,6 +12,7 @@ Wires:
 """
 from app.models.trustrepo_context import TrustRepoContext
 from app.services.knowledge.graph_builder import GraphBuilder
+from app.services.knowledge.graph_schema_validator import GraphSchemaValidator
 from app.repositories.graph_repository import GraphRepository
 from app.services.analysis.graph_algorithms.call_graph_builder import CallGraphBuilder
 from app.services.analysis.graph_algorithms.dependency_graph_builder import DependencyGraphBuilder
@@ -30,6 +31,7 @@ from app.services.analysis.semantic.graph_enrichment_engine import GraphEnrichme
 class KnowledgeGraphPipeline:
     def __init__(self):
         self.builder = GraphBuilder()
+        self.schema_validator = GraphSchemaValidator()
         self.repo = GraphRepository()
         self.graph_algorithms = [
             CallGraphBuilder(),
@@ -41,8 +43,8 @@ class KnowledgeGraphPipeline:
         self.tech_detection = TechnologyDetection(repo=self.repo)
         self.arch_detection = ArchitectureDetection()
         self.analytics_engine = GraphAnalyticsEngine(repo=self.repo)
-        
-        self.feature_extractor = FeatureExtractor(repo=self.repo)
+
+        self.feature_extractor = FeatureExtractor()
         self.capability_detector = CapabilityDetector()
         self.enrichment_engine = GraphEnrichmentEngine(repo=self.repo)
 
@@ -55,6 +57,16 @@ class KnowledgeGraphPipeline:
         graph = self.builder.build(context.code_context)
         context.graph_context.graph = graph
         print(f"  Graph Built: {len(graph.nodes)} nodes, {len(graph.edges)} edges.")
+
+        # ── Step 1b: Schema Validation ─────────────────────────────────────────
+        validation = self.schema_validator.validate(graph)
+        context.graph_context.analytics["schema_validation"] = validation.to_dict()
+        if validation.errors:
+            for err in validation.errors:
+                print(f"  [GraphSchema] ERROR: {err}")
+        for warn in validation.warnings:
+            print(f"  [GraphSchema] WARN: {warn}")
+        print(f"  Graph Integrity: {validation.integrity_score:.2f} | Nodes: {validation.node_count} | Edges: {validation.edge_count}")
 
         # ── Step 2: Persist to Neo4j ──────────────────────────────────────────
         try:
@@ -84,15 +96,17 @@ class KnowledgeGraphPipeline:
             print(f"  [KGPipeline] Technology detection failed: {e}")
 
         # ── Step 5: Feature Extraction (Plugin Detectors + Fusion + Validation)
+        # CRITICAL: Pass the in-memory RepositoryKnowledgeGraph — NOT RepositoryContext.
+        # All feature detector plugins query graph nodes directly (same as TechnologyDetection).
+        # Previously they attempted live Neo4j Cypher queries (always None) — now fixed.
         try:
-            # We pass context.repository_context to feature extractor for configuration/source files.
-            features = self.feature_extractor.extract(context.repository_context)
+            features = self.feature_extractor.extract(graph)
             context.semantic_context.features = [f.canonical_name for f in features]
         except Exception as e:
             print(f"  [KGPipeline] Feature extraction failed: {e}")
             features = []
-            
-        # ── Step 6: Capability Detection
+
+        # ── Step 6: Capability Detection ─────────────────────────────────────
         try:
             detected_caps = self.capability_detector.detect(features)
             context.semantic_context.capabilities.extend(detected_caps)

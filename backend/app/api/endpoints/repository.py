@@ -42,10 +42,18 @@ def analyze_repository(req: AnalyzeRequest):
     Returns the full RepositoryTrustReport as JSON + Markdown.
     """
     # ── Validation ────────────────────────────────────────────────────────────
-    if not req.repository_url or not (req.repository_url.startswith("http") or req.repository_url.startswith("local://")):
+    import os
+    url = req.repository_url.strip()
+    is_valid = (
+        url.startswith("http")
+        or url.startswith("local://")
+        or os.path.isabs(url)
+        or (len(url) > 2 and url[1] == ":")  # Windows drive letter: D:\...
+    )
+    if not url or not is_valid:
         return {
             "status": "error",
-            "message": "Invalid repository URL. Must start with http/https or local://."
+            "message": "Invalid repository URL. Must be http/https, a local:// URI, or an absolute local path."
         }
 
     start_time = time.time()
@@ -134,6 +142,8 @@ def analyze_repository(req: AnalyzeRequest):
         "processing_time_seconds": processing_time,
         "report": report.model_dump() if report else {},
         "markdown": markdown,
+
+        # ── Code Metrics ───────────────────────────────────────────────────────
         "code_metrics": {
             "source_files":   code_meta.get("source_files", 0),
             "parsed_files":   code_meta.get("parsed_files", 0),
@@ -142,18 +152,33 @@ def analyze_repository(req: AnalyzeRequest):
             "symbols":        code_meta.get("symbols", 0),
             "relationships":  code_meta.get("relationships", 0),
         },
+
+        # ── Graph Metrics (all fields from semantic_context) ───────────────────
         "graph_metrics": {
-            "nodes":          graph_nodes,
-            "edges":          graph_edges,
-            "technologies":   context.semantic_context.technologies if context.semantic_context else [],
-            "architecture":   context.semantic_context.architectures if context.semantic_context else [],
-            "analytics":      graph_analytics,
+            "nodes":                  graph_nodes,
+            "edges":                  graph_edges,
+            "technologies":           context.semantic_context.technologies if context.semantic_context else [],
+            "technology_categories":  context.semantic_context.technology_categories if context.semantic_context else {},
+            "features":               context.semantic_context.features if context.semantic_context else [],
+            "capabilities":           context.semantic_context.capabilities if context.semantic_context else [],
+            "architectures":          context.semantic_context.architectures if context.semantic_context else [],
+            "evidence_chain_count":   len(context.semantic_context.evidence_chains) if context.semantic_context else 0,
+            "analytics":              graph_analytics,
+            "schema_validation":      graph_analytics.get("schema_validation", {}),
         },
+
+        # ── Verification Summary ───────────────────────────────────────────────
         "verification_summary": {
             "total_claims":        total_claims,
             "verified":            verified_count,
             "refuted":             refuted_count,
             "partially_verified":  partial_count,
             "insufficient":        insufficient_count,
-        }
+        },
+
+        # ── Phase 10: Runtime Dashboard — per-layer execution trace ─────────────
+        "execution_trace": context.execution_trace,
+
+        # ── Phase 11: Code Intelligence Mode output ─────────────────────────────
+        "code_intelligence": context.code_intelligence,
     }

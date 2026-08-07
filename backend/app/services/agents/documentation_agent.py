@@ -29,7 +29,7 @@ class DocumentationAgent(BaseAgent):
                 continue
                 
             # Check canonical name and aliases
-            search_terms = [feature_def.name] + feature_def.aliases
+            search_terms = [feature_def.canonical_name] + feature_def.aliases
             found = False
             for term in search_terms:
                 if found:
@@ -41,7 +41,7 @@ class DocumentationAgent(BaseAgent):
                     chain = EvidenceChain(
                         chain_id=f"doc_feat_{feat}",
                         chain_type="Documentation Match",
-                        reasoning_trace=f"Documentation explicitly mentions '{term}' supporting feature '{feature_def.name}'",
+                        reasoning_trace=f"Documentation explicitly mentions '{term}' supporting feature '{feature_def.canonical_name}'",
                         sequence=[
                             EvidenceItem(
                                 source=EvidenceSource(file_path="README/Documentation"),

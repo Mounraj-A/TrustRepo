@@ -45,5 +45,11 @@ class TrustRepoContext(BaseModel):
     evidence_context: EvidenceContextData = Field(default_factory=EvidenceContextData)
     verification_context: VerificationContext = Field(default_factory=VerificationContext)
     report_context: ReportContext = Field(default_factory=ReportContext)
-    
+
     claims: List[Claim] = Field(default_factory=list)
+
+    # Phase 10: Runtime Dashboard — per-layer execution trace
+    execution_trace: List[Dict[str, Any]] = Field(default_factory=list)
+
+    # Phase 11: Code Intelligence Mode — populated when no docs exist
+    code_intelligence: Dict[str, Any] = Field(default_factory=dict)

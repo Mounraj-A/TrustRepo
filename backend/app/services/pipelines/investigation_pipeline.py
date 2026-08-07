@@ -85,7 +85,9 @@ class InvestigationPipeline:
                     raise Exception("TaskPlannerAgent returned no VerificationResult.")
 
             except Exception as e:
+                import traceback
                 print(f"      Investigation failed for claim '{nc.claim_id}': {e}")
+                traceback.print_exc()
                 from datetime import datetime, timezone
                 context.verification_context.verification_results[nc.claim_id] = VerificationResult(
                     claim_id=nc.claim_id,

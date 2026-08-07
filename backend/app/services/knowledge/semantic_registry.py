@@ -133,7 +133,6 @@ class SemanticFeatureRegistry:
             capabilities=["Messaging & Events"]
         ))
         
-        # ── Infrastructure Features ─────────────────────────────────────────────
         self._add(FeatureDefinition(
             id="feat_docker",
             canonical_name="Docker Containerization",
@@ -142,6 +141,33 @@ class SemanticFeatureRegistry:
             description="Application packaged as a Docker container",
             ontology_path=["Infrastructure", "Containerization", "Docker"],
             capabilities=["Containerization"]
+        ))
+        self._add(FeatureDefinition(
+            id="feat_graph_database",
+            canonical_name="Graph Database",
+            aliases=["Graph DB", "Neo4j", "Graph Store"],
+            category="Database",
+            description="Graph database for connected data storage and traversal",
+            ontology_path=["Database", "Graph Database", "Neo4j"],
+            capabilities=["Database Management"]
+        ))
+        self._add(FeatureDefinition(
+            id="feat_caching",
+            canonical_name="Distributed Caching",
+            aliases=["Caching", "Redis", "Memcached", "Cache Layer"],
+            category="Infrastructure",
+            description="Distributed in-memory caching for performance",
+            ontology_path=["Infrastructure", "Caching", "Redis"],
+            capabilities=["Performance"]
+        ))
+        self._add(FeatureDefinition(
+            id="feat_task_queue",
+            canonical_name="Async Task Queue",
+            aliases=["Task Queue", "Celery", "Background Tasks", "Worker"],
+            category="Messaging",
+            description="Asynchronous background task processing",
+            ontology_path=["Messaging", "Task Queue", "Celery"],
+            capabilities=["Messaging & Events"]
         ))
 
     def _add(self, feat: FeatureDefinition):

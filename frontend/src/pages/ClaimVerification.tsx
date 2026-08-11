@@ -25,7 +25,7 @@ export default function ClaimVerification() {
     );
   }
 
-  const verify = analysisResult?.verification_summary;
+  const verify = analysisResult?.report?.verification_counts || analysisResult?.verification_summary;
   const claims = analysisResult?.report?.documentation_claims ?? [];
 
   const filteredClaims = useMemo(() => {
@@ -79,7 +79,7 @@ export default function ClaimVerification() {
         </div>
         <div className="glass rounded-xl p-5 border-l-4 border-l-rose-500">
           <div className="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1">✕ Refuted</div>
-          <div className="text-3xl font-bold text-rose-600">{verify?.refuted || 0}</div>
+          <div className="text-3xl font-bold text-rose-600">{(verify as any)?.contradicted || (verify as any)?.refuted || 0}</div>
         </div>
         <div className="glass rounded-xl p-5 border-l-4 border-l-indigo-500">
           <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">? Insufficient</div>

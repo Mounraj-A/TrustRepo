@@ -157,6 +157,8 @@ class ReasoningTrace(BaseModel):
 
 class DocumentationClaim(BaseModel):
     claim_id: str
+    normalized_claim_id: str = ""
+    source_document: Optional[str] = None
     claim_text: str
     verdict: VerificationVerdict
     verification_category: VerificationCategory = VerificationCategory.UNKNOWN
@@ -188,6 +190,17 @@ class TrustAssessment(BaseModel):
     score: float = 0.0
     status: str = "Unknown"
     details: str = "Not yet calibrated"
+    total_claims: int = 0
+    verified_claims: int = 0
+    documentation_coverage: float = 0.0
+
+class VerificationCounts(BaseModel):
+    total_claims: int = 0
+    verified: int = 0
+    contradicted: int = 0
+    partially_verified: int = 0
+    insufficient: int = 0
+    missing_documentation: int = 0
 
 class UnifiedEvidenceItem(BaseModel):
     evidence_id: str
@@ -213,5 +226,6 @@ class RepositoryReport(BaseModel):
     contradictions: List[Contradiction] = Field(default_factory=list)
     recommendations: List[Recommendation] = Field(default_factory=list)
     trust_assessment: Optional[TrustAssessment] = None
+    verification_counts: VerificationCounts = Field(default_factory=VerificationCounts)
     evidence_summary: EvidenceSummary = Field(default_factory=EvidenceSummary)
     unified_evidence: List[UnifiedEvidenceItem] = Field(default_factory=list)

@@ -11,7 +11,7 @@ export default function TrustScore() {
 
   const report = analysisResult?.report;
   const graph = analysisResult?.graph_metrics;
-  const verify = analysisResult?.verification_summary;
+  const verify = analysisResult?.report?.verification_counts || analysisResult?.verification_summary;
 
   const docScore    = (report?.summary?.coverage_percentage ?? 0) / 100;
   const techCount   = graph?.technologies?.length ?? 0;

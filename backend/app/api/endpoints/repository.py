@@ -185,22 +185,19 @@ def analyze_repository(req: AnalyzeRequest):
         }
 
     # ── Extract Claim Statistics ────────────────────────────────────────────
-    verification_results = context.verification_context.verification_results if context.verification_context else {}
-    total_claims = len(verification_results)
-    from app.models.knowledge.investigation import VerificationVerdict
-    verified_count = sum(
-        1 for r in verification_results.values()
-        if r.verdict == VerificationVerdict.VERIFIED
-    )
-    refuted_count = sum(
-        1 for r in verification_results.values()
-        if r.verdict == VerificationVerdict.CONTRADICTION
-    )
-    partial_count = sum(
-        1 for r in verification_results.values()
-        if r.verdict == VerificationVerdict.PARTIAL_DOCUMENTATION
-    )
-    insufficient_count = total_claims - verified_count - refuted_count - partial_count
+    if report and hasattr(report, "verification_counts"):
+        vc = report.verification_counts
+        total_claims = vc.total_claims
+        verified_count = vc.verified
+        refuted_count = vc.contradicted
+        partial_count = vc.partially_verified
+        insufficient_count = vc.insufficient + vc.missing_documentation
+    else:
+        total_claims = 0
+        verified_count = 0
+        refuted_count = 0
+        partial_count = 0
+        insufficient_count = 0
 
     logger.info(
         f"Analysis complete in {processing_time}s — "

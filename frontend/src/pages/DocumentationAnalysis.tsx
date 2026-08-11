@@ -26,7 +26,7 @@ export default function DocumentationAnalysis() {
   }
 
   const report = analysisResult?.report;
-  const summary = analysisResult?.verification_summary;
+  const summary = analysisResult?.report?.verification_counts || analysisResult?.verification_summary;
 
   if (!report || !summary) return <EmptyState />;
 

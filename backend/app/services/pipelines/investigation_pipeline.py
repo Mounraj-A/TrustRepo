@@ -44,11 +44,22 @@ class InvestigationPipeline:
         print(f"  Normalizing {len(context.claims)} claims...")
 
         # Step 1: Full claim normalization (deduplication + intent + features)
+        # This mutates each raw claim to set its normalized_claim_id
         normalized_claims = self.normalizer.normalize(context.claims)
 
         print(
-            f"  {
-                len(normalized_claims)} unique normalized claims after deduplication.")
+            f"  {len(normalized_claims)} unique normalized claims after deduplication.")
+
+        # Step 1b: Build reverse map — normalized_claim_id → [raw claim IDs]
+        # Every raw claim now has a normalized_claim_id set by _normalize_single
+        from collections import defaultdict
+        claim_mapping: dict = defaultdict(list)
+        for raw_claim in context.claims:
+            if raw_claim.normalized_claim_id:
+                claim_mapping[raw_claim.normalized_claim_id].append(raw_claim.id)
+        context.claim_mapping = dict(claim_mapping)
+
+        print(f"  Claim mapping: {len(claim_mapping)} groups covering {sum(len(v) for v in claim_mapping.values())} raw claims")
 
         # Retrieve pre-collected evidence contexts (from EvidencePipeline Layer
         # 4)

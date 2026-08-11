@@ -76,6 +76,9 @@ export interface TrustAssessment {
   score: number;
   status: string;
   details: string;
+  total_claims?: number;
+  verified_claims?: number;
+  documentation_coverage?: number;
 }
 
 export interface RepositoryMetadata {
@@ -113,6 +116,15 @@ export interface EvidenceSummary {
   source_files: number;
 }
 
+export interface VerificationCounts {
+  total_claims: number;
+  verified: number;
+  contradicted: number;
+  partially_verified: number;
+  insufficient: number;
+  missing_documentation: number;
+}
+
 export interface RepositoryReport {
   metadata: RepositoryMetadata;
   summary: DocumentationSummary;
@@ -122,6 +134,7 @@ export interface RepositoryReport {
   contradictions: any[]; // Map if needed
   recommendations: Recommendation[];
   trust_assessment: TrustAssessment | null;
+  verification_counts: VerificationCounts;
   evidence_summary: EvidenceSummary;
   unified_evidence: UnifiedEvidenceItem[];
 }
@@ -224,6 +237,8 @@ export interface ReasoningTrace {
 
 export interface DocumentationClaim {
   claim_id: string;
+  normalized_claim_id?: string;
+  source_document?: string;
   claim_text: string;
   verdict: string;
   verification_category?: string;

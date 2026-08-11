@@ -65,6 +65,10 @@ class TrustRepoContext(BaseModel):
 
     claims: List[Claim] = Field(default_factory=list)
 
+    # Reverse map: normalized_claim_id → list of raw claim IDs
+    # Built by InvestigationPipeline after normalization
+    claim_mapping: Dict[str, List[str]] = Field(default_factory=dict)
+
     # Phase 10: Runtime Dashboard — per-layer execution trace
     execution_trace: List[Dict[str, Any]] = Field(default_factory=list)
 

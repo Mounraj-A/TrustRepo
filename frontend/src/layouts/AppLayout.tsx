@@ -30,8 +30,8 @@ export default function AppLayout() {
   // Health check on mount
   useEffect(() => { ping(); }, []);
 
-  const score = analysisResult?.report?.trust_score;
-  const repoName = analysisResult?.report?.repository_name;
+  const score = analysisResult?.report?.trust_assessment?.score;
+  const repoName = analysisResult?.report?.metadata?.repository_url?.split(/[\/\\]/).pop();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-slate-900 selection:bg-indigo-500/30">
@@ -121,7 +121,7 @@ export default function AppLayout() {
             </div>
             {score !== undefined && (
               <div className="text-xs text-muted-foreground">
-                Trust Score: <span className={cn('font-bold', scoreColor(score))}>{Math.round(score * 100)}%</span>
+                Trust Score: <span className={cn('font-bold', scoreColor(score / 100))}>{Math.round(score)}%</span>
               </div>
             )}
             {repoName && (

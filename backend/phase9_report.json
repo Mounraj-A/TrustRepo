@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "repository_url": "d:/Projects/TrustRepo/sample_repo",
+    "commit_sha": "HEAD",
+    "branch": "main",
+    "languages": [
+      "Python",
+      "JavaScript",
+      "TypeScript"
+    ],
+    "frameworks": [],
+    "source_files_count": 0,
+    "documentation_sources": [],
+    "claims_analyzed": 0,
+    "features_investigated": 1,
+    "analysis_date": "2026-08-10T07:14:10.853499Z",
+    "verification_version": "3.0.0"
+  },
+  "summary": {
+    "documentation_sources": [],
+    "total_candidates": 1,
+    "confirmed_features": 0,
+    "documented_features": 0,
+    "missing_documentation": 0,
+    "contradicted": 0,
+    "insufficient_evidence": 0,
+    "total_claims": 0,
+    "verified_claims": 0,
+    "contradicted_claims": 0,
+    "coverage_percentage": 0.0,
+    "coverage_score": null
+  },
+  "documentation_claims": [],
+  "feature_findings": [],
+  "contradictions": [],
+  "recommendations": [],
+  "trust_assessment": {
+    "score": 0.0,
+    "status": "Low Trust",
+    "details": "Calculated based on 0% doc coverage and 0/0 verified claims."
+  }
+}

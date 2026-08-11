@@ -25,7 +25,7 @@ import time
 import os
 import psutil
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any
 
 from app.models.trustrepo_context import TrustRepoContext
 from app.models.repository_context import RepositoryContext
@@ -79,13 +79,13 @@ class TrustRepoPipeline:
     """
 
     def __init__(self):
-        self.doc_pipeline           = DocumentUnderstandingPipeline()
-        self.code_pipeline          = CodeUnderstandingPipeline()
-        self.kg_pipeline            = KnowledgeGraphPipeline()
-        self.evidence_pipeline      = EvidencePipeline()
+        self.doc_pipeline = DocumentUnderstandingPipeline()
+        self.code_pipeline = CodeUnderstandingPipeline()
+        self.kg_pipeline = KnowledgeGraphPipeline()
+        self.evidence_pipeline = EvidencePipeline()
         self.investigation_pipeline = InvestigationPipeline()
-        self.verification_pipeline  = VerificationPipeline()
-        self.reporting_pipeline     = ReportingPipeline()
+        self.verification_pipeline = VerificationPipeline()
+        self.reporting_pipeline = ReportingPipeline()
 
     def run(self, repo_context: RepositoryContext) -> TrustRepoContext:
         print("==========================================")
@@ -95,22 +95,26 @@ class TrustRepoPipeline:
         context = TrustRepoContext(repository_context=repo_context)
         trace: List[LayerTrace] = []
 
-        # ── Detect Mode ───────────────────────────────────────────────────────
+        # ── Detect Mode ──────────────────────────────────────────────────────
         has_docs = bool(repo_context.documentation_files)
         code_intelligence_mode = not has_docs
         if code_intelligence_mode:
             print("\n  [Mode] CODE INTELLIGENCE — No documentation detected.")
             print("  [Mode] Pipeline will derive all insights from parser evidence.")
         else:
-            print(f"\n  [Mode] DOCUMENTATION VERIFICATION — {len(repo_context.documentation_files)} doc files.")
+            print(
+                f"\n  [Mode] DOCUMENTATION VERIFICATION — {
+                    len(
+                        repo_context.documentation_files)} doc files.")
 
-        # ── Layer 2A: Document Understanding ──────────────────────────────────
+        # ── Layer 2A: Document Understanding ─────────────────────────────────
         print("\n--- Layer 2A: Document Understanding ---")
         t = time.time()
         layer_trace = LayerTrace(layer="2A: Document Understanding")
 
         if code_intelligence_mode:
-            print("  [SKIPPED] Code Intelligence Mode — no documentation to process.")
+            print(
+                "  [SKIPPED] Code Intelligence Mode — no documentation to process.")
             layer_trace.status = "SKIPPED"
             layer_trace.details["mode"] = "code_intelligence"
         else:
@@ -131,11 +135,12 @@ class TrustRepoPipeline:
                 print(f"  [Layer 2A] Document pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
-        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.memory_mb = psutil.Process(
+            os.getpid()).memory_info().rss / (1024 * 1024)
         layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
-        # ── Layer 2B: Code Understanding ──────────────────────────────────────
+        # ── Layer 2B: Code Understanding ─────────────────────────────────────
         print("\n--- Layer 2B: Code Understanding ---")
         t = time.time()
         layer_trace = LayerTrace(layer="2B: Code Understanding")
@@ -157,11 +162,12 @@ class TrustRepoPipeline:
             print(f"  [Layer 2B] Code pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
-        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.memory_mb = psutil.Process(
+            os.getpid()).memory_info().rss / (1024 * 1024)
         layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
-        # ── Layer 3: Knowledge Graph + Analytics ──────────────────────────────
+        # ── Layer 3: Knowledge Graph + Analytics ─────────────────────────────
         print("\n--- Layer 3: Knowledge Graph + Analytics ---")
         t = time.time()
         layer_trace = LayerTrace(layer="3: Knowledge Graph")
@@ -170,7 +176,8 @@ class TrustRepoPipeline:
             graph = context.graph_context.graph
             layer_trace.status = "OK"
             layer_trace.objects_created = len(graph.nodes) if graph else 0
-            layer_trace.evidence_count = len(context.semantic_context.evidence_chains)
+            layer_trace.evidence_count = len(
+                context.semantic_context.evidence_chains)
             layer_trace.details = {
                 "graph_nodes": len(graph.nodes) if graph else 0,
                 "graph_edges": len(graph.edges) if graph else 0,
@@ -189,52 +196,59 @@ class TrustRepoPipeline:
             print(f"  [Layer 3] KG pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
-        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.memory_mb = psutil.Process(
+            os.getpid()).memory_info().rss / (1024 * 1024)
         layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
-        # ── Code Intelligence Mode: Generate Repository Intelligence ──────────
+        # ── Code Intelligence Mode: Generate Repository Intelligence ─────────
         if code_intelligence_mode and context.graph_context.graph:
             self._generate_code_intelligence(context)
 
-        # ── Layer 4: Evidence Retrieval ───────────────────────────────────────
+        # ── Layer 4: Evidence Retrieval ──────────────────────────────────────
         print("\n--- Layer 4: Evidence Retrieval ---")
         t = time.time()
         layer_trace = LayerTrace(layer="4: Evidence Retrieval")
         try:
             context = self.evidence_pipeline.run(context)
             layer_trace.status = "OK"
-            layer_trace.objects_created = len(context.evidence_context.contexts)
-            layer_trace.details = {"evidence_contexts": len(context.evidence_context.contexts)}
+            layer_trace.objects_created = len(
+                context.evidence_context.contexts)
+            layer_trace.details = {
+                "evidence_contexts": len(
+                    context.evidence_context.contexts)}
         except Exception as e:
             layer_trace.status = "FAILED"
             layer_trace.errors.append(str(e))
             print(f"  [Layer 4] Evidence pipeline failed: {e}")
 
         layer_trace.time_s = time.time() - t
-        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.memory_mb = psutil.Process(
+            os.getpid()).memory_info().rss / (1024 * 1024)
         layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
-        # ── Layer 5: Multi-Agent Investigation + Reasoning ────────────────────
+        # ── Layer 5: Multi-Agent Investigation + Reasoning ───────────────────
         print("\n--- Layer 5: Multi-Agent Investigation ---")
         t = time.time()
         layer_trace = LayerTrace(layer="5: Investigation")
         try:
             context = self.investigation_pipeline.run(context)
             layer_trace.status = "OK"
-            layer_trace.objects_created = len(context.verification_context.verification_results)
+            layer_trace.objects_created = len(
+                context.verification_context.verification_results)
         except Exception as e:
             layer_trace.status = "FAILED"
             layer_trace.errors.append(str(e))
             print(f"  [Layer 5] Investigation failed: {e}")
 
         layer_trace.time_s = time.time() - t
-        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.memory_mb = psutil.Process(
+            os.getpid()).memory_info().rss / (1024 * 1024)
         layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
-        # ── Layer 6: Verification Summary ─────────────────────────────────────
+        # ── Layer 6: Verification Summary ────────────────────────────────────
         print("\n--- Layer 6: Verification Summary ---")
         t = time.time()
         layer_trace = LayerTrace(layer="6: Verification")
@@ -247,11 +261,12 @@ class TrustRepoPipeline:
             print(f"  [Layer 6] Verification failed: {e}")
 
         layer_trace.time_s = time.time() - t
-        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.memory_mb = psutil.Process(
+            os.getpid()).memory_info().rss / (1024 * 1024)
         layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
-        # ── Layer 7: Report Generation ────────────────────────────────────────
+        # ── Layer 7: Report Generation ───────────────────────────────────────
         print("\n--- Layer 7: Report Generation ---")
         t = time.time()
         layer_trace = LayerTrace(layer="7: Report Generation")
@@ -265,11 +280,12 @@ class TrustRepoPipeline:
             print(f"  [Layer 7] Reporting failed: {e}")
 
         layer_trace.time_s = time.time() - t
-        layer_trace.memory_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        layer_trace.memory_mb = psutil.Process(
+            os.getpid()).memory_info().rss / (1024 * 1024)
         layer_trace.cpu_percent = psutil.cpu_percent()
         trace.append(layer_trace)
 
-        # ── Store execution trace in context ──────────────────────────────────
+        # ── Store execution trace in context ─────────────────────────────────
         context.execution_trace = [t.to_dict() for t in trace]
 
         print("\n  Pipeline execution complete.")
@@ -309,10 +325,16 @@ class TrustRepoPipeline:
             ],
             "recommendations": self._generate_recommendations(context),
         }
-        print(f"  [Code Intelligence] {len(components)} components detected from graph.")
-        print(f"  [Code Intelligence] {len(context.code_intelligence['missing_documentation'])} documentation gaps found.")
+        print(
+            f"  [Code Intelligence] {
+                len(components)} components detected from graph.")
+        print(
+            f"  [Code Intelligence] {
+                len(
+                    context.code_intelligence['missing_documentation'])} documentation gaps found.")
 
-    def _generate_recommendations(self, context: TrustRepoContext) -> List[str]:
+    def _generate_recommendations(
+            self, context: TrustRepoContext) -> List[str]:
         """Generate recommendations from graph analytics."""
         recs = []
         analytics = context.graph_context.analytics
@@ -345,19 +367,26 @@ class TrustRepoPipeline:
             )
 
         if not recs:
-            recs.append("Repository structure appears healthy based on graph analysis.")
+            recs.append(
+                "Repository structure appears healthy based on graph analysis.")
 
         return recs
 
-    def _print_summary(self, trace: List[LayerTrace], context: TrustRepoContext):
+    def _print_summary(
+            self, trace: List[LayerTrace], context: TrustRepoContext):
         """Print a clean pipeline execution summary."""
         print("\n==========================================")
         print("  PIPELINE SUMMARY")
         print("==========================================")
         total_time = sum(t.time_s for t in trace)
         for t in trace:
-            icon = "[OK]" if t.status == "OK" else ("[SKIP]" if t.status == "SKIPPED" else "[FAIL]")
-            print(f"  {icon} {t.layer:<30} {t.time_s:.2f}s  objects={t.objects_created}")
+            icon = "[OK]" if t.status == "OK" else (
+                "[SKIP]" if t.status == "SKIPPED" else "[FAIL]")
+            print(
+                f"  {icon} {
+                    t.layer:<30} {
+                    t.time_s:.2f}s  objects={
+                    t.objects_created}")
         print(f"\n  Total time: {total_time:.2f}s")
         print(f"  Technologies: {len(context.semantic_context.technologies)}")
         print(f"  Features:     {len(context.semantic_context.features)}")

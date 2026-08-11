@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+
 
 class ParserReliability(float, Enum):
     """
@@ -13,9 +13,10 @@ class ParserReliability(float, Enum):
     REGEX = 0.40
     HEURISTIC = 0.30
 
+
 class ParserRegistry:
     """Central registry for AST and source code parsers."""
-    
+
     @classmethod
     def get_reliability(cls, parser_name: str) -> float:
         mapping = {

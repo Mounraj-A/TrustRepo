@@ -103,7 +103,6 @@ class ClaimCandidateGenerator:
 
             document_context.candidate_claims.append(claim)
 
-
         return document_context
 
     def _classify(

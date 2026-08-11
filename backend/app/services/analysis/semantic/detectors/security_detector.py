@@ -44,7 +44,7 @@ class SecurityDetector(BaseFeatureDetector):
     def detect(self, graph: RepositoryKnowledgeGraph) -> List[FeatureInstance]:
         features = []
 
-        # ── RBAC ──────────────────────────────────────────────────────────────
+        # ── RBAC ─────────────────────────────────────────────────────────────
         rbac_chain = self._find_annotation_chain(
             graph, RBAC_ANNOTATIONS, "Authorization", "feat_rbac",
             "Role-based access control annotations detected.",
@@ -52,7 +52,7 @@ class SecurityDetector(BaseFeatureDetector):
         if rbac_chain:
             self._append_feature(features, "feat_rbac", [rbac_chain])
 
-        # ── JWT ───────────────────────────────────────────────────────────────
+        # ── JWT ──────────────────────────────────────────────────────────────
         jwt_chain = self._find_import_chain(
             graph, JWT_IMPORTS, "JWT Authentication", "feat_jwt",
             "JWT authentication imports detected.",
@@ -60,7 +60,7 @@ class SecurityDetector(BaseFeatureDetector):
         if jwt_chain:
             self._append_feature(features, "feat_jwt", [jwt_chain])
 
-        # ── CORS ──────────────────────────────────────────────────────────────
+        # ── CORS ─────────────────────────────────────────────────────────────
         cors_ann_chain = self._find_annotation_chain(
             graph, CORS_ANNOTATIONS, "CORS", "feat_cors",
             "CORS annotation detected.",
@@ -73,7 +73,7 @@ class SecurityDetector(BaseFeatureDetector):
             chains = [c for c in [cors_ann_chain, cors_imp_chain] if c]
             self._append_feature(features, "feat_cors", chains)
 
-        # ── OAuth2 ────────────────────────────────────────────────────────────
+        # ── OAuth2 ───────────────────────────────────────────────────────────
         oauth_chain = self._find_import_chain(
             graph, OAUTH_IMPORTS, "OAuth2", "feat_oauth2",
             "OAuth2 library imports detected.",
@@ -106,7 +106,9 @@ class SecurityDetector(BaseFeatureDetector):
             return None
         items = [
             EvidenceItem(
-                source=EvidenceSource(file_path=n.properties.get("file_path", "unknown")),
+                source=EvidenceSource(
+                    file_path=n.properties.get(
+                        "file_path", "unknown")),
                 node_type="Annotation",
                 symbol=n.properties.get("name", ""),
                 context_type=context_type,
@@ -135,7 +137,9 @@ class SecurityDetector(BaseFeatureDetector):
             return None
         items = [
             EvidenceItem(
-                source=EvidenceSource(file_path=n.properties.get("file_path", "unknown")),
+                source=EvidenceSource(
+                    file_path=n.properties.get(
+                        "file_path", "unknown")),
                 node_type="Import",
                 symbol=n.properties.get("name", ""),
                 context_type=context_type,

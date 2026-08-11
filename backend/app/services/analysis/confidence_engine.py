@@ -2,6 +2,7 @@ from typing import List
 from datetime import datetime, timezone
 from app.models.knowledge.evidence import EvidenceItem, EvidenceType, EvidenceStrength
 
+
 class ConfidenceEngine:
     """
     Centralized Confidence & Ranking Engine.
@@ -15,29 +16,30 @@ class ConfidenceEngine:
 
         # Calculate individual item scores
         item_scores = [self.calculate_item_confidence(item) for item in items]
-        
+
         # Base score is the maximum of individual evidence items
         base_score = max(item_scores)
-        
+
         # Agreement multiplier based on number of supporting evidence pieces
         agreement_multiplier = min(1.0 + (len(items) - 1) * 0.05, 1.2)
-        
+
         final_score = base_score * agreement_multiplier
         return min(1.0, final_score)
 
     def calculate_item_confidence(self, item: EvidenceItem) -> float:
         # 1. Source Weight
         source_weight = self._get_source_weight(item.evidence_type)
-        
+
         # 2. Graph Weight (Strength of evidence)
         graph_weight = self._get_graph_weight(item.evidence_strength)
-        
+
         # 3. Freshness (decay based on analysis timestamp)
         freshness = self._calculate_freshness(item.source.analysis_timestamp)
-        
+
         # 4. Parser Confidence
-        parser_confidence = self._get_parser_confidence(item.source.parser_used)
-        
+        parser_confidence = self._get_parser_confidence(
+            item.source.parser_used)
+
         # Score = SourceWeight * GraphWeight * Freshness * ParserConfidence
         # Since this is a single item, Agreement = 1.0
         return source_weight * graph_weight * freshness * parser_confidence
@@ -72,21 +74,22 @@ class ConfidenceEngine:
             now = datetime.now(timezone.utc)
             delta = now - analysis_timestamp
             hours = delta.total_seconds() / 3600
-            
+
             if hours <= 24:
                 return 1.0
-            elif hours <= 168: # 1 week
+            elif hours <= 168:  # 1 week
                 return 0.95
-            elif hours <= 720: # 1 month
+            elif hours <= 720:  # 1 month
                 return 0.90
             return 0.80
         except TypeError:
-            return 1.0 # timezone naive vs aware
+            return 1.0  # timezone naive vs aware
 
     def _get_parser_confidence(self, parser_name: str) -> float:
         # AST parsers are high confidence
         # Regex or unknown parsers are lower confidence
-        if parser_name in ("DependencyParser", "ASTParser", "AnnotationProvider"):
+        if parser_name in ("DependencyParser", "ASTParser",
+                           "AnnotationProvider"):
             return 1.0
         if "Regex" in parser_name:
             return 0.8

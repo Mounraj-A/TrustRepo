@@ -49,7 +49,7 @@ class TaskPlannerAgent(BaseAgent):
     """
     Central coordinator. Receives a NormalizedClaim, dispatches to 3 specialized
     agents in parallel, then fuses results via EvidenceFusionAgent.
-    
+
     Returns a single enriched AgentMessage ready for the VerificationEngine.
     """
     role = AgentRole.TASK_PLANNER
@@ -59,7 +59,7 @@ class TaskPlannerAgent(BaseAgent):
         self.code_agent = CodeAgent()
         self.docs_agent = DocumentationAgent()
         self.graph_agent = KnowledgeGraphAgent()
-        
+
         self.ranking_agent = EvidenceRankingAgent()
         self.fusion_agent = EvidenceFusionAgent()
         self.validation_agent = EvidenceValidationAgent()
@@ -71,9 +71,9 @@ class TaskPlannerAgent(BaseAgent):
         self.verification_agent = VerificationAgent()
         self.recommendation_engine = RecommendationEngine()
         self.llm_agent = LLMExplanationAgent()
-        
+
         self.raw_doc_text = raw_doc_text
-        
+
         # Agent Memory
         self.memory = {
             "retrieved_evidence": [],
@@ -90,11 +90,13 @@ class TaskPlannerAgent(BaseAgent):
         """
         # ── Step 0: Agent Memory & Intent Resolution ────────────────────────
         if raw_claim.id in self.memory["visited_claims"]:
-            self._log(None, f"Claim {raw_claim.id} already processed. Skipping.")
+            self._log(
+                None, f"Claim {
+                    raw_claim.id} already processed. Skipping.")
             return None
-            
+
         self.memory["visited_claims"].add(raw_claim.id)
-        
+
         resolved_intent = self.intent_resolver.resolve(raw_claim.text)
         for feat in resolved_intent.expected_features:
             self.memory["visited_features"].add(feat)
@@ -115,19 +117,24 @@ class TaskPlannerAgent(BaseAgent):
             },
             confidence=0.0
         )
-        
-        self._log(base_message, f"Planning investigation for intent='{resolved_intent.intent}', features={resolved_intent.expected_features}")
-        
+
+        self._log(
+            base_message,
+            f"Planning investigation for intent='{
+                resolved_intent.intent}', features={
+                resolved_intent.expected_features}")
+
         # ── Step 1: Dispatch to 3 specialized agents independently ──────────
         code_msg = self._clone_message(base_message, AgentRole.CODE)
         code_result = self.code_agent.process(code_msg)
-        
+
         doc_msg = self._clone_message(base_message, AgentRole.DOCUMENTATION)
         doc_result = self.docs_agent.process(doc_msg)
-        
-        graph_msg = self._clone_message(base_message, AgentRole.KNOWLEDGE_GRAPH)
+
+        graph_msg = self._clone_message(
+            base_message, AgentRole.KNOWLEDGE_GRAPH)
         graph_result = self.graph_agent.process(graph_msg)
-        
+
         # ── Step 2: Aggregate results into ranking message ─────────────────
         ranking_message = AgentMessage(
             message_type=MessageType.REQUEST,
@@ -147,33 +154,42 @@ class TaskPlannerAgent(BaseAgent):
             trace=code_result.trace + doc_result.trace + graph_result.trace,
             confidence=0.0
         )
-        
-        self._log(ranking_message, "Aggregating evidence from specialized agents for ranking.")
-        
+
+        self._log(
+            ranking_message,
+            "Aggregating evidence from specialized agents for ranking.")
+
         # ── Step 3: Run Remaining Pipeline (Linear) ─────────────────────────
         ranked_result = self.ranking_agent.process(ranking_message)
         fused_result = self.fusion_agent.process(ranked_result)
         validated_result = self.validation_agent.process(fused_result)
         agreement_result = self.agreement_engine.process(validated_result)
         coverage_result = self.coverage_agent.process(agreement_result)
-        contradiction_result = self.contradiction_agent.process(coverage_result)
+        contradiction_result = self.contradiction_agent.process(
+            coverage_result)
         reasoning_result = self.reasoning_agent.process(contradiction_result)
         decision_result = self.decision_matrix.process(reasoning_result)
-        recommendation_result = self.recommendation_engine.process(decision_result)
-        verification_result = self.verification_agent.process(recommendation_result)
+        recommendation_result = self.recommendation_engine.process(
+            decision_result)
+        verification_result = self.verification_agent.process(
+            recommendation_result)
         final_result = self.llm_agent.process(verification_result)
-        
+
         # Update Memory
         self.memory["retrieved_evidence"].extend(final_result.evidence)
         self.memory["previous_decisions"].append({
             "claim_id": raw_claim.id,
             "verdict": final_result.payload.get("verdict")
         })
-        
-        self._log(final_result, f"Investigation complete. Final confidence={final_result.confidence:.2f}")
+
+        self._log(
+            final_result,
+            f"Investigation complete. Final confidence={
+                final_result.confidence:.2f}")
         return final_result
 
-    def _clone_message(self, base: AgentMessage, recipient: AgentRole) -> AgentMessage:
+    def _clone_message(self, base: AgentMessage,
+                       recipient: AgentRole) -> AgentMessage:
         """Creates a fresh copy of the base message for a specific recipient."""
         return AgentMessage(
             message_type=MessageType.REQUEST,

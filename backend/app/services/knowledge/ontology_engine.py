@@ -6,13 +6,14 @@ from app.models.knowledge.evidence_registry import EvidenceRegistry
 from app.models.knowledge.relationship_registry import RelationshipRegistry
 from app.models.knowledge.parser_registry import ParserRegistry
 
+
 class OntologyEngine:
     """
     The semantic backbone of the system. Unifies all registries and manages
     the ontology of Technologies, Features, Capabilities, Architectures,
     Evidences, and Relationships.
     """
-    
+
     def __init__(self):
         self.technologies = TechnologyRegistry()
         self.features = FeatureRegistry()
@@ -31,5 +32,6 @@ class OntologyEngine:
             "architectures": self.architectures.all_patterns(),
             "evidences": self.evidences.all_types(),
             "relationships": self.relationships.all_types(),
-            "parser_reliabilities": [p.name for p in self.parsers.get_reliability.__annotations__] # Placeholder
+            # Placeholder
+            "parser_reliabilities": [p.name for p in self.parsers.get_reliability.__annotations__]
         }

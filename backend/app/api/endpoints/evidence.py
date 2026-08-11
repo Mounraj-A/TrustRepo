@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 from app.repositories.graph_repository import GraphRepository
@@ -6,12 +6,15 @@ from app.repositories.graph_repository import GraphRepository
 router = APIRouter()
 
 # DTOs
+
+
 class EvidenceSourceDTO(BaseModel):
     repository_id: str
     file_path: str
     line_number: Optional[int]
     commit_sha: str
     parser_used: str
+
 
 class EvidenceItemDTO(BaseModel):
     id: str
@@ -21,6 +24,7 @@ class EvidenceItemDTO(BaseModel):
     evidence_strength: str
     source: EvidenceSourceDTO
 
+
 class EvidenceChainDTO(BaseModel):
     chain_id: str
     chain_type: str
@@ -28,12 +32,17 @@ class EvidenceChainDTO(BaseModel):
     reasoning_trace: str
     sequence: List[EvidenceItemDTO]
 
-@router.get("/evidence/technology/{technology}", response_model=List[EvidenceChainDTO])
-def get_evidence_by_technology(technology: str, repo: GraphRepository = Depends()):
+
+@router.get("/evidence/technology/{technology}",
+            response_model=List[EvidenceChainDTO])
+def get_evidence_by_technology(
+        technology: str, repo: GraphRepository = Depends()):
     """Get all evidence chains that led to the detection of a specific technology."""
     # This would normally query the TrustRepoContext or database for evidence chains
-    # related to the technology. For now, returning a mocked structure based on graph.
+    # related to the technology. For now, returning a mocked structure based
+    # on graph.
     return []
+
 
 @router.get("/evidence/claim/{claim_id}", response_model=Dict[str, Any])
 def get_evidence_by_claim(claim_id: str):
@@ -43,6 +52,7 @@ def get_evidence_by_claim(claim_id: str):
         "claim_id": claim_id,
         "evidence_chains": []
     }
+
 
 @router.get("/evidence/file/{file_id}", response_model=List[EvidenceItemDTO])
 def get_evidence_by_file(file_id: str):

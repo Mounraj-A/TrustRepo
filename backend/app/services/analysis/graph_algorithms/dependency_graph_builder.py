@@ -1,9 +1,11 @@
 from app.repositories.graph_repository import GraphRepository
 
+
 class DependencyGraphBuilder:
     """
     Computes module dependency metrics without overwriting raw relationships.
     """
+
     def __init__(self, repo: GraphRepository = None):
         self.repo = repo or GraphRepository()
 

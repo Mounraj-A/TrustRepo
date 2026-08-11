@@ -8,7 +8,7 @@ docker-compose.yml, and other infrastructure files.
 Also queries the graph for configuration-related File nodes.
 """
 import uuid
-from typing import List, Optional
+from typing import List
 
 from app.models.knowledge.repository_knowledge_graph import RepositoryKnowledgeGraph
 from app.models.knowledge.feature_instance import FeatureInstance
@@ -18,7 +18,11 @@ from app.models.knowledge.evidence import (
 from app.services.analysis.semantic.detectors.base_feature_detector import BaseFeatureDetector
 from app.services.knowledge.semantic_registry import SEMANTIC_REGISTRY
 
-DOCKER_KEYWORDS = {"dockerfile", "docker-compose", "compose.yaml", "compose.yml"}
+DOCKER_KEYWORDS = {
+    "dockerfile",
+    "docker-compose",
+    "compose.yaml",
+    "compose.yml"}
 CELERY_IMPORTS = {"celery", "kombu"}
 MESSAGE_QUEUE_IMPORTS = {
     "pika", "aio_pika", "aioamqp",
@@ -37,7 +41,7 @@ class ConfigurationDetector(BaseFeatureDetector):
     def detect(self, graph: RepositoryKnowledgeGraph) -> List[FeatureInstance]:
         features = []
 
-        # ── Containerization (Docker) ─────────────────────────────────────────
+        # ── Containerization (Docker) ────────────────────────────────────────
         docker_nodes = self._find_docker_nodes(graph)
         if docker_nodes:
             chain = self._build_chain(
@@ -46,7 +50,7 @@ class ConfigurationDetector(BaseFeatureDetector):
             )
             self._append_feature(features, "feat_docker", [chain])
 
-        # ── Task Queue (Celery) ───────────────────────────────────────────────
+        # ── Task Queue (Celery) ──────────────────────────────────────────────
         celery_nodes = self._get_import_nodes_matching(graph, CELERY_IMPORTS)
         if celery_nodes:
             chain = self._build_chain(
@@ -55,7 +59,7 @@ class ConfigurationDetector(BaseFeatureDetector):
             )
             self._append_feature(features, "feat_task_queue", [chain])
 
-        # ── Message Queue ─────────────────────────────────────────────────────
+        # ── Message Queue ────────────────────────────────────────────────────
         mq_nodes = (
             self._get_import_nodes_matching(graph, MESSAGE_QUEUE_IMPORTS) +
             self._get_dependency_nodes_matching(graph, MESSAGE_QUEUE_IMPORTS)
@@ -75,7 +79,12 @@ class ConfigurationDetector(BaseFeatureDetector):
         for node in graph.nodes:
             if node.label != "File":
                 continue
-            path = (node.properties.get("path", "") or node.properties.get("name", "")).lower()
+            path = (
+                node.properties.get(
+                    "path",
+                    "") or node.properties.get(
+                    "name",
+                    "")).lower()
             if any(kw in path for kw in DOCKER_KEYWORDS):
                 result.append(node)
         return result[:5]
@@ -90,10 +99,14 @@ class ConfigurationDetector(BaseFeatureDetector):
                 evidence=chains,
             ))
 
-    def _build_chain(self, nodes: list, context_type: str, reasoning: str) -> EvidenceChain:
+    def _build_chain(self, nodes: list, context_type: str,
+                     reasoning: str) -> EvidenceChain:
         items = [
             EvidenceItem(
-                source=EvidenceSource(file_path=n.properties.get("file_path", n.properties.get("path", "unknown"))),
+                source=EvidenceSource(
+                    file_path=n.properties.get(
+                        "file_path", n.properties.get(
+                            "path", "unknown"))),
                 node_type=n.label,
                 symbol=n.properties.get("name", n.properties.get("path", "")),
                 context_type=context_type,

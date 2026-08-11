@@ -1,9 +1,11 @@
 from app.repositories.graph_repository import GraphRepository
 
+
 class PackageGraphBuilder:
     """
     Computes hierarchical package/directory structure metrics.
     """
+
     def __init__(self, repo: GraphRepository = None):
         self.repo = repo or GraphRepository()
 

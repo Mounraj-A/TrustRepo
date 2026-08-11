@@ -21,9 +21,9 @@ export default function TrustScoreGauge({
   const { outer, stroke, fontSize, icon } = SIZES[size];
   const radius = (outer - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
-  const pct = Math.min(Math.max(score, 0), 1);
+  const pct = Math.min(Math.max(score, 0), 100) / 100;
   const offset = circumference * (1 - pct);
-  const displayScore = Math.round(pct * 100);
+  const displayScore = Math.round(Math.min(Math.max(score, 0), 100));
 
   const gradientId = `trust-gradient-${size}`;
 

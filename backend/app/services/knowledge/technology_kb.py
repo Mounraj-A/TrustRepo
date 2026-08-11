@@ -4,10 +4,12 @@ from app.models.knowledge.capability import Capability
 
 TECHNOLOGY_KB: Dict[str, Technology] = {}
 
+
 def _add_tech(tech: Technology):
     TECHNOLOGY_KB[tech.id] = tech
 
-# ── Java / Spring ─────────────────────────────────────────────────────────────
+
+# ── Java / Spring ───────────────────────────────────────────────────────
 _add_tech(Technology(
     id="spring",
     display_name="Spring Framework",
@@ -146,7 +148,7 @@ _add_tech(Technology(
     category="Caching"
 ))
 
-# ── Python ────────────────────────────────────────────────────────────────────
+# ── Python ──────────────────────────────────────────────────────────────
 _add_tech(Technology(
     id="fastapi",
     display_name="FastAPI",
@@ -293,7 +295,7 @@ _add_tech(Technology(
     category="Visualization"
 ))
 
-# ── JavaScript / Node ─────────────────────────────────────────────────────────
+# ── JavaScript / Node ───────────────────────────────────────────────────
 _add_tech(Technology(
     id="express",
     display_name="Express.js",
@@ -333,19 +335,19 @@ _add_tech(Technology(
     parent="plotly"
 ))
 
-# ── Universal / Language Independent ──────────────────────────────────────────
+# ── Universal / Language Independent ────────────────────────────────────
 _add_tech(Technology(
     id="docker",
     display_name="Docker",
     aliases=["docker"],
-    languages=[], # Empty implies universal
+    languages=[],  # Empty implies universal
     category="Containerization"
 ))
 _add_tech(Technology(
     id="neo4j",
     display_name="Neo4j",
     aliases=["neo4j", "org.neo4j", "spring-data-neo4j"],
-    languages=[], # Usually matches neo4j driver across languages
+    languages=[],  # Usually matches neo4j driver across languages
     category="Database"
 ))
 _add_tech(Technology(
@@ -357,56 +359,99 @@ _add_tech(Technology(
 ))
 
 
-# ── Capabilities Mapping ──────────────────────────────────────────────────────
+# ── Capabilities Mapping ────────────────────────────────────────────────
 CAPABILITY_KB: Dict[str, Capability] = {}
+
 
 def _add_cap(cap: Capability):
     CAPABILITY_KB[cap.id] = cap
 
-_add_cap(Capability("database", "Database Management", ["Database", "ORM"], "Data persistence and database communication layer."))
-_add_cap(Capability("visualization", "Data Visualization", ["Visualization", "Dashboard"], "Graphical representation of data and metrics."))
-_add_cap(Capability("analytics", "Data Analytics", ["Data Processing", "Scientific Computing", "Machine Learning"], "Processing and analyzing structured or unstructured data."))
-_add_cap(Capability("authentication", "Authentication & Security", ["Authentication", "Security"], "User identity verification and access control."))
-_add_cap(Capability("api", "API Infrastructure", ["Backend Framework"], "Exposes endpoints for external systems or frontends."))
-_add_cap(Capability("messaging", "Messaging & Events", ["Messaging", "Task Queue"], "Asynchronous inter-service communication via queues or event buses."))
-_add_cap(Capability("caching", "Caching Layer", ["Caching"], "In-memory or distributed caching for performance optimization."))
-_add_cap(Capability("frontend", "Frontend / UI", ["Frontend Framework"], "User-facing UI layer and component rendering."))
-_add_cap(Capability("containerization", "Containerization", ["Containerization", "Orchestration"], "Container-based deployment and orchestration infrastructure."))
 
-def resolve_technology(import_path: str, file_languages: List[str]) -> List[Technology]:
+_add_cap(
+    Capability(
+        "database", "Database Management", [
+            "Database", "ORM"], "Data persistence and database communication layer."))
+_add_cap(
+    Capability(
+        "visualization", "Data Visualization", [
+            "Visualization", "Dashboard"], "Graphical representation of data and metrics."))
+_add_cap(Capability("analytics",
+                    "Data Analytics",
+                    ["Data Processing",
+                     "Scientific Computing",
+                     "Machine Learning"],
+                    "Processing and analyzing structured or unstructured data."))
+_add_cap(Capability("authentication", "Authentication & Security", [
+         "Authentication", "Security"], "User identity verification and access control."))
+_add_cap(
+    Capability(
+        "api",
+        "API Infrastructure",
+        ["Backend Framework"],
+        "Exposes endpoints for external systems or frontends."))
+_add_cap(Capability("messaging",
+                    "Messaging & Events",
+                    ["Messaging",
+                     "Task Queue"],
+                    "Asynchronous inter-service communication via queues or event buses."))
+_add_cap(
+    Capability(
+        "caching",
+        "Caching Layer",
+        ["Caching"],
+        "In-memory or distributed caching for performance optimization."))
+_add_cap(
+    Capability(
+        "frontend",
+        "Frontend / UI",
+        ["Frontend Framework"],
+        "User-facing UI layer and component rendering."))
+_add_cap(Capability("containerization",
+                    "Containerization",
+                    ["Containerization",
+                     "Orchestration"],
+                    "Container-based deployment and orchestration infrastructure."))
+
+
+def resolve_technology(import_path: str,
+                       file_languages: List[str]) -> List[Technology]:
     """
     Given an import path (e.g. plotly.express.colors) and file languages,
     returns all matching Technologies from longest path to shortest.
     Example: plotly.express.colors -> matches plotly.express -> matches plotly.
     """
     results = []
-    
+
     # Simple strategy: generate paths from longest to shortest
     # e.g., ['plotly.express.colors', 'plotly.express', 'plotly']
     parts = import_path.split('.')
     paths = []
     for i in range(len(parts), 0, -1):
         paths.append('.'.join(parts[:i]))
-        
+
     for p in paths:
         # Check against aliases
         for tech in TECHNOLOGY_KB.values():
-            if tech.languages and not any(lang in tech.languages for lang in file_languages):
+            if tech.languages and not any(
+                    lang in tech.languages for lang in file_languages):
                 continue
-                
+
             if p in tech.aliases or import_path == tech.id:
                 if tech not in results:
                     results.append(tech)
-    
+
     # Also attempt reverse-lookup by alias for common shortnames (e.g., 'px')
     # but only if it's an exact match
     for tech in TECHNOLOGY_KB.values():
-        if tech.languages and not any(lang in tech.languages for lang in file_languages):
+        if tech.languages and not any(
+                lang in tech.languages for lang in file_languages):
             continue
         if import_path in tech.aliases and tech not in results:
             results.append(tech)
-            
+
     return results
 
+
 def get_capabilities_for_tech(tech: Technology) -> List[Capability]:
-    return [cap for cap in CAPABILITY_KB.values() if tech.category in cap.category_triggers]
+    return [cap for cap in CAPABILITY_KB.values(
+    ) if tech.category in cap.category_triggers]

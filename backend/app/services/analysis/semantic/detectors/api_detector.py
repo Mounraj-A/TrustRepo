@@ -38,7 +38,12 @@ REST_IMPORT_PREFIXES = {
 }
 
 # GraphQL indicators
-GRAPHQL_ANNOTATIONS = {"GraphQLApi", "Query", "Mutation", "Subscription", "Schema"}
+GRAPHQL_ANNOTATIONS = {
+    "GraphQLApi",
+    "Query",
+    "Mutation",
+    "Subscription",
+    "Schema"}
 GRAPHQL_IMPORTS = {"graphene", "strawberry", "ariadne", "graphql", "apollo"}
 
 
@@ -51,7 +56,7 @@ class ApiDetector(BaseFeatureDetector):
     def detect(self, graph: RepositoryKnowledgeGraph) -> List[FeatureInstance]:
         features = []
 
-        # ── REST API ──────────────────────────────────────────────────────────
+        # ── REST API ─────────────────────────────────────────────────────────
         rest_chain = self._find_rest_evidence(graph)
         if rest_chain:
             feat_def = SEMANTIC_REGISTRY.get_by_id("feat_rest_api")
@@ -63,7 +68,7 @@ class ApiDetector(BaseFeatureDetector):
                     evidence=[rest_chain],
                 ))
 
-        # ── GraphQL API ───────────────────────────────────────────────────────
+        # ── GraphQL API ──────────────────────────────────────────────────────
         graphql_chain = self._find_graphql_evidence(graph)
         if graphql_chain:
             feat_def = SEMANTIC_REGISTRY.get_by_id("feat_graphql")
@@ -77,9 +82,12 @@ class ApiDetector(BaseFeatureDetector):
 
         return features
 
-    def _find_rest_evidence(self, graph: RepositoryKnowledgeGraph) -> Optional[EvidenceChain]:
-        annotation_nodes = self._get_annotation_nodes_matching(graph, REST_ANNOTATIONS)
-        import_nodes = self._get_import_nodes_matching(graph, REST_IMPORT_PREFIXES)
+    def _find_rest_evidence(
+            self, graph: RepositoryKnowledgeGraph) -> Optional[EvidenceChain]:
+        annotation_nodes = self._get_annotation_nodes_matching(
+            graph, REST_ANNOTATIONS)
+        import_nodes = self._get_import_nodes_matching(
+            graph, REST_IMPORT_PREFIXES)
         matched_nodes = annotation_nodes[:5] + import_nodes[:5]
 
         if not matched_nodes:
@@ -87,7 +95,9 @@ class ApiDetector(BaseFeatureDetector):
 
         items = [
             EvidenceItem(
-                source=EvidenceSource(file_path=n.properties.get("file_path", "unknown")),
+                source=EvidenceSource(
+                    file_path=n.properties.get(
+                        "file_path", "unknown")),
                 node_type=n.label,
                 symbol=n.properties.get("name", ""),
                 context_type="REST API",
@@ -100,11 +110,14 @@ class ApiDetector(BaseFeatureDetector):
             chain_id=f"chain_{uuid.uuid4().hex[:8]}",
             chain_type="REST API Detection",
             sequence=items,
-            reasoning_trace=f"Found {len(items)} REST API indicators (annotations/imports) in the Knowledge Graph.",
+            reasoning_trace=f"Found {
+                len(items)} REST API indicators (annotations/imports) in the Knowledge Graph.",
         )
 
-    def _find_graphql_evidence(self, graph: RepositoryKnowledgeGraph) -> Optional[EvidenceChain]:
-        annotation_nodes = self._get_annotation_nodes_matching(graph, GRAPHQL_ANNOTATIONS)
+    def _find_graphql_evidence(
+            self, graph: RepositoryKnowledgeGraph) -> Optional[EvidenceChain]:
+        annotation_nodes = self._get_annotation_nodes_matching(
+            graph, GRAPHQL_ANNOTATIONS)
         import_nodes = self._get_import_nodes_matching(graph, GRAPHQL_IMPORTS)
         matched_nodes = annotation_nodes[:5] + import_nodes[:5]
 
@@ -113,7 +126,9 @@ class ApiDetector(BaseFeatureDetector):
 
         items = [
             EvidenceItem(
-                source=EvidenceSource(file_path=n.properties.get("file_path", "unknown")),
+                source=EvidenceSource(
+                    file_path=n.properties.get(
+                        "file_path", "unknown")),
                 node_type=n.label,
                 symbol=n.properties.get("name", ""),
                 context_type="GraphQL",
@@ -126,5 +141,6 @@ class ApiDetector(BaseFeatureDetector):
             chain_id=f"chain_{uuid.uuid4().hex[:8]}",
             chain_type="GraphQL Detection",
             sequence=items,
-            reasoning_trace=f"Found {len(items)} GraphQL indicators in the Knowledge Graph.",
+            reasoning_trace=f"Found {
+                len(items)} GraphQL indicators in the Knowledge Graph.",
         )

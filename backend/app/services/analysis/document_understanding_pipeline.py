@@ -63,7 +63,8 @@ class DocumentUnderstandingPipeline:
 
         # Stage 2
         document_context = self.preprocessor.preprocess(document_context)
-        print("Processed Documents    :", len(document_context.processed_documents))
+        print("Processed Documents    :", len(
+            document_context.processed_documents))
 
         # Stage 3
         document_context = self.segmenter.segment(document_context)
@@ -71,25 +72,33 @@ class DocumentUnderstandingPipeline:
 
         # Stage 4
         document_context = self.statement_extractor.extract(document_context)
-        print("Atomic Statements      :", len(document_context.atomic_statements))
+        print("Atomic Statements      :", len(
+            document_context.atomic_statements))
 
         # Stage 5
         document_context = self.claim_generator.generate(document_context)
-        print("Candidate Claims       :", len(document_context.candidate_claims))
+        print("Candidate Claims       :", len(
+            document_context.candidate_claims))
 
         # Stage 6
         document_context = self.claim_normalizer.normalize(document_context)
-        print("Normalized Claims      :", len(document_context.normalized_claims))
+        print("Normalized Claims      :", len(
+            document_context.normalized_claims))
 
         # Stage 7
-        document_context = self.claim_deduplicator.deduplicate(document_context)
-        print("Deduplicated Claims    :", len(document_context.deduplicated_claims))
+        document_context = self.claim_deduplicator.deduplicate(
+            document_context)
+        print("Deduplicated Claims    :", len(
+            document_context.deduplicated_claims))
 
         # Stage 8
-        document_context = self.claim_repository_builder.build(document_context)
-        print("Repository Claims      :", len(document_context.claim_repository))
+        document_context = self.claim_repository_builder.build(
+            document_context)
+        print("Repository Claims      :", len(
+            document_context.claim_repository))
 
-        if len(document_context.claim_repository) == 0 and len(document_context.documents) > 0:
+        if len(document_context.claim_repository) == 0 and len(
+                document_context.documents) > 0:
             raise RuntimeError(
                 "Document pipeline produced zero claims.\n"
                 "Reason: No claims could be extracted or normalized from the provided documents.\n"

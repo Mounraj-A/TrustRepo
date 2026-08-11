@@ -33,53 +33,56 @@ Agents do NOT share mutable state — all communication is via AgentMessage.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional, Type
+from typing import List, Dict, Any, Optional
 from enum import Enum
 import uuid
 from datetime import datetime
 from app.models.knowledge.evidence import EvidenceChain
 
+
 class AgentRole(str, Enum):
-    TASK_PLANNER       = "TaskPlannerAgent"
-    CODE               = "CodeAgent"
-    DOCUMENTATION      = "DocumentationAgent"
-    KNOWLEDGE_GRAPH    = "KnowledgeGraphAgent"
-    EVIDENCE_RANKING   = "EvidenceRankingAgent"    # NEW
-    EVIDENCE_FUSION    = "EvidenceFusionAgent"
-    EVIDENCE_AGREEMENT = "EvidenceAgreementEngine" # NEW
+    TASK_PLANNER = "TaskPlannerAgent"
+    CODE = "CodeAgent"
+    DOCUMENTATION = "DocumentationAgent"
+    KNOWLEDGE_GRAPH = "KnowledgeGraphAgent"
+    EVIDENCE_RANKING = "EvidenceRankingAgent"    # NEW
+    EVIDENCE_FUSION = "EvidenceFusionAgent"
+    EVIDENCE_AGREEMENT = "EvidenceAgreementEngine"  # NEW
     EVIDENCE_VALIDATION = "EvidenceValidationAgent"
-    COVERAGE           = "CoverageAgent"           # NEW
-    CONTRADICTION      = "ContradictionAgent"      # NEW
-    REASONING          = "ReasoningAgent"
-    DECISION_MATRIX    = "DecisionMatrix"          # NEW
-    VERIFICATION       = "VerificationAgent"
-    RECOMMENDATION     = "RecommendationEngine"    # NEW
-    LLM_EXPLANATION    = "LLMExplanationAgent"     # NEW
-    REPORT             = "ReportAgent"
+    COVERAGE = "CoverageAgent"           # NEW
+    CONTRADICTION = "ContradictionAgent"      # NEW
+    REASONING = "ReasoningAgent"
+    DECISION_MATRIX = "DecisionMatrix"          # NEW
+    VERIFICATION = "VerificationAgent"
+    RECOMMENDATION = "RecommendationEngine"    # NEW
+    LLM_EXPLANATION = "LLMExplanationAgent"     # NEW
+    REPORT = "ReportAgent"
+
 
 class MessageType(str, Enum):
-    REQUEST  = "REQUEST"
+    REQUEST = "REQUEST"
     RESPONSE = "RESPONSE"
-    ERROR    = "ERROR"
+    ERROR = "ERROR"
     BROADCAST = "BROADCAST"
+
 
 # Explicit workflow routing table
 # Defines the exact sequence each agent must hand off to
 AGENT_WORKFLOW: Dict[AgentRole, AgentRole] = {
-    AgentRole.TASK_PLANNER:        AgentRole.CODE,
-    AgentRole.CODE:                AgentRole.EVIDENCE_RANKING,
-    AgentRole.DOCUMENTATION:       AgentRole.EVIDENCE_RANKING,
-    AgentRole.KNOWLEDGE_GRAPH:     AgentRole.EVIDENCE_RANKING,
-    AgentRole.EVIDENCE_RANKING:    AgentRole.EVIDENCE_FUSION,
-    AgentRole.EVIDENCE_FUSION:     AgentRole.EVIDENCE_AGREEMENT,
-    AgentRole.EVIDENCE_AGREEMENT:  AgentRole.COVERAGE,
-    AgentRole.COVERAGE:            AgentRole.CONTRADICTION,
-    AgentRole.CONTRADICTION:       AgentRole.REASONING,
-    AgentRole.REASONING:           AgentRole.DECISION_MATRIX,
-    AgentRole.DECISION_MATRIX:     AgentRole.VERIFICATION,
-    AgentRole.VERIFICATION:        AgentRole.RECOMMENDATION,
-    AgentRole.RECOMMENDATION:      AgentRole.LLM_EXPLANATION,
-    AgentRole.LLM_EXPLANATION:     AgentRole.REPORT,
+    AgentRole.TASK_PLANNER: AgentRole.CODE,
+    AgentRole.CODE: AgentRole.EVIDENCE_RANKING,
+    AgentRole.DOCUMENTATION: AgentRole.EVIDENCE_RANKING,
+    AgentRole.KNOWLEDGE_GRAPH: AgentRole.EVIDENCE_RANKING,
+    AgentRole.EVIDENCE_RANKING: AgentRole.EVIDENCE_FUSION,
+    AgentRole.EVIDENCE_FUSION: AgentRole.EVIDENCE_AGREEMENT,
+    AgentRole.EVIDENCE_AGREEMENT: AgentRole.COVERAGE,
+    AgentRole.COVERAGE: AgentRole.CONTRADICTION,
+    AgentRole.CONTRADICTION: AgentRole.REASONING,
+    AgentRole.REASONING: AgentRole.DECISION_MATRIX,
+    AgentRole.DECISION_MATRIX: AgentRole.VERIFICATION,
+    AgentRole.VERIFICATION: AgentRole.RECOMMENDATION,
+    AgentRole.RECOMMENDATION: AgentRole.LLM_EXPLANATION,
+    AgentRole.LLM_EXPLANATION: AgentRole.REPORT,
 }
 
 
@@ -123,7 +126,9 @@ class AgentMessage:
         """
         next_agent = AGENT_WORKFLOW.get(self.recipient)
         if next_agent is None:
-            raise ValueError(f"No workflow route defined from {self.recipient.value}")
+            raise ValueError(
+                f"No workflow route defined from {
+                    self.recipient.value}")
         self.sender = self.recipient
         self.recipient = next_agent
         return self
@@ -147,4 +152,3 @@ class BaseAgent:
         """Forward to next agent in the explicit workflow."""
         message.route_to_next()
         return message
-

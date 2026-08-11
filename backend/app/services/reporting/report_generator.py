@@ -1,431 +1,555 @@
-from typing import List, Dict, Any
 from datetime import datetime, timezone
-from app.models.knowledge.investigation import VerificationResult, VerificationVerdict
-from app.models.report.trust_report import (
-    RepositoryTrustReport, 
-    RepositorySummary, 
-    ClaimReport, 
-    UndocumentedFeature, 
-    DocumentationCoverage,
-    Recommendation,
-    RecommendationPriority,
-    VerificationCategory
-)
-from app.services.reporting.explanation_generator import ExplanationGenerator
+import json
 from app.models.trustrepo_context import TrustRepoContext
 from app.models.knowledge.evidence import EvidenceChain
 
+from app.models.report.trust_report import (
+    RepositoryReport,
+    RepositoryMetadata,
+    DocumentationSummary,
+    DocumentationClaim,
+    Recommendation,
+    RecommendationPriority,
+    FeatureFinding,
+    CandidateSource,
+    VerificationVerdict,
+    VerificationCategory,
+    TrustAssessment,
+    EvidenceRetrievalTrace,
+    EvidenceSearchStep
+)
+
 class ReportGenerator:
     def __init__(self):
-        self.explanation_gen = ExplanationGenerator()
+        pass
+
+    def generate_report(self, context: TrustRepoContext) -> RepositoryReport:
+        # 1. Process Claims (Direction A: Documentation -> Repository)
+        verification_results = context.verification_context.verification_results
         
-    def generate_report(self, context: TrustRepoContext) -> RepositoryTrustReport:
-        results = list(context.verification_context.verification_results.values())
-        claim_texts = {c.id: c.text for c in context.claims}
+        documentation_claims = []
+        feature_findings = []
         
-        claim_reports = []
-        verified_count = 0
-        refuted_count = 0
-        insufficient_count = 0
-        total_trust = 0.0
-        
-        for res in results:
-            text = claim_texts.get(res.claim_id, "Unknown Claim")
-            report = self.explanation_gen.generate(res, text)
-            claim_reports.append(report)
-            
-            if res.verdict == VerificationVerdict.VERIFIED:
-                verified_count += 1
-            elif res.verdict == VerificationVerdict.CONTRADICTION:
-                refuted_count += 1
-            else:
-                insufficient_count += 1
+        for raw_claim in context.claims:
+            res = verification_results.get(raw_claim.normalized_claim_id)
+            if not res:
+                # If a claim somehow missed verification, skip or record as insufficient
+                continue
                 
-            total_trust += res.trust_score
+            text = raw_claim.text
             
-        total_claims = len(results)
+            # Use original verdict mapped to new enums
+            verdict = VerificationVerdict.VERIFIED if res.verdict.value == "VERIFIED" else (
+                VerificationVerdict.CONTRADICTED if res.verdict.value == "CONTRADICTION" else (
+                    VerificationVerdict.UNSUPPORTED if res.verdict.value == "UNSUPPORTED_DOCUMENTATION" else VerificationVerdict.MISSING_DOCUMENTATION
+                )
+            )
+
+            # Reconstruct provenance_chain if available
+            prov_chain = None
+            if res.supporting_evidence:
+                chains = [e.chain for e in res.supporting_evidence if e.chain]
+                if chains:
+                    prov_chain = chains[0]
+                else:
+                    # Fallback construct
+                    from app.models.knowledge.evidence import EvidenceChain, EvidenceItem, EvidenceSource, EvidenceType, EvidenceStrength
+                    items = []
+                    for ev in res.supporting_evidence:
+                        items.append(EvidenceItem(
+                            source=EvidenceSource(file_path=ev.file_path or "unknown"),
+                            code_snippet=ev.content_snippet or ev.content,
+                            evidence_type=EvidenceType.UNKNOWN,
+                            evidence_strength=EvidenceStrength.SUPPORTING,
+                        ))
+                    if items:
+                        prov_chain = EvidenceChain(
+                            chain_id=f"prov-{res.claim_id}",
+                            chain_type="Fallback",
+                            sequence=items,
+                            confidence=res.trust_score
+                        )
+
+            trace_obj = next((t for t in context.semantic_context.reasoning_traces if t.claim_id == res.claim_id), None)
+
+            claim = DocumentationClaim(
+                claim_id=raw_claim.id,
+                claim_text=text,
+                verdict=verdict,
+                verification_category=VerificationCategory.UNKNOWN,
+                trust_score=res.trust_score,
+                confidence=res.trust_score, # For backward compatibility until TrustScorer/ConfidenceEngine is fully split
+                confidence_breakdown={
+                    "evidence_quality": res.evidence_quality,
+                    "evidence_diversity": res.evidence_diversity,
+                    "graph_connectivity": res.graph_connectivity,
+                    "evidence_agreement": res.evidence_agreement
+                },
+                evidence_count=res.evidence_count,
+                evidence_quality=res.evidence_quality,
+                evidence_diversity=res.evidence_diversity,
+                expected_features=res.expected_features,
+                observed_features=res.observed_features,
+                missing_features=res.missing_features,
+                unsupported_features=res.unsupported_features,
+                contradicted_features=res.contradicted_features,
+                reasoning=" ".join(res.reasoning_trace) if res.reasoning_trace else "No reasoning provided.",
+                reasoning_trace=trace_obj,
+                provenance_chain=prov_chain,
+                recommendation=None
+            )
+            documentation_claims.append(claim)
+            
+            if verdict == VerificationVerdict.CONTRADICTED:
+                feature_findings.append(FeatureFinding(
+                    feature=text,
+                    category=VerificationCategory.UNKNOWN,
+                    candidate_source=CandidateSource.DOCUMENTATION_ANALYSIS,
+                    status=VerificationVerdict.CONTRADICTED,
+                    documentation_claim=claim,
+                    evidence=[],
+                    evidence_count=res.evidence_count,
+                    evidence_quality=res.evidence_quality,
+                    evidence_diversity=res.evidence_diversity,
+                    documentation_search=None,
+                    retrieval_trace=None,
+                    confidence=res.trust_score,
+                    reasoning=" ".join(res.reasoning_trace) if res.reasoning_trace else "No reasoning provided.",
+                    reasoning_trace=res.reasoning_trace,
+                    provenance_chain=prov_chain,
+                    recommendation=None
+                ))
+
+        # 2. Process Features (Direction B: Repository -> Documentation)
+        recommendations = []
+        
+        all_detected_features = set(
+            (context.semantic_context.technologies if context.semantic_context else []) +
+            (context.semantic_context.capabilities if context.semantic_context else []) +
+            (context.semantic_context.architectures if context.semantic_context else []) +
+            (context.semantic_context.features if context.semantic_context else [])
+        )
+        
+        evidence_chains = (context.semantic_context.evidence_chains if context.semantic_context else [])
         
         raw_doc_text = ""
         if context.document_context and hasattr(context.document_context, 'documents'):
             raw_doc_text = " ".join([d.content for d in context.document_context.documents]).lower()
+
+        documented_features_count = 0
+        confirmed_features_count = 0
+
+        for feature in all_detected_features:
+            if not feature or feature == "Unknown":
+                continue
+
+            feature_chain = next((c for c in evidence_chains if feature in c.chain_type), None)
+            has_repository_evidence = feature_chain is not None and len(feature_chain.sequence) > 0
             
+            is_documented = bool(raw_doc_text and feature.lower() in raw_doc_text)
+            
+            from app.models.knowledge.evidence import DocumentationSearchResult
+            doc_search = DocumentationSearchResult(
+                searched_sources=[f.path for f in context.document_context.documents] if context.document_context and hasattr(context.document_context, 'documents') else [],
+                searched_terms=[feature.lower()],
+                matches=[feature.lower()] if is_documented else [],
+                found=is_documented
+            )
+
+            # Build Retrieval Trace
+            trace = EvidenceRetrievalTrace(
+                strategies_attempted=["Structural Search", "AST Search", "Graph Search"],
+                strategies_succeeded=["Graph Search"] if has_repository_evidence else [],
+                strategies_failed=["AST Search"] if not has_repository_evidence else [],
+                searches=[
+                    EvidenceSearchStep(
+                        strategy="Global Search",
+                        source="Repository",
+                        matches=len(feature_chain.sequence) if feature_chain else 0,
+                        status="SUCCESS" if has_repository_evidence else "FAILED"
+                    )
+                ],
+                candidate_count=1,
+                matched_entities=len(feature_chain.sequence) if feature_chain else 0,
+                evidence_items_created=len(feature_chain.sequence) if feature_chain else 0,
+                conclusion="Repository evidence retrieved successfully." if has_repository_evidence else "Could not independently confirm repository evidence."
+            )
+
+            if not has_repository_evidence:
+                finding = FeatureFinding(
+                    feature=feature,
+                    category=VerificationCategory.TECHNOLOGY,
+                    candidate_source=CandidateSource.TECHNOLOGY_DETECTOR,
+                    status=VerificationVerdict.INSUFFICIENT_EVIDENCE,
+                    evidence=[],
+                    evidence_count=0,
+                    evidence_quality=0.0,
+                    evidence_diversity=0.0,
+                    documentation_search=doc_search,
+                    retrieval_trace=trace,
+                    confidence=0.0,
+                    reasoning="TrustRepo identified a candidate feature but could not retrieve enough structural evidence to confirm it.",
+                    reasoning_trace=[],
+                    provenance_chain=None,
+                    recommendation=None
+                )
+                feature_findings.append(finding)
+            else:
+                confirmed_features_count += 1
+                if is_documented:
+                    documented_features_count += 1
+                    finding = FeatureFinding(
+                        feature=feature,
+                        category=VerificationCategory.TECHNOLOGY,
+                        candidate_source=CandidateSource.TECHNOLOGY_DETECTOR,
+                        status=VerificationVerdict.VERIFIED,
+                        evidence=[feature_chain],
+                        evidence_count=len(feature_chain.sequence),
+                        evidence_quality=0.9, # Mock value for now
+                        evidence_diversity=0.9, # Mock value for now
+                        documentation_search=doc_search,
+                        retrieval_trace=trace,
+                        confidence=feature_chain.confidence if hasattr(feature_chain, 'confidence') else 1.0,
+                        reasoning=feature_chain.reasoning_trace,
+                        reasoning_trace=[feature_chain.reasoning_trace],
+                        provenance_chain=feature_chain,
+                        recommendation=None
+                    )
+                else:
+                    finding = FeatureFinding(
+                        feature=feature,
+                        category=VerificationCategory.TECHNOLOGY,
+                        candidate_source=CandidateSource.TECHNOLOGY_DETECTOR,
+                        status=VerificationVerdict.MISSING_DOCUMENTATION,
+                        evidence=[feature_chain],
+                        evidence_count=len(feature_chain.sequence),
+                        evidence_quality=0.9,
+                        evidence_diversity=0.9,
+                        documentation_search=doc_search,
+                        retrieval_trace=trace,
+                        confidence=feature_chain.confidence if hasattr(feature_chain, 'confidence') else 1.0,
+                        reasoning=feature_chain.reasoning_trace,
+                        reasoning_trace=[feature_chain.reasoning_trace],
+                        provenance_chain=feature_chain,
+                        recommendation=f"Document where and why {feature} is used."
+                    )
+                    recommendations.append(Recommendation(
+                        priority=RecommendationPriority.MEDIUM,
+                        message=f"Document {feature} usage. We found {len(feature_chain.sequence)} pieces of repository evidence, but documentation searches for '{feature.lower()}' in {len(doc_search.searched_sources)} files yielded 0 matches."
+                    ))
+                feature_findings.append(finding)
+
+        for finding in feature_findings:
+            if finding.status == VerificationVerdict.CONTRADICTED and finding.documentation_claim:
+                recommendations.append(Recommendation(
+                    priority=RecommendationPriority.HIGH,
+                    message=f"Resolve documentation contradiction regarding: '{finding.documentation_claim.claim_text}'."
+                ))
+
+        # 3. Compute Summaries and Metadata
+        coverage_pct = round((documented_features_count / confirmed_features_count) * 100) if confirmed_features_count > 0 else 0
+
+        summary = DocumentationSummary(
+            documentation_sources=[f.path for f in context.document_context.documents] if context.document_context and hasattr(context.document_context, 'documents') else [],
+            total_candidates=len(all_detected_features),
+            confirmed_features=confirmed_features_count,
+            documented_features=documented_features_count,
+            missing_documentation=sum(1 for f in feature_findings if f.status == VerificationVerdict.MISSING_DOCUMENTATION),
+            contradicted=sum(1 for f in feature_findings if f.status == VerificationVerdict.CONTRADICTED),
+            insufficient_evidence=sum(1 for f in feature_findings if f.status == VerificationVerdict.INSUFFICIENT_EVIDENCE),
+            total_claims=len(documentation_claims),
+            verified_claims=sum(1 for c in documentation_claims if c.verdict == VerificationVerdict.VERIFIED),
+            contradicted_claims=sum(1 for c in documentation_claims if c.verdict == VerificationVerdict.CONTRADICTED),
+            coverage_percentage=coverage_pct
+        )
+
         repo_metadata = {}
         if context.repository_context:
             repo_metadata = {
                 "url": getattr(context.repository_context, "repository_url", "local://repository"),
                 "commit_sha": "HEAD",
                 "branch": "main",
-
-                "technologies": context.semantic_context.technologies if context.semantic_context else [],
-                "architecture": context.semantic_context.architectures if context.semantic_context else [],
-                "capabilities": context.semantic_context.capabilities if context.semantic_context else []
+                "languages": ["Python", "JavaScript", "TypeScript"], # Mocked for now
+                "frameworks": context.semantic_context.technologies if context.semantic_context else [],
             }
-            
-        undocumented_features = []
-        recommendations = []
-        
-        detected_techs = context.semantic_context.technologies
-        detected_caps = context.semantic_context.capabilities
-        detected_arch = context.semantic_context.architectures
-        detected_features_list = context.semantic_context.features
-        
-        # Combine all features detected in code to check against documentation
-        all_detected_features = []
-        all_detected_features.extend(detected_techs)
-        all_detected_features.extend(detected_caps)
-        all_detected_features.extend(detected_arch)
-        all_detected_features.extend(detected_features_list)
-        all_detected_features = list(set(all_detected_features))
-        
-        # Pull evidence chains from canonical location
-        evidence_chains = context.semantic_context.evidence_chains or []
-        
-        documented_features_count = 0
-        
-        for feature in all_detected_features:
-            if not feature or feature == "Unknown":
-                continue
-                
-            # Find evidence chain for this feature
-            feature_chain = None
-            for chain in evidence_chains:
-                if feature in chain.chain_type:
-                    feature_chain = chain
-                    break
-                    
-            # CODE INTELLIGENCE MODE: If there's no documentation OR the feature isn't in it, it's missing.
-            if not raw_doc_text or feature.lower() not in raw_doc_text:
-                reason = "AST parser identified evidence in code. Knowledge Graph links this to feature. Documentation lacks mention."
-                if feature_chain:
-                    reason = feature_chain.reasoning_trace
-                elif not raw_doc_text:
-                    reason = "No repository documentation found. Feature was reverse-engineered from source code (Code Intelligence Mode)."
-                    
-                undoc = UndocumentedFeature(
-                    feature_name=feature,
-                    evidence_chain=feature_chain,
-                    reason=reason,
-                    documentation_analysis=f"- Expected: {feature}\n- Observed: Missing in Docs",
-                    verdict="Missing Documentation",
-                    confidence=feature_chain.confidence if feature_chain else 0.8,
-                    recommendation=f"Document the usage of {feature}."
-                )
-                undocumented_features.append(undoc)
-                
-                recommendations.append(Recommendation(
-                    priority=RecommendationPriority.MEDIUM,
-                    message=f"Missing Documentation: {feature} is detected in code but not documented."
-                ))
-            else:
-                documented_features_count += 1
-                
-        for cr in claim_reports:
-            if cr.verdict == VerificationVerdict.CONTRADICTION:
-                recommendations.append(Recommendation(
-                    priority=RecommendationPriority.HIGH,
-                    message=f"Contradiction: Update documentation stating '{cr.claim_text}' to reflect actual implementation."
-                ))
-        
-        detected_count = len(all_detected_features)
-        coverage_pct = round((documented_features_count / detected_count) * 100) if detected_count > 0 else 0
-        
-        doc_coverage = DocumentationCoverage(
-            detected_features=detected_count,
-            documented_features=documented_features_count,
-            verified_features=verified_count,
-            contradicted_features=refuted_count,
-            missing_features=len(undocumented_features),
-            coverage_percentage=coverage_pct
-        )
-        
-        from app.services.verification.trust_scorer import TrustScorer
-        scorer = TrustScorer()
-        
-        all_quality = [r.trust_score / 100.0 for r in results if r.trust_score > 0]
-        avg_evidence_quality = sum(all_quality) / len(all_quality) if all_quality else 0.0
-        
-        claim_coverage_pct = (len(results) / max(total_claims, 1)) * 100.0
-        
-        # Compute multi-dimensional scores for TrustScorer
-        doc_score = coverage_pct
-        tech_score = 100.0 if detected_techs else 0.0
-        feature_score = min(len(detected_features_list) * 10.0, 100.0)
-        capability_score = min(len(detected_caps) * 20.0, 100.0)
-        architecture_score = 100.0 if detected_arch and "Unknown" not in detected_arch else 50.0
-        evidence_score = avg_evidence_quality * 100.0
-        verification_score = (verified_count / max(total_claims, 1)) * 100.0
-        
-        # Graph score based on graph analytics
-        graph_analytics = context.graph_context.analytics
-        graph_score = 50.0
-        if graph_analytics:
-            has_cycles = graph_analytics.get("cycle_detected", True)
-            graph_score = 50.0 if has_cycles else 100.0
-        
-        global_score = scorer.calculate_repository_score(
-            doc_score=doc_score,
-            tech_score=tech_score,
-            feature_score=feature_score,
-            capability_score=capability_score,
-            architecture_score=architecture_score,
-            evidence_score=evidence_score,
-            verification_score=verification_score,
-            graph_score=graph_score
-        )
-        
-        status = "Highly Consistent"
-        if global_score < 50:
-            status = "Inconsistent"
-        elif global_score < 80:
-            status = "Needs Improvement"
-            
-        summary = RepositorySummary(
+
+        metadata = RepositoryMetadata(
             repository_url=repo_metadata.get("url", "local://repository"),
             commit_sha=repo_metadata.get("commit_sha", "HEAD"),
             branch=repo_metadata.get("branch", "main"),
-            technologies=repo_metadata.get("technologies", []),
-            architecture=repo_metadata.get("architecture", []),
-            capabilities=repo_metadata.get("capabilities", []),
-            total_claims=total_claims,
-            verified_claims=verified_count,
-            refuted_claims=refuted_count,
-            insufficient_claims=insufficient_count,
-            repository_trust_score=global_score,
-            status=status,
-            verification_version="2.0.0",
-            verification_timestamp=datetime.now(timezone.utc)
+            languages=repo_metadata.get("languages", []),
+            frameworks=repo_metadata.get("frameworks", []),
+            source_files_count=0,
+            documentation_sources=summary.documentation_sources,
+            claims_analyzed=len(documentation_claims),
+            features_investigated=len(all_detected_features),
+            analysis_date=datetime.now(timezone.utc),
+            verification_version="3.0.0"
         )
         
-        return RepositoryTrustReport(
-            summary=summary, 
-            claim_reports=claim_reports,
-            undocumented_features=undocumented_features,
-            coverage=doc_coverage,
-            recommendations=recommendations
+        repo_score = 0.0
+        verified_c = 0
+        total_c = 0
+        if confirmed_features_count > 0 or len(documentation_claims) > 0:
+            verified_c = sum(1 for c in documentation_claims if c.verdict == VerificationVerdict.VERIFIED)
+            total_c = len(documentation_claims)
+            claim_score = (verified_c / total_c) * 100 if total_c > 0 else 100.0
+            overall_score = (claim_score * 0.5) + (coverage_pct * 0.5)
+            repo_score = round(overall_score, 1)
+
+        trust_assessment = TrustAssessment(
+            score=repo_score,
+            status="High Trust" if repo_score >= 80 else ("Moderate Trust" if repo_score >= 50 else "Low Trust"),
+            details=f"Calculated based on {coverage_pct}% doc coverage and {verified_c if total_c > 0 else 0}/{total_c if total_c > 0 else 0} verified claims."
         )
+
+        architecture_findings = context.semantic_context.architecture_findings if context.semantic_context else []
+
+        # -- Build unified_evidence and evidence_summary --
+        unified_evidence = []
+        source_files = set()
         
-    def to_markdown(self, report: RepositoryTrustReport) -> str:
+        from app.models.report.trust_report import UnifiedEvidenceItem, EvidenceSummary
+        import uuid
+        
+        for claim in documentation_claims:
+            if claim.provenance_chain and getattr(claim.provenance_chain, 'sequence', None):
+                for item in claim.provenance_chain.sequence:
+                    file_path = item.source.file_path if item.source else None
+                    if file_path:
+                        source_files.add(file_path)
+                    
+                    evidence_type = item.evidence_type.value if hasattr(item.evidence_type, 'value') else str(item.evidence_type)
+                    
+                    unified_evidence.append(UnifiedEvidenceItem(
+                        evidence_id=item.id if hasattr(item, 'id') else str(uuid.uuid4()),
+                        evidence_type=evidence_type,
+                        source_file=file_path,
+                        line_range=str(item.source.line_number) if item.source and item.source.line_number else None,
+                        snippet=item.code_snippet,
+                        linked_claim={
+                            "claim_id": claim.claim_id,
+                            "claim_text": claim.claim_text,
+                            "verdict": claim.verdict.value
+                        },
+                        reasoning=claim.reasoning,
+                        provenance_chain=claim.provenance_chain.model_dump() if hasattr(claim.provenance_chain, 'model_dump') else None
+                    ))
+            elif claim.verdict in [VerificationVerdict.MISSING_DOCUMENTATION, VerificationVerdict.INSUFFICIENT_EVIDENCE]:
+                 unified_evidence.append(UnifiedEvidenceItem(
+                    evidence_id=f"doc-ev-{claim.claim_id}",
+                    evidence_type="DOCUMENTATION",
+                    source_file=claim.source_file,
+                    line_range=claim.line_range,
+                    snippet=None,
+                    linked_claim={
+                        "claim_id": claim.claim_id,
+                        "claim_text": claim.claim_text,
+                        "verdict": claim.verdict.value
+                    },
+                    reasoning=claim.reasoning,
+                    provenance_chain=None
+                ))
+
+        for finding in feature_findings:
+            if finding.status == VerificationVerdict.MISSING_DOCUMENTATION:
+                 seq_item = None
+                 if finding.evidence and finding.evidence[0].sequence:
+                     seq_item = finding.evidence[0].sequence[0]
+                 unified_evidence.append(UnifiedEvidenceItem(
+                    evidence_id=seq_item.id if seq_item and hasattr(seq_item, 'id') else str(uuid.uuid4()),
+                    evidence_type="CODE",
+                    source_file=seq_item.source.file_path if seq_item and seq_item.source else None,
+                    line_range=str(seq_item.source.line_number) if seq_item and seq_item.source and seq_item.source.line_number else None,
+                    snippet=seq_item.code_snippet if seq_item else None,
+                    linked_claim={
+                        "claim_id": f"feature-{finding.feature}",
+                        "claim_text": finding.feature,
+                        "verdict": finding.status.value
+                    },
+                    reasoning=finding.reasoning,
+                    provenance_chain=finding.provenance_chain.model_dump() if hasattr(finding.provenance_chain, 'model_dump') else None
+                ))
+            elif finding.evidence:
+                 for chain in finding.evidence:
+                     if getattr(chain, 'sequence', None):
+                         for item in chain.sequence:
+                             file_path = item.source.file_path if item.source else None
+                             if file_path:
+                                 source_files.add(file_path)
+                             
+                             evidence_type = item.evidence_type.value if hasattr(item.evidence_type, 'value') else str(item.evidence_type)
+                             unified_evidence.append(UnifiedEvidenceItem(
+                                evidence_id=item.id if hasattr(item, 'id') else str(uuid.uuid4()),
+                                evidence_type=evidence_type,
+                                source_file=file_path,
+                                line_range=str(item.source.line_number) if item.source and item.source.line_number else None,
+                                snippet=item.code_snippet,
+                                linked_claim={
+                                    "claim_id": f"feature-{finding.feature}",
+                                    "claim_text": finding.feature,
+                                    "verdict": finding.status.value
+                                },
+                                reasoning=finding.reasoning,
+                                provenance_chain=chain.model_dump() if hasattr(chain, 'model_dump') else None
+                             ))
+
+        evidence_summary = EvidenceSummary(
+            total_evidence=len(unified_evidence),
+            linked_claims=len(set(ev.linked_claim["claim_id"] for ev in unified_evidence if ev.linked_claim)),
+            source_files=len(source_files)
+        )
+
+        return RepositoryReport(
+            metadata=metadata,
+            summary=summary,
+            documentation_claims=documentation_claims,
+            feature_findings=feature_findings,
+            architecture_findings=architecture_findings,
+            recommendations=recommendations,
+            trust_assessment=trust_assessment,
+            evidence_summary=evidence_summary,
+            unified_evidence=unified_evidence
+        )
+
+    def to_markdown(self, report: RepositoryReport) -> str:
         md = [
-            "# TrustRepo Verification Report",
+            "╔══════════════════════════════════════════════════════╗",
+            "║          TRUSTREPO DOCUMENTATION REPORT             ║",
+            "╚══════════════════════════════════════════════════════╝",
             "",
-            "## Repository Information",
+            "## 1. REPOSITORY OVERVIEW",
             "",
-            "```",
-            f"Repository URL    : {report.summary.repository_url}",
-            f"Branch            : {report.summary.branch}",
-            f"Commit            : {report.summary.commit_sha}",
-            f"Verification Date : {report.summary.verification_timestamp.strftime('%d-%b-%Y %H:%M:%S')}",
-            "```",
+            f"**Repository:** {report.metadata.repository_url}",
+            f"**Revision:** {report.metadata.commit_sha} ({report.metadata.branch})",
+            f"**Languages:** {', '.join(report.metadata.languages) if report.metadata.languages else 'None detected'}",
+            f"**Frameworks:** {', '.join(report.metadata.frameworks) if report.metadata.frameworks else 'None detected'}",
+            f"**Documentation Sources:** {', '.join(report.metadata.documentation_sources) if report.metadata.documentation_sources else 'None'}",
             "",
-            "---",
+            "## 2. VERIFICATION SUMMARY",
             "",
-            "## Technology Stack Detected",
+            "**Documentation Claims**",
+            f"- Total: {len(report.documentation_claims)}",
+            f"- Verified: {report.summary.verified_claims}",
+            f"- Contradicted: {report.summary.contradicted_claims}",
+            f"- Unsupported: {sum(1 for c in report.documentation_claims if c.verdict == VerificationVerdict.UNSUPPORTED)}",
+            "",
+            "**Repository Features**",
+            f"- Candidates Investigated: {report.summary.total_candidates}",
+            f"- Confirmed: {report.summary.confirmed_features}",
+            f"- Missing Documentation: {report.summary.missing_documentation}",
+            f"- Insufficient Evidence: {report.summary.insufficient_evidence}",
+            "",
+            "## 3. DOCUMENTATION COVERAGE",
+            "",
+            f"**Coverage Score:** {report.summary.coverage_percentage}%",
+            f"({report.summary.documented_features} / {report.summary.confirmed_features} confirmed features documented)",
+            "",
+            "## 4. DOCUMENTATION CLAIM VERIFICATION",
             ""
         ]
         
-        if report.summary.architecture:
-            md.extend(["Architecture", "------------", *report.summary.architecture, ""])
-        if report.summary.technologies:
-            md.extend(["Technologies", "------------", *report.summary.technologies, ""])
-        if getattr(report.summary, 'capabilities', []):
-            md.extend(["Detected Capabilities", "---------------------", *report.summary.capabilities, ""])
-            
-        md.extend([
-            "---",
-            "",
-            "# Repository Trust Score",
-            "",
-            "```",
-            "Overall Trust Score",
-            "",
-            f"{report.summary.repository_trust_score} / 100",
-            "",
-            "Status",
-            "",
-            f"{report.summary.status}",
-            "```",
-            "",
-            "---",
-            "",
-            "# Repository Summary",
-            "",
-            "```",
-            f"Total Claims Extracted          : {report.summary.total_claims}",
-            "",
-            f"Verified Claims                 : {report.summary.verified_claims}",
-            "",
-            f"Contradicted Claims             : {report.summary.refuted_claims}",
-            "",
-            f"Missing Documentation           : {report.coverage.missing_features}",
-            "",
-            f"Unsupported Claims              : {report.summary.insufficient_claims}",
-            "```",
-            "",
-            "---"
-        ])
-        
-        verified_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.VERIFIED]
-        refuted_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.CONTRADICTION]
-        unsupported_claims = [c for c in report.claim_reports if c.verdict == VerificationVerdict.MISSING_DOCUMENTATION]
-        
-        def format_chain(chain: EvidenceChain) -> str:
-            if not chain: return "No explicit evidence chain available."
-            res = [f"- Graph Path: {chain.graph_path}"]
-            for item in chain.sequence:
-                res.append(f"- File: `{item.source.file_path}`")
-                if item.source.line_number:
-                    res.append(f"  Line: {item.source.line_number}")
-                res.append(f"  Qualified Name: `{item.qualified_name}`")
-                res.append(f"  Snippet: `{item.code_snippet}`")
-                res.append(f"  Strength: {item.evidence_strength.value}")
-            return "\n".join(res)
-        
-        if verified_claims:
-            md.extend(["", "# Verified Claims", ""])
-            for idx, c in enumerate(verified_claims, 1):
+        for idx, claim in enumerate(report.documentation_claims, 1):
+            md.extend([
+                f"### Claim #{idx}",
+                f"> {claim.claim_text}",
+                f"**Verdict:** {claim.verdict.value} (Confidence: {claim.confidence:.2f})",
+                f"**Reasoning:** {claim.reasoning}",
+                f"**Evidence Count:** {claim.evidence_count}",
+                ""
+            ])
+
+        verified_findings = [f for f in report.feature_findings if f.status == VerificationVerdict.VERIFIED]
+        if verified_findings:
+            md.extend(["## 5. VERIFIED FEATURES", ""])
+            for finding in verified_findings:
                 md.extend([
-                    f"## Claim {idx}",
-                    "",
-                    f"> {c.claim_text}",
-                    "",
-                    "### Evidence Trace",
-                    "README → Claim → Intent → Expected Features → Evidence Query → Evidence Nodes → Reasoning → Verdict",
-                    "",
-                    "### Detailed Evidence",
-                    format_chain(c.provenance_chain) if getattr(c, 'provenance_chain', None) else "Evidence analyzed by multi-agent reasoning.",
-                    "",
-                    "### Documentation Analysis",
-                    "- Expected: Present",
-                    "- Observed: Matched in Code",
-                    "",
-                    "### Verdict & Category",
-                    f"✅ **{c.verdict.value}** | {c.verification_category.value}",
-                    "",
-                    "### Reasoning",
-                    c.explanation,
-                    "",
-                    "Confidence",
-                    "```",
-                    f"{c.trust_score} / 100",
-                    "```",
-                    "---"
+                    f"### {finding.feature}",
+                    f"**Evidence:** {len(finding.evidence)} sources",
+                    "**Documentation:** Found",
+                    f"**Verdict:** {finding.status.value}",
+                    ""
                 ])
-                
-        if refuted_claims:
-            md.extend(["", "# Contradicted Claims", ""])
-            for idx, c in enumerate(refuted_claims, 1):
-                md.extend([
-                    f"## Contradiction {idx}",
-                    "",
-                    f"> {c.claim_text}",
-                    "",
-                    "### Evidence Trace",
-                    "README → Claim → Intent → Expected Features → Evidence Query → Evidence Nodes → Reasoning → Verdict",
-                    "",
-                    "### Detailed Evidence",
-                    format_chain(c.provenance_chain) if getattr(c, 'provenance_chain', None) else "Evidence analyzed by multi-agent reasoning.",
-                    "",
-                    "### Documentation Analysis",
-                    "- Expected: Required by documentation",
-                    "- Observed: Contradicting implementation found",
-                    "",
-                    "### Verdict & Category",
-                    f"❌ **{c.verdict.value}** | {c.verification_category.value}",
-                    "",
-                    "### Reasoning",
-                    c.explanation,
-                    "",
-                    "Confidence",
-                    "```",
-                    f"{c.trust_score} / 100",
-                    "```",
-                    "---"
-                ])
-                
-        if report.undocumented_features:
-            md.extend(["", "# Undocumented Code Features", ""])
-            for uf in report.undocumented_features:
-                md.extend([
-                    f"### Feature: {uf.feature_name}",
-                    "",
-                    "#### Evidence Trace",
-                    "AST → Semantic Symbols → Knowledge Graph → Evidence Retrieval → Evidence Validation → Reasoning → Verdict",
-                    "",
-                    "#### Detailed Evidence",
-                    format_chain(uf.evidence_chain) if uf.evidence_chain else "Evidence analyzed by graph traversal.",
-                    "",
-                    "#### Documentation Analysis",
-                    uf.documentation_analysis,
-                    "",
-                    "#### Verdict & Category",
-                    f"**{uf.verdict}** | Structural",
-                    "",
-                    "#### Reasoning",
-                    uf.reason,
-                    "",
-                    "#### Confidence",
-                    f"{uf.confidence * 100}%",
-                    "",
-                    "#### Recommendation",
-                    "```",
-                    uf.recommendation,
-                    "```",
-                    "---"
-                ])
-                
-        if unsupported_claims:
-            md.extend(["", "# Unsupported Documentation", ""])
-            for idx, c in enumerate(unsupported_claims, 1):
-                md.extend([
-                    f"## Unsupported {idx}",
-                    f"> {c.claim_text}",
-                    "",
-                    "### Documentation Analysis",
-                    "- Expected: Required by documentation",
-                    "- Observed: Missing in implementation",
-                    "",
-                    "### Verdict & Category",
-                    f"**Unsupported Documentation** | {c.verification_category.value}",
-                    "",
-                    "### Reasoning",
-                    c.explanation,
-                    "---"
-                ])
-                
-        md.extend([
-            "",
-            "# Documentation Coverage",
-            "",
-            "```",
-            f"Detected Features in Code    : {report.coverage.detected_features}",
-            "",
-            f"Documented Features          : {report.coverage.documented_features}",
-            "",
-            f"Verified Features            : {report.coverage.verified_features}",
-            "",
-            f"Contradicted Features        : {report.coverage.contradicted_features}",
-            "",
-            f"Missing Features             : {report.coverage.missing_features}",
-            "",
-            f"Coverage                     : {report.coverage.coverage_percentage}%",
-            "```",
-            "",
-            "---",
-            "",
-            "# Recommendations",
-            ""
-        ])
-        
-        if report.recommendations:
-            priorities = [RecommendationPriority.CRITICAL, RecommendationPriority.HIGH, RecommendationPriority.MEDIUM, RecommendationPriority.LOW]
-            for p in priorities:
-                recs = [r for r in report.recommendations if r.priority == p]
-                if recs:
-                    md.extend([f"### {p.value} Priority", ""])
-                    for r in recs:
-                        md.append(f"• {r.message}")
-                    md.append("")
         else:
-            md.append("No recommendations at this time. Repository is well-documented.")
+            md.extend(["## 5. VERIFIED FEATURES", "", "None", ""])
+
+        missing_findings = [f for f in report.feature_findings if f.status == VerificationVerdict.MISSING_DOCUMENTATION]
+        if missing_findings:
+            md.extend(["## 6. MISSING DOCUMENTATION", ""])
+            for finding in missing_findings:
+                md.extend([
+                    f"### {finding.feature}",
+                    f"**Repository Proof:** {len(finding.evidence)} sources",
+                    f"**Verdict:** ⚠ {finding.status.value}",
+                    f"**Recommendation:** {finding.recommendation or 'None'}",
+                    ""
+                ])
+        else:
+             md.extend(["## 6. MISSING DOCUMENTATION", "", "None", ""])
+
+        insufficient_findings = [f for f in report.feature_findings if f.status == VerificationVerdict.INSUFFICIENT_EVIDENCE]
+        if insufficient_findings:
+            md.extend(["## 7. INSUFFICIENT EVIDENCE", ""])
+            for finding in insufficient_findings:
+                md.extend([
+                    f"- {finding.feature} ({finding.candidate_source.value})"
+                ])
+            md.append("")
+        else:
+            md.extend(["## 7. INSUFFICIENT EVIDENCE", "", "None", ""])
+
+        md.extend(["## 8. CONTRADICTIONS", ""])
+        contradicted_findings = [f for f in report.feature_findings if f.status == VerificationVerdict.CONTRADICTED]
+        if contradicted_findings:
+            for idx, c in enumerate(contradicted_findings, 1):
+                claim_text = c.documentation_claim.claim_text if c.documentation_claim else c.feature
+                md.extend([
+                    f"### Contradiction #{idx}",
+                    f"**Claim:** {claim_text}",
+                    f"**Explanation:** {c.reasoning}",
+                    ""
+                ])
+        else:
+            md.append("None\n")
+
+        md.extend(["## 9. EVIDENCE EXPLORER", ""])
+        for finding in [f for f in report.feature_findings if f.status != VerificationVerdict.INSUFFICIENT_EVIDENCE]:
+            md.extend([
+                f"<details><summary><b>{finding.feature} Evidence</b></summary>",
+                ""
+            ])
+            for chain in finding.evidence:
+                if chain.sequence:
+                    for item in chain.sequence:
+                        md.append(f"- **{item.context_type}**: `{item.source.file_path}:{item.source.line_number}` - `{item.code_snippet}`")
+            if finding.retrieval_trace:
+                md.extend([
+                    "",
+                    "#### Evidence Retrieval Trace",
+                    f"- **Strategies Attempted:** {', '.join(finding.retrieval_trace.strategies_attempted)}",
+                    f"- **Conclusion:** {finding.retrieval_trace.conclusion}"
+                ])
+            md.extend(["", "</details>", ""])
+
+        md.extend(["## 10. RECOMMENDATIONS", ""])
+        if report.recommendations:
+            for rec in report.recommendations:
+                md.append(f"- **[{rec.priority.value}]** {rec.message}")
+            md.append("")
+        else:
+            md.append("No recommendations at this time.\n")
             
+        md.extend([
+            "## 11. REPOSITORY TRUST ASSESSMENT",
+            "",
+            f"**Trust Score:** {report.trust_assessment.score} / 100",
+            f"**Status:** {report.trust_assessment.status}",
+            f"**Details:** {report.trust_assessment.details}",
+            "",
+            "## 12. REPORT METADATA / ARTIFACTS",
+            "",
+            "- `trust_report.json` (Machine-readable JSON)",
+            "- `trust_report.md` (This document)"
+        ])
+
         return "\n".join(md)

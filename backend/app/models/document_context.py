@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import List
 
 from app.models.atomic_statement import AtomicStatement
 from app.models.claim import Claim
@@ -92,4 +92,4 @@ class DocumentContext:
 
     claim_repository: ClaimRepository = field(
         default_factory=ClaimRepository
-    )
+    )

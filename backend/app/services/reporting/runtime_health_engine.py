@@ -1,21 +1,22 @@
-from typing import List, Dict, Any
 from app.models.trustrepo_context import TrustRepoContext
 from app.models.report.runtime_report import RuntimeHealthReport, PipelineStageMetric
 from datetime import datetime
+
 
 class RuntimeHealthEngine:
     """
     Analyzes execution traces to produce a RuntimeHealthReport.
     Supports Execution Replay by persisting traces.
     """
-    
-    def generate_report(self, context: TrustRepoContext) -> RuntimeHealthReport:
+
+    def generate_report(
+            self, context: TrustRepoContext) -> RuntimeHealthReport:
         report = RuntimeHealthReport(
             execution_id=context.execution_id,
             start_time=datetime.utcnow(),
             end_time=datetime.utcnow()
         )
-        
+
         for trace in context.execution_trace:
             stage = PipelineStageMetric(
                 stage_name=trace.get("layer", "Unknown"),
@@ -33,13 +34,14 @@ class RuntimeHealthEngine:
             report.total_errors += stage.errors
             report.total_warnings += stage.warnings
             report.total_duration_s += stage.duration_s
-            
+
             if stage.status == "FAILED":
                 report.status = "FAIL"
-                
+
         return report
 
-    def save_execution_trace(self, context: TrustRepoContext, output_path: str):
+    def save_execution_trace(
+            self, context: TrustRepoContext, output_path: str):
         """Saves the context trace for Execution Replay."""
         import json
         with open(output_path, 'w', encoding='utf-8') as f:

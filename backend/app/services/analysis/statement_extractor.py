@@ -40,7 +40,6 @@ class StatementExtractor:
                     )
                 )
 
-
         return document_context
 
     def _extract_statements(

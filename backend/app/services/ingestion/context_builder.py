@@ -29,18 +29,23 @@ class RepositoryContextBuilder:
         context.metadata = metadata
 
         # ── Evidence Categories ────────────────────────────────────────────
-        context.source_code_files          = normalized_results.get("source_code", [])
-        context.test_files                 = normalized_results.get("tests", [])
-        context.documentation_files        = normalized_results.get("documentation", [])
-        context.build_files                = normalized_results.get("build_files", [])
-        context.package_manifests          = normalized_results.get("package_manifests", [])
-        context.infrastructure_files       = normalized_results.get("infrastructure", [])
-        context.ci_cd_files                = normalized_results.get("ci_cd", [])
-        context.infrastructure_as_code_files = normalized_results.get("infrastructure_as_code", [])
-        context.configuration_files        = normalized_results.get("configuration", [])
-        context.script_files               = normalized_results.get("scripts", [])
-        context.generated_files            = normalized_results.get("generated", [])
-        context.asset_files                = normalized_results.get("assets", [])
-        context.other_files                = normalized_results.get("other", [])
+        context.source_code_files = normalized_results.get("source_code", [])
+        context.test_files = normalized_results.get("tests", [])
+        context.documentation_files = normalized_results.get(
+            "documentation", [])
+        context.build_files = normalized_results.get("build_files", [])
+        context.package_manifests = normalized_results.get(
+            "package_manifests", [])
+        context.infrastructure_files = normalized_results.get(
+            "infrastructure", [])
+        context.ci_cd_files = normalized_results.get("ci_cd", [])
+        context.infrastructure_as_code_files = normalized_results.get(
+            "infrastructure_as_code", [])
+        context.configuration_files = normalized_results.get(
+            "configuration", [])
+        context.script_files = normalized_results.get("scripts", [])
+        context.generated_files = normalized_results.get("generated", [])
+        context.asset_files = normalized_results.get("assets", [])
+        context.other_files = normalized_results.get("other", [])
 
         return context

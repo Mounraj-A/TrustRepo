@@ -3,7 +3,7 @@ Verification Engine — explicit reasoning stages for dissertation-grade transpa
 """
 from __future__ import annotations
 from datetime import datetime, timezone
-from typing import List, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from app.models.knowledge.investigation import VerificationResult, VerificationVerdict
 from app.models.knowledge.evidence import EvidenceChain
@@ -30,9 +30,10 @@ class VerificationEngine:
         normalized_claim: "NormalizedClaim",
         agent_message: "AgentMessage"
     ) -> VerificationResult:
-        
+
         # In a full system, we would extract EvidenceChains from the agent_message
-        # For this prototype integration, if there are chains in the payload, use them.
+        # For this prototype integration, if there are chains in the payload,
+        # use them.
         chains = []
         raw_chains = agent_message.payload.get("evidence_chains", [])
         for rc in raw_chains:
@@ -40,32 +41,41 @@ class VerificationEngine:
                 chains.append(EvidenceChain(**rc))
             except Exception:
                 pass
-                
+
         # Fallback if no chains, mock a basic chain based on candidates
         if not chains:
             raw_candidates = agent_message.payload.get("fused_evidence", [])
             for rc in raw_candidates:
                 from app.models.knowledge.evidence import EvidenceItem, EvidenceSource
-                source = EvidenceSource(file_path=rc.get("file_path", "unknown"))
-                item = EvidenceItem(source=source, code_snippet=rc.get("content", ""))
+                source = EvidenceSource(
+                    file_path=rc.get(
+                        "file_path", "unknown"))
+                item = EvidenceItem(
+                    source=source, code_snippet=rc.get(
+                        "content", ""))
                 chains.append(EvidenceChain(
                     chain_id="fallback",
                     sequence=[item],
                     reasoning_trace=f"Found '{rc.get('feature', 'evidence')}'",
                     ranking_score=0.8
                 ))
-        
-        # ── Reasoning Agent ────────────────────────────────────────────────────
+
+        # ── Reasoning Agent ──────────────────────────────────────────────────
         from app.models.claim import Claim
-        dummy_claim = Claim(id=normalized_claim.claim_id, text=normalized_claim.raw_text, source_document="doc1", source_section="auto")
-        
-        verdict, category, reasoning_trace_str, confidence = self.reasoning_agent.evaluate(dummy_claim, chains)
-        
+        dummy_claim = Claim(
+            id=normalized_claim.claim_id,
+            text=normalized_claim.raw_text,
+            source_document="doc1",
+            source_section="auto")
+
+        verdict, category, reasoning_trace_str, confidence = self.reasoning_agent.evaluate(
+            dummy_claim, chains)
+
         reasoning_trace = reasoning_trace_str.split("\n")
 
         # ── Trust Score ───────────────────────────────────────────────
         contradiction_found = (verdict == VerificationVerdict.CONTRADICTION)
-        
+
         trust_score = self.scorer.calculate_claim_score(
             verdict=verdict,
             evidence_count=len(chains),

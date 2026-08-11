@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any
 
+
 @dataclass
 class IRNode:
     """
@@ -15,6 +16,7 @@ class IRNode:
     end_line: int
     metadata: Dict[str, Any] = field(default_factory=dict)
     children: List['IRNode'] = field(default_factory=list)
+
 
 @dataclass
 class IntermediateRepresentation:

@@ -55,7 +55,11 @@ graph TD
 
 ## Technology Stack
 ### Backend
+<<<<<<< HEAD
 - **Framework & Validation**: FastAPI (Python 3.10+), Pydantic
+=======
+- **Framework**: FastAPI (Python 3.10+)
+>>>>>>> 3e19abb7723094b338df85f2e0b55ce9a331f359
 - **Database**: PostgreSQL (SQLAlchemy), Neo4j (Cypher)
 - **Analysis**: Custom AST Parsers, LLM Agents, NetworkX
 - **Telemetry**: `psutil`, custom pipeline timers
@@ -176,4 +180,8 @@ TrustRepo is designed to analyze mid-sized repositories (up to 50k lines of code
 - Dynamically typed languages (like JavaScript without JSDoc) yield sparser Knowledge Graphs compared to statically typed languages.
 
 ## License
+<<<<<<< HEAD
 [MIT License](LICENSE)
+=======
+[MIT License](LICENSE)
+>>>>>>> 3e19abb7723094b338df85f2e0b55ce9a331f359

@@ -15,6 +15,38 @@ from app.services.ingestion.repository_ingestion_pipeline import RepositoryInges
 from app.services.trustrepo_pipeline import TrustRepoPipeline
 from app.services.reporting.report_generator import ReportGenerator
 
+def build_file_tree(source_files):
+    tree = {"name": "root", "type": "directory", "children": {}}
+    for f in source_files:
+        parts = f.path.replace("\\", "/").split("/")
+        current = tree
+        for i, part in enumerate(parts):
+            if i == len(parts) - 1:
+                current["children"][part] = {
+                    "name": part,
+                    "type": "file",
+                    "path": f.path,
+                    "language": getattr(f, "language", ""),
+                    "size": getattr(f, "size", 0)
+                }
+            else:
+                if part not in current["children"]:
+                    current["children"][part] = {
+                        "name": part,
+                        "type": "directory",
+                        "children": {}
+                    }
+                current = current["children"][part]
+    
+    def dict_to_list(node):
+        if "children" in node:
+            node["children"] = [dict_to_list(c) for c in node["children"].values()]
+            node["children"].sort(key=lambda x: (0 if x["type"] == "directory" else 1, x["name"]))
+        return node
+        
+    res = dict_to_list(tree)
+    return res.get("children", [])
+
 router = APIRouter(prefix="/repositories", tags=["Repositories"])
 logger = logging.getLogger(__name__)
 
@@ -41,7 +73,7 @@ def analyze_repository(req: AnalyzeRequest):
 
     Returns the full RepositoryTrustReport as JSON + Markdown.
     """
-    # ── Validation ────────────────────────────────────────────────────────────
+    # ── Validation ──────────────────────────────────────────────────────────
     import os
     url = req.repository_url.strip()
     is_valid = (
@@ -59,7 +91,7 @@ def analyze_repository(req: AnalyzeRequest):
     start_time = time.time()
     logger.info(f"Starting analysis for: {req.repository_url}")
 
-    # ── Layer 1: Repository Ingestion ─────────────────────────────────────────
+    # ── Layer 1: Repository Ingestion ───────────────────────────────────────
     try:
         ingestion_pipeline = RepositoryIngestionPipeline()
         repo_context = ingestion_pipeline.ingest(req.repository_url)
@@ -71,7 +103,7 @@ def analyze_repository(req: AnalyzeRequest):
             "detail": str(e)
         }
 
-    # ── Layers 2-7: Master Pipeline ───────────────────────────────────────────
+    # ── Layers 2-7: Master Pipeline ─────────────────────────────────────────
     try:
         trustrepo_pipeline = TrustRepoPipeline()
         context = trustrepo_pipeline.run(repo_context)
@@ -83,25 +115,45 @@ def analyze_repository(req: AnalyzeRequest):
             "detail": str(e)
         }
 
-    # ── Validate Pipeline Output ──────────────────────────────────────────────
+    # ── Validate Pipeline Output ────────────────────────────────────────────
+    from fastapi import HTTPException
+    
+    # Check if any crucial pipeline layer failed
+    if hasattr(context, 'execution_trace'):
+        for trace in context.execution_trace:
+            if trace.get("status") == "FAILED":
+                failed_layer = trace.get("layer")
+                errors = trace.get("errors", [])
+                error_msg = errors[0] if errors else "Unknown error"
+                raise HTTPException(
+                    status_code=500, 
+                    detail={
+                        "status": "failed", 
+                        "failed_stage": failed_layer, 
+                        "error": error_msg
+                    }
+                )
+                
     if not context.code_context or not context.code_context.source_files:
         return {
             "status": "error",
             "message": "Repository contains no supported source files (Java, Python, JS, TS)."
         }
 
-    # ── Generate Markdown Report ──────────────────────────────────────────────
+    # ── Generate Markdown Report ────────────────────────────────────────────
     rg = ReportGenerator()
     report = context.report_context.report if context.report_context else None
     markdown = rg.to_markdown(report) if report else ""
 
     processing_time = round(time.time() - start_time, 2)
 
-    # ── Extract Graph Metrics ─────────────────────────────────────────────────
-    graph_nodes = len(context.graph_context.graph.nodes) if context.graph_context and context.graph_context.graph else 0
-    graph_edges = len(context.graph_context.graph.edges) if context.graph_context and context.graph_context.graph else 0
+    # ── Extract Graph Metrics ───────────────────────────────────────────────
+    graph_nodes = len(
+        context.graph_context.graph.nodes) if context.graph_context and context.graph_context.graph else 0
+    graph_edges = len(
+        context.graph_context.graph.edges) if context.graph_context and context.graph_context.graph else 0
     graph_analytics = context.graph_context.analytics if context.graph_context else {}
-    
+
     serialized_nodes = []
     serialized_edges = []
     if context.graph_context and context.graph_context.graph:
@@ -120,7 +172,7 @@ def analyze_repository(req: AnalyzeRequest):
                 **edge.properties
             })
 
-    # ── Extract Code Metrics ──────────────────────────────────────────────────
+    # ── Extract Code Metrics ────────────────────────────────────────────────
     code_meta = {}
     if context.code_context:
         code_meta = {
@@ -132,7 +184,7 @@ def analyze_repository(req: AnalyzeRequest):
             "relationships": len(context.code_context.relationships) if getattr(context.code_context, "relationships", None) else 0,
         }
 
-    # ── Extract Claim Statistics ──────────────────────────────────────────────
+    # ── Extract Claim Statistics ────────────────────────────────────────────
     verification_results = context.verification_context.verification_results if context.verification_context else {}
     total_claims = len(verification_results)
     from app.models.knowledge.investigation import VerificationVerdict
@@ -161,44 +213,47 @@ def analyze_repository(req: AnalyzeRequest):
         "report": report.model_dump() if report else {},
         "markdown": markdown,
 
-        # ── Code Metrics ───────────────────────────────────────────────────────
+        # ── Code Metrics ─────────────────────────────────────────────────────
         "code_metrics": {
-            "source_files":   code_meta.get("source_files", 0),
-            "parsed_files":   code_meta.get("parsed_files", 0),
-            "ast_nodes":      code_meta.get("ast_nodes", 0),
-            "uir_files":      code_meta.get("uir_files", 0),
-            "symbols":        code_meta.get("symbols", 0),
-            "relationships":  code_meta.get("relationships", 0),
+            "source_files": code_meta.get("source_files", 0),
+            "parsed_files": code_meta.get("parsed_files", 0),
+            "ast_nodes": code_meta.get("ast_nodes", 0),
+            "uir_files": code_meta.get("uir_files", 0),
+            "symbols": code_meta.get("symbols", 0),
+            "relationships": code_meta.get("relationships", 0),
         },
 
-        # ── Graph Metrics (all fields from semantic_context) ───────────────────
+        # ── Graph Metrics (all fields from semantic_context) ─────────────────
         "graph_metrics": {
-            "nodes":                  graph_nodes,
-            "edges":                  graph_edges,
-            "raw_nodes":              serialized_nodes,
-            "raw_edges":              serialized_edges,
-            "technologies":           context.semantic_context.technologies if context.semantic_context else [],
-            "technology_categories":  context.semantic_context.technology_categories if context.semantic_context else {},
-            "features":               context.semantic_context.features if context.semantic_context else [],
-            "capabilities":           context.semantic_context.capabilities if context.semantic_context else [],
-            "architectures":          context.semantic_context.architectures if context.semantic_context else [],
-            "evidence_chain_count":   len(context.semantic_context.evidence_chains) if context.semantic_context else 0,
-            "analytics":              graph_analytics,
-            "schema_validation":      graph_analytics.get("schema_validation", {}),
+            "nodes": graph_nodes,
+            "edges": graph_edges,
+            "raw_nodes": serialized_nodes,
+            "raw_edges": serialized_edges,
+            "technologies": context.semantic_context.technologies if context.semantic_context else [],
+            "technology_categories": context.semantic_context.technology_categories if context.semantic_context else {},
+            "features": context.semantic_context.features if context.semantic_context else [],
+            "capabilities": context.semantic_context.capabilities if context.semantic_context else [],
+            "architectures": context.semantic_context.architectures if context.semantic_context else [],
+            "evidence_chain_count": len(context.semantic_context.evidence_chains) if context.semantic_context else 0,
+            "analytics": graph_analytics,
+            "schema_validation": graph_analytics.get("schema_validation", {}),
         },
 
-        # ── Verification Summary ───────────────────────────────────────────────
+        # ── Verification Summary ─────────────────────────────────────────────
         "verification_summary": {
-            "total_claims":        total_claims,
-            "verified":            verified_count,
-            "refuted":             refuted_count,
-            "partially_verified":  partial_count,
-            "insufficient":        insufficient_count,
+            "total_claims": total_claims,
+            "verified": verified_count,
+            "refuted": refuted_count,
+            "partially_verified": partial_count,
+            "insufficient": insufficient_count,
         },
 
-        # ── Phase 10: Runtime Dashboard — per-layer execution trace ─────────────
+        # ── Phase 10: Runtime Dashboard — per-layer execution trace ──────────
         "execution_trace": context.execution_trace,
 
-        # ── Phase 11: Code Intelligence Mode output ─────────────────────────────
+        # ── Phase 11: Code Intelligence Mode output ──────────────────────────
         "code_intelligence": context.code_intelligence,
+        
+        # ── File Tree ────────────────────────────────────────────────────────
+        "file_tree": build_file_tree(context.code_context.source_files) if context.code_context and hasattr(context.code_context, "source_files") else [],
     }

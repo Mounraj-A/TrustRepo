@@ -17,19 +17,24 @@ class IRBuilder:
     Produces a properly qualified node tree so RelationshipExtractor can generate edges.
     """
 
-    def build(self, source_file: SourceFile, ast_root: ASTNode) -> IntermediateRepresentation:
+    def build(self, source_file: SourceFile,
+              ast_root: ASTNode) -> IntermediateRepresentation:
         ir = IntermediateRepresentation(
             file_path=source_file.path,
             language=source_file.language
         )
         if ast_root:
             for child in ast_root.children:
-                node = self._visit(child, source_file.path, parent_qualname=source_file.path)
+                node = self._visit(
+                    child,
+                    source_file.path,
+                    parent_qualname=source_file.path)
                 if node:
                     ir.nodes.append(node)
         return ir
 
-    def _visit(self, node: ASTNode, file_path: str, parent_qualname: str) -> Optional[IRNode]:
+    def _visit(self, node: ASTNode, file_path: str,
+               parent_qualname: str) -> Optional[IRNode]:
         ir_type = self._map_type(node.node_type)
 
         # Build a globally unique qualname scoped to the file
@@ -47,7 +52,8 @@ class IRBuilder:
         )
 
         for child in node.children:
-            child_node = self._visit(child, file_path, parent_qualname=qualname)
+            child_node = self._visit(
+                child, file_path, parent_qualname=qualname)
             if child_node:
                 ir_node.children.append(child_node)
 

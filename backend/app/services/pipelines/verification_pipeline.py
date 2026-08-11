@@ -20,7 +20,8 @@ class VerificationPipeline:
         results = context.verification_context.verification_results
 
         if not results:
-            print("  No verification results found. Investigation pipeline may not have run.")
+            print(
+                "  No verification results found. Investigation pipeline may not have run.")
             return context
 
         verified = sum(

@@ -19,14 +19,14 @@ Decision Matrix Schema:
     │  Spring Security     │  Partial config    │  PARTIAL     │
     └─────────────────────────────────────────────────────────┘
 """
-from typing import List, Set, Dict, Optional
+from typing import List, Set
 from dataclasses import dataclass, field
 from enum import Enum
 
 
 class DecisionVerdictState(str, Enum):
-    VERIFIED             = "VERIFIED"
-    CONTRADICTION        = "CONTRADICTION"
+    VERIFIED = "VERIFIED"
+    CONTRADICTION = "CONTRADICTION"
     MISSING_DOCUMENTATION = "MISSING_DOCUMENTATION"
     UNSUPPORTED_DOCUMENTATION = "UNSUPPORTED_DOCUMENTATION"
     PARTIAL_DOCUMENTATION = "PARTIAL_DOCUMENTATION"
@@ -57,13 +57,14 @@ class DecisionMatrixResult:
     reasoning_trace: str = ""
 
 
-# Known contradicting pairs: if expected X and observed Y, it is a Contradiction
+# Known contradicting pairs: if expected X and observed Y, it is a
+# Contradiction
 CONTRADICTION_PAIRS: List[tuple] = [
-    ("jwt",           "oauth2"),
-    ("jwt",           "session"),
-    ("mysql",         "mongodb"),
-    ("postgresql",    "mongodb"),
-    ("rest_api",      "graphql"),
+    ("jwt", "oauth2"),
+    ("jwt", "session"),
+    ("mysql", "mongodb"),
+    ("postgresql", "mongodb"),
+    ("rest_api", "graphql"),
     ("microservices", "monolith"),
 ]
 
@@ -87,7 +88,7 @@ class DecisionMatrix:
         - Selects verdict from the 5-state model
         """
         expected_set = {f.lower() for f in expected_features}
-        observed_set  = {f.lower() for f in observed_features}
+        observed_set = {f.lower() for f in observed_features}
 
         comparisons: List[FeatureComparison] = []
 
@@ -126,7 +127,9 @@ class DecisionMatrix:
                 expected=True,
                 observed=True,
                 verdict=DecisionVerdictState.CONTRADICTION,
-                reasoning=f"Documentation claims '{pair[0]}' but code implements '{pair[1]}'.",
+                reasoning=f"Documentation claims '{
+                    pair[0]}' but code implements '{
+                    pair[1]}'.",
             ))
 
         # Coverage Score = |expected ∩ observed| / |expected|
@@ -139,11 +142,13 @@ class DecisionMatrix:
         # Consistency Score = 1 - (contradictions / total features)
         contradiction_count = len(contradicted)
         total = max(len(all_features), 1)
-        consistency_score = round(max(1.0 - (contradiction_count / total), 0.0), 4)
+        consistency_score = round(
+            max(1.0 - (contradiction_count / total), 0.0), 4)
 
         # Final Verdict Selection
-        missing_features   = [f for f in expected_set if f not in observed_set]
-        unsupported_features = [f for f in observed_set if f not in expected_set]
+        missing_features = [f for f in expected_set if f not in observed_set]
+        unsupported_features = [
+            f for f in observed_set if f not in expected_set]
 
         final_verdict = self._select_verdict(
             coverage_score, consistency_score, contradicted, missing_features, unsupported_features
@@ -168,9 +173,10 @@ class DecisionMatrix:
             reasoning_trace=reasoning_trace,
         )
 
-    # ─── Internal helpers ─────────────────────────────────────────────────────
+    # ─── Internal helpers ───────────────────────────────────────────────────
 
-    def _detect_contradictions(self, expected: Set[str], observed: Set[str]) -> List[tuple]:
+    def _detect_contradictions(
+            self, expected: Set[str], observed: Set[str]) -> List[tuple]:
         """Returns list of (expected, observed) pairs that are direct contradictions."""
         found = []
         for exp_kw, obs_kw in CONTRADICTION_PAIRS:

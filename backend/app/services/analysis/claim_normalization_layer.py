@@ -215,7 +215,7 @@ INTENT_TAXONOMY: List[Dict] = [
 class NormalizedClaim:
     """
     A fully normalized, intent-tagged claim produced by the ClaimNormalizationLayer.
-    
+
     Pipeline trace:
         raw_text → normalized_text → intent → expected_features
     """
@@ -233,7 +233,7 @@ class NormalizedClaim:
 class ClaimNormalizationLayer:
     """
     Implements the full Claim Normalization pipeline:
-    
+
         Atomic Statements
               ↓
         Candidate Claims
@@ -243,11 +243,11 @@ class ClaimNormalizationLayer:
         Intent Extraction
               ↓
         Expected Features
-    
+
     Ensures semantically equivalent claims ("Uses JWT", "JWT Authentication",
     "Supports JWT") all resolve to the same intent and feature set.
     """
-    
+
     def __init__(self):
         # Pre-compile all patterns for efficiency
         self._compiled_taxonomy = []
@@ -278,7 +278,8 @@ class ClaimNormalizationLayer:
                 # Merge: if duplicate found, update confidence
                 for existing in normalized:
                     if existing.canonical_form == nc.canonical_form:
-                        existing.confidence = min(1.0, existing.confidence + 0.1)
+                        existing.confidence = min(
+                            1.0, existing.confidence + 0.1)
                         break
 
         return normalized
@@ -286,15 +287,15 @@ class ClaimNormalizationLayer:
     def _normalize_single(self, claim: Claim) -> NormalizedClaim:
         """Normalize a single Claim → NormalizedClaim."""
         text = claim.text
-        
+
         # Step 1: Text Normalization
         normalized_text = self._clean_text(text)
-        
+
         # Step 2: Intent + Feature Extraction via taxonomy
         intent = "General"
         features: List[str] = []
         technologies: List[str] = []
-        
+
         for entry in self._compiled_taxonomy:
             for pattern in entry["compiled_patterns"]:
                 if pattern.search(normalized_text):
@@ -302,20 +303,23 @@ class ClaimNormalizationLayer:
                     features.extend(entry["features"])
                     technologies.append(entry["technology"])
                     break  # One match per taxonomy entry is enough
-        
+
         # Deduplicate
         features = list(dict.fromkeys(features))
         technologies = list(dict.fromkeys(technologies))
-        
+
         # Step 3: Build canonical form for deduplication
         canonical = self._build_canonical(intent, features)
-        
+
         # Update the original claim metadata
         claim.normalized_text = normalized_text
+        import hashlib
+        # Use a stable hash of the canonical form as the ID
+        claim.normalized_claim_id = "norm-" + hashlib.md5(canonical.encode()).hexdigest()[:8]
         # Metadata deprecated in Phase 3
-        
+
         return NormalizedClaim(
-            claim_id=claim.id,
+            claim_id=claim.normalized_claim_id,
             raw_text=claim.text,
             normalized_text=normalized_text,
             intent=intent,
@@ -325,7 +329,7 @@ class ClaimNormalizationLayer:
             confidence=1.0,
             metadata={"source_document": claim.source_document}
         )
-    
+
     def _clean_text(self, text: str) -> str:
         """Minimal normalization — preserve meaning, just clean noise."""
         cleaned = text.lower()
@@ -334,7 +338,7 @@ class ClaimNormalizationLayer:
         cleaned = re.sub(r'#+\s*', '', cleaned)     # Remove markdown headings
         cleaned = re.sub(r'\s+', ' ', cleaned)      # Normalize whitespace
         return cleaned.strip()
-    
+
     def _build_canonical(self, intent: str, features: List[str]) -> str:
         """
         Builds a canonical string that uniquely identifies the semantic content.

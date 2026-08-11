@@ -1,27 +1,31 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional
 
+
 class FeatureDefinition(BaseModel):
     id: str
     canonical_name: str
     aliases: List[str] = Field(default_factory=list)
     category: str
     description: str
-    ontology_path: List[str] = Field(default_factory=list) # e.g. ["Security", "Authentication", "Token Authentication", "JWT"]
+    # e.g. ["Security", "Authentication", "Token Authentication", "JWT"]
+    ontology_path: List[str] = Field(default_factory=list)
     capabilities: List[str] = Field(default_factory=list)
     severity: str = "Info"
     relationships: Dict[str, List[str]] = Field(default_factory=dict)
+
 
 class SemanticFeatureRegistry:
     """
     Single source of truth ontology for all semantic features, capabilities, and aliases.
     """
+
     def __init__(self):
         self._features: Dict[str, FeatureDefinition] = {}
         self._build_registry()
 
     def _build_registry(self):
-        # ── API Features ────────────────────────────────────────────────────────
+        # ── API Features ─────────────────────────────────────────────────────
         self._add(FeatureDefinition(
             id="feat_rest_api",
             canonical_name="REST API",
@@ -40,15 +44,19 @@ class SemanticFeatureRegistry:
             ontology_path=["API", "Web API", "GraphQL"],
             capabilities=["API Infrastructure"]
         ))
-        
-        # ── Security Features ───────────────────────────────────────────────────
+
+        # ── Security Features ────────────────────────────────────────────────
         self._add(FeatureDefinition(
             id="feat_jwt",
             canonical_name="JWT Authentication",
             aliases=["JWT", "JSON Web Token", "Bearer Authentication"],
             category="Security",
             description="Stateless authentication using JSON Web Tokens",
-            ontology_path=["Security", "Authentication", "Token Authentication", "JWT"],
+            ontology_path=[
+                "Security",
+                "Authentication",
+                "Token Authentication",
+                "JWT"],
             capabilities=["Authentication & Security"],
             severity="High"
         ))
@@ -58,7 +66,11 @@ class SemanticFeatureRegistry:
             aliases=["OAuth", "OAuth2.0", "OpenID Connect", "OIDC"],
             category="Security",
             description="Delegated authorization using OAuth2",
-            ontology_path=["Security", "Authentication", "Delegated Authentication", "OAuth2"],
+            ontology_path=[
+                "Security",
+                "Authentication",
+                "Delegated Authentication",
+                "OAuth2"],
             capabilities=["Authentication & Security"],
             severity="High"
         ))
@@ -81,12 +93,18 @@ class SemanticFeatureRegistry:
             ontology_path=["Security", "Web Security", "CORS"],
             capabilities=["Authentication & Security"]
         ))
-        
-        # ── Database Features ───────────────────────────────────────────────────
+
+        # ── Database Features ────────────────────────────────────────────────
         self._add(FeatureDefinition(
             id="feat_orm",
             canonical_name="ORM Usage",
-            aliases=["ORM", "Object Relational Mapping", "JPA", "Hibernate", "Entity Framework", "SQLAlchemy"],
+            aliases=[
+                "ORM",
+                "Object Relational Mapping",
+                "JPA",
+                "Hibernate",
+                "Entity Framework",
+                "SQLAlchemy"],
             category="Database",
             description="Object-Relational Mapping to a relational database",
             ontology_path=["Database", "Data Access", "ORM"],
@@ -110,8 +128,8 @@ class SemanticFeatureRegistry:
             ontology_path=["Database", "Schema Management", "Migration"],
             capabilities=["Database Management"]
         ))
-        
-        # ── Architecture Features ───────────────────────────────────────────────
+
+        # ── Architecture Features ────────────────────────────────────────────
         self._add(FeatureDefinition(
             id="feat_mvc",
             canonical_name="MVC Architecture",
@@ -121,18 +139,24 @@ class SemanticFeatureRegistry:
             ontology_path=["Architecture", "Pattern", "MVC"],
             capabilities=["Frontend / UI", "API Infrastructure"]
         ))
-        
-        # ── Messaging Features ──────────────────────────────────────────────────
+
+        # ── Messaging Features ───────────────────────────────────────────────
         self._add(FeatureDefinition(
             id="feat_event_streaming",
             canonical_name="Event Streaming",
-            aliases=["Event Streaming", "Kafka", "Message Queue", "RabbitMQ", "SQS", "ActiveMQ"],
+            aliases=[
+                "Event Streaming",
+                "Kafka",
+                "Message Queue",
+                "RabbitMQ",
+                "SQS",
+                "ActiveMQ"],
             category="Messaging",
             description="Asynchronous message or event streaming",
             ontology_path=["Messaging", "Event Streaming"],
             capabilities=["Messaging & Events"]
         ))
-        
+
         self._add(FeatureDefinition(
             id="feat_docker",
             canonical_name="Docker Containerization",
@@ -192,6 +216,7 @@ class SemanticFeatureRegistry:
 
     def get_all(self) -> List[FeatureDefinition]:
         return list(self._features.values())
+
 
 # Singleton instance
 SEMANTIC_REGISTRY = SemanticFeatureRegistry()

@@ -45,7 +45,6 @@ class DocumentPreprocessor:
                 )
             )
 
-
         return document_context
 
     def _extract_headings(self, text: str) -> list[str]:

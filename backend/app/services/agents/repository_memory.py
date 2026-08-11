@@ -1,8 +1,10 @@
 from app.models.knowledge.evidence import EvidenceContext
 from typing import Dict
 
+
 class RepositoryMemory:
     """Short-term memory for the Agent during a verification session."""
+
     def __init__(self):
         self.memory: Dict[str, EvidenceContext] = {}
 

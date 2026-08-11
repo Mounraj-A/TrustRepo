@@ -7,7 +7,7 @@ and Cycle Detection as first-class research contributions.
 
 Architecture position: Knowledge Graph → Graph Analytics → Evidence Retrieval
 """
-from typing import List, Dict, Optional, Tuple, Set
+from typing import List, Tuple
 from dataclasses import dataclass, field
 
 
@@ -37,8 +37,10 @@ class PathResult:
 class DependencyNode:
     name: str
     qualified_name: str
-    dependents: List[str] = field(default_factory=list)    # who depends on this
-    dependencies: List[str] = field(default_factory=list)  # what this depends on
+    dependents: List[str] = field(
+        default_factory=list)    # who depends on this
+    dependencies: List[str] = field(
+        default_factory=list)  # what this depends on
     dependency_depth: int = 0
     is_leaf: bool = False
     is_root: bool = False
@@ -60,6 +62,7 @@ class GraphIntegrityReport:
     architectures_without_capabilities: int = 0
     is_valid: bool = False
 
+
 @dataclass
 class GraphAnalyticsReport:
     """Aggregated output of all graph analytics algorithms."""
@@ -67,7 +70,8 @@ class GraphAnalyticsReport:
     critical_nodes: List[NodeCentrality] = field(default_factory=list)
     dependency_graph: List[DependencyNode] = field(default_factory=list)
     cycle_report: CycleReport = field(default_factory=CycleReport)
-    integrity_report: GraphIntegrityReport = field(default_factory=GraphIntegrityReport)
+    integrity_report: GraphIntegrityReport = field(
+        default_factory=GraphIntegrityReport)
     total_nodes: int = 0
     total_relationships: int = 0
     graph_density: float = 0.0
@@ -90,19 +94,20 @@ class GraphAnalyticsEngine:
         report.total_relationships = self._count_relationships()
         if report.total_nodes > 0:
             report.graph_density = round(
-                report.total_relationships / (report.total_nodes * (report.total_nodes - 1) + 1), 4
+                report.total_relationships /
+                (report.total_nodes * (report.total_nodes - 1) + 1), 4
             )
 
         report.centrality_nodes = self.compute_degree_centrality()
         report.critical_nodes = [n for n in report.centrality_nodes
-                                  if n.structural_importance in ("HIGH", "CRITICAL")]
+                                 if n.structural_importance in ("HIGH", "CRITICAL")]
         report.dependency_graph = self.analyze_dependencies()
         report.cycle_report = self.detect_cycles()
         report.integrity_report = self.validate_integrity()
 
         return report
 
-    # ─── 1. Degree Centrality ─────────────────────────────────────────────────
+    # ─── 1. Degree Centrality ───────────────────────────────────────────────
 
     def compute_degree_centrality(self) -> List[NodeCentrality]:
         """
@@ -143,7 +148,7 @@ class GraphAnalyticsEngine:
             ))
         return nodes
 
-    # ─── 2. Betweenness / PageRank (simulated if GDS not available) ───────────
+    # ─── 2. Betweenness / PageRank (simulated if GDS not available) ─────────
 
     def compute_betweenness_approximation(self) -> List[Tuple[str, float]]:
         """
@@ -159,7 +164,7 @@ class GraphAnalyticsEngine:
         results = self._query(query, {})
         return [(r.get("name", ""), r.get("callers", 0)) for r in results]
 
-    # ─── 3. Shortest Path ─────────────────────────────────────────────────────
+    # ─── 3. Shortest Path ───────────────────────────────────────────────────
 
     def shortest_path(self, source_name: str, target_name: str) -> PathResult:
         """
@@ -175,7 +180,9 @@ class GraphAnalyticsEngine:
                length(path) as path_length
         LIMIT 1
         """
-        results = self._query(query, {"source": source_name, "target": target_name})
+        results = self._query(
+            query, {
+                "source": source_name, "target": target_name})
         if results:
             r = results[0]
             return PathResult(
@@ -186,11 +193,13 @@ class GraphAnalyticsEngine:
                 path_length=r.get("path_length", 0),
                 reachable=True
             )
-        return PathResult(source=source_name, target=target_name, reachable=False)
+        return PathResult(source=source_name,
+                          target=target_name, reachable=False)
 
     # ─── 4. Reachability ─────────────────────────────────────────────────────
 
-    def check_reachability(self, source_name: str, target_label: str) -> List[str]:
+    def check_reachability(self, source_name: str,
+                           target_label: str) -> List[str]:
         """
         Returns all nodes of target_label reachable from source_name.
         Used to verify architectural completeness (e.g., Security reaches Repository).
@@ -201,10 +210,12 @@ class GraphAnalyticsEngine:
         RETURN DISTINCT target.name as name
         LIMIT 30
         """
-        results = self._query(query, {"source": source_name, "label": target_label})
+        results = self._query(
+            query, {
+                "source": source_name, "label": target_label})
         return [r.get("name", "") for r in results if r.get("name")]
 
-    # ─── 5. Dependency Analysis ───────────────────────────────────────────────
+    # ─── 5. Dependency Analysis ─────────────────────────────────────────────
 
     def analyze_dependencies(self) -> List[DependencyNode]:
         """
@@ -228,7 +239,9 @@ class GraphAnalyticsEngine:
             callers = [c for c in r.get("callers", []) if c]
             nodes.append(DependencyNode(
                 name=r.get("name", "Unknown"),
-                qualified_name=r.get("qualified_name", r.get("name", "Unknown")),
+                qualified_name=r.get(
+                    "qualified_name", r.get(
+                        "name", "Unknown")),
                 dependencies=deps,
                 dependents=callers,
                 dependency_depth=len(deps),
@@ -237,7 +250,7 @@ class GraphAnalyticsEngine:
             ))
         return nodes
 
-    # ─── 6. Cycle Detection ───────────────────────────────────────────────────
+    # ─── 6. Cycle Detection ─────────────────────────────────────────────────
 
     def detect_cycles(self) -> CycleReport:
         """
@@ -257,35 +270,45 @@ class GraphAnalyticsEngine:
             total_cycle_count=len(cycles)
         )
 
-    # ─── 7. Integrity Validation ──────────────────────────────────────────────
-    
+    # ─── 7. Integrity Validation ────────────────────────────────────────────
+
     def validate_integrity(self) -> GraphIntegrityReport:
         """
         Validates the semantic and structural integrity of the Knowledge Graph.
         Ensures no orphan nodes and full lineage for Architecture -> Tech.
         """
         # Isolated Nodes
-        res = self._query("MATCH (n) WHERE NOT (n)--() RETURN count(n) as isolated", {})
+        res = self._query(
+            "MATCH (n) WHERE NOT (n)--() RETURN count(n) as isolated", {})
         isolated = res[0].get("isolated", 0) if res else 0
-        
+
         # Orphan Technologies (No ENABLES edge to Feature)
-        res = self._query("MATCH (t:Technology) WHERE NOT (t)-[:ENABLES]->() RETURN count(t) as orphan", {})
+        res = self._query(
+            "MATCH (t:Technology) WHERE NOT (t)-[:ENABLES]->() RETURN count(t) as orphan",
+            {})
         orphan_tech = res[0].get("orphan", 0) if res else 0
-        
+
         # Orphan Features (No IMPLEMENTS edge to Capability)
-        res = self._query("MATCH (f:FeatureInstance) WHERE NOT (f)-[:IMPLEMENTS]->() RETURN count(f) as orphan", {})
+        res = self._query(
+            "MATCH (f:FeatureInstance) WHERE NOT (f)-[:IMPLEMENTS]->() RETURN count(f) as orphan",
+            {})
         orphan_feat = res[0].get("orphan", 0) if res else 0
-        
+
         # Capabilities without Features (No incoming IMPLEMENTS edge)
-        res = self._query("MATCH (c:Capability) WHERE NOT ()-[:IMPLEMENTS]->(c) RETURN count(c) as orphans", {})
+        res = self._query(
+            "MATCH (c:Capability) WHERE NOT ()-[:IMPLEMENTS]->(c) RETURN count(c) as orphans",
+            {})
         caps_wo_feat = res[0].get("orphans", 0) if res else 0
-        
-        # Architectures without Capabilities (No incoming REQUIRES or SUPPORTS edge)
-        res = self._query("MATCH (a:Architecture) WHERE NOT ()-[:REQUIRES|SUPPORTS]->(a) RETURN count(a) as orphans", {})
+
+        # Architectures without Capabilities (No incoming REQUIRES or SUPPORTS
+        # edge)
+        res = self._query(
+            "MATCH (a:Architecture) WHERE NOT ()-[:REQUIRES|SUPPORTS]->(a) RETURN count(a) as orphans",
+            {})
         archs_wo_cap = res[0].get("orphans", 0) if res else 0
-        
+
         is_valid = isolated < 5 and orphan_tech == 0 and orphan_feat == 0
-        
+
         return GraphIntegrityReport(
             isolated_nodes=isolated,
             orphan_technologies=orphan_tech,
@@ -295,7 +318,7 @@ class GraphAnalyticsEngine:
             is_valid=is_valid
         )
 
-    # ─── Internal helpers ─────────────────────────────────────────────────────
+    # ─── Internal helpers ───────────────────────────────────────────────────
 
     def _query(self, cypher: str, params: dict) -> list:
         if not self.repo:

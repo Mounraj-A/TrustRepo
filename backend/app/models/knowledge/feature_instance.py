@@ -1,7 +1,8 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+from typing import List
 
 from app.models.knowledge.evidence import EvidenceChain
+
 
 class FeatureInstance(BaseModel):
     """

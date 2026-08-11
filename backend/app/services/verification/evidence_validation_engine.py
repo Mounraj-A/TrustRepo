@@ -10,11 +10,11 @@ Architecture position: Evidence Retrieval → Evidence Validation → Evidence F
 Key principle: A single 'import jwt' is NOT sufficient to claim JWT Authentication.
 Validation rules enforce topological completeness requirements.
 """
-from typing import List, Dict, Optional
+from typing import List, Dict
 from dataclasses import dataclass, field
 from enum import Enum
 
-from app.models.knowledge.evidence import EvidenceChain, EvidenceItem
+from app.models.knowledge.evidence import EvidenceChain
 
 
 class ValidationOutcome(str, Enum):
@@ -92,7 +92,8 @@ class EvidenceValidationEngine:
     Validates EvidenceChains against defined policies before they reach the Reasoning Engine.
     """
 
-    def validate(self, chain: EvidenceChain, technology_context: str = "") -> EvidenceValidationResult:
+    def validate(self, chain: EvidenceChain,
+                 technology_context: str = "") -> EvidenceValidationResult:
         """Validate a single EvidenceChain, returning a structured validation result."""
         rule_results: List[ValidationRuleResult] = []
         total_penalty = 0.0
@@ -123,7 +124,8 @@ class EvidenceValidationEngine:
             total_penalty += r4.penalty
 
         # Rule 5: Completeness policy check (technology-specific)
-        r5, is_complete = self._rule_completeness_policy(chain, technology_context)
+        r5, is_complete = self._rule_completeness_policy(
+            chain, technology_context)
         rule_results.append(r5)
         if r5.outcome == ValidationOutcome.WARN:
             total_penalty += r5.penalty
@@ -142,20 +144,23 @@ class EvidenceValidationEngine:
             false_positive_reason=fp_reason,
         )
 
-    def validate_all(self, chains: List[EvidenceChain], technology_context: str = "") -> List[EvidenceValidationResult]:
+    def validate_all(self, chains: List[EvidenceChain],
+                     technology_context: str = "") -> List[EvidenceValidationResult]:
         return [self.validate(chain, technology_context) for chain in chains]
 
-    def filter_valid(self, chains: List[EvidenceChain], technology_context: str = "") -> List[EvidenceChain]:
+    def filter_valid(self, chains: List[EvidenceChain],
+                     technology_context: str = "") -> List[EvidenceChain]:
         """Return only chains that pass validation."""
         results = self.validate_all(chains, technology_context)
         valid_ids = {r.chain_id for r in results if r.is_valid}
         return [c for c in chains if c.chain_id in valid_ids]
 
-    # ─── Individual Rules ─────────────────────────────────────────────────────
+    # ─── Individual Rules ───────────────────────────────────────────────────
 
     def _rule_non_empty(self, chain: EvidenceChain) -> ValidationRuleResult:
         if chain.sequence:
-            return ValidationRuleResult("R1", "NonEmpty", ValidationOutcome.PASS, "Chain has items.")
+            return ValidationRuleResult(
+                "R1", "NonEmpty", ValidationOutcome.PASS, "Chain has items.")
         return ValidationRuleResult("R1", "NonEmpty", ValidationOutcome.FAIL,
                                     "Chain has no evidence items — cannot validate.", penalty=0.8)
 
@@ -165,11 +170,13 @@ class EvidenceValidationEngine:
             if item.source.file_path in ("", "Unknown", "unknown")
         ]
         if not unknown_sources:
-            return ValidationRuleResult("R2", "KnownSource", ValidationOutcome.PASS, "All items have known file paths.")
+            return ValidationRuleResult(
+                "R2", "KnownSource", ValidationOutcome.PASS, "All items have known file paths.")
         return ValidationRuleResult("R2", "KnownSource", ValidationOutcome.WARN,
                                     f"{len(unknown_sources)} items have unknown source paths.", penalty=0.15)
 
-    def _rule_ranking_threshold(self, chain: EvidenceChain) -> ValidationRuleResult:
+    def _rule_ranking_threshold(
+            self, chain: EvidenceChain) -> ValidationRuleResult:
         if chain.ranking_score >= 0.5:
             return ValidationRuleResult("R3", "RankingThreshold", ValidationOutcome.PASS,
                                         f"Ranking score {chain.ranking_score} meets threshold.")
@@ -177,7 +184,8 @@ class EvidenceValidationEngine:
                                     f"Ranking score {chain.ranking_score} below threshold 0.5.", penalty=0.3)
 
     def _rule_false_positive_check(self, chain: EvidenceChain) -> tuple:
-        all_snippets = " ".join(item.code_snippet.lower() for item in chain.sequence)
+        all_snippets = " ".join(item.code_snippet.lower()
+                                for item in chain.sequence)
         all_symbols = " ".join(item.symbol.lower() for item in chain.sequence)
 
         for pattern in FALSE_POSITIVE_PATTERNS:
@@ -198,7 +206,8 @@ class EvidenceValidationEngine:
         return ValidationRuleResult("R4", "FalsePositiveDetection", ValidationOutcome.PASS,
                                     "No false positive patterns detected."), ""
 
-    def _rule_completeness_policy(self, chain: EvidenceChain, tech_context: str) -> tuple:
+    def _rule_completeness_policy(
+            self, chain: EvidenceChain, tech_context: str) -> tuple:
         tech_lower = tech_context.lower()
         policy = None
         for key, p in COMPLETENESS_POLICIES.items():
@@ -211,7 +220,8 @@ class EvidenceValidationEngine:
                                         "No specific completeness policy for this technology."), True
 
         all_symbols = " ".join(item.symbol.lower() for item in chain.sequence)
-        matched = [sym for sym in policy["required_symbols"] if sym.lower() in all_symbols]
+        matched = [sym for sym in policy["required_symbols"]
+                   if sym.lower() in all_symbols]
 
         if len(matched) >= policy["required_min"]:
             return ValidationRuleResult("R5", "CompletenessPolicy", ValidationOutcome.PASS,

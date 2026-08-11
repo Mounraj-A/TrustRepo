@@ -4,12 +4,14 @@ from app.models.knowledge.repository_knowledge_graph import RepositoryKnowledgeG
 from app.models.knowledge.evidence import EvidenceItem, EvidenceSource, EvidenceStrength, EvidenceType
 from app.services.analysis.providers.evidence_provider import EvidenceProvider
 
+
 class ImportProvider(EvidenceProvider):
     """
     Extracts module and library imports from source code files.
     """
 
-    def extract_evidence(self, graph: RepositoryKnowledgeGraph) -> List[EvidenceItem]:
+    def extract_evidence(
+            self, graph: RepositoryKnowledgeGraph) -> List[EvidenceItem]:
         items = []
         for node in graph.nodes:
             if node.label == "Import":
@@ -18,16 +20,17 @@ class ImportProvider(EvidenceProvider):
                     name = node.properties.get("qualname", "")
                 if not name:
                     continue
-                
+
                 source = EvidenceSource(
                     file_path=node.properties.get("file_path", "unknown"),
                     parser_used="ASTParser",
-                    language=self._detect_language(node.properties.get("file_path", "unknown")),
+                    language=self._detect_language(
+                        node.properties.get("file_path", "unknown")),
                     line_number=node.properties.get("start_line", None),
                     commit_sha=graph.metadata.get("commit_sha", "HEAD"),
                     branch=graph.metadata.get("branch", "main")
                 )
-                
+
                 item = EvidenceItem(
                     id=str(uuid.uuid4()),
                     source=source,
@@ -46,8 +49,12 @@ class ImportProvider(EvidenceProvider):
 
     def _detect_language(self, path: str) -> str:
         path = path.lower()
-        if path.endswith(".py"): return "Python"
-        if path.endswith(".js") or path.endswith(".jsx"): return "JavaScript"
-        if path.endswith(".ts") or path.endswith(".tsx"): return "TypeScript"
-        if path.endswith(".java"): return "Java"
+        if path.endswith(".py"):
+            return "Python"
+        if path.endswith(".js") or path.endswith(".jsx"):
+            return "JavaScript"
+        if path.endswith(".ts") or path.endswith(".tsx"):
+            return "TypeScript"
+        if path.endswith(".java"):
+            return "Java"
         return "Unknown"

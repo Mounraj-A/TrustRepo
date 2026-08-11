@@ -37,18 +37,18 @@ class EvidenceQualityAssessor:
     # Strength weights map: node type → weight (mirrors ranking formula)
     NODE_TYPE_WEIGHTS = {
         "Annotation": 1.0,
-        "Import":     0.8,
-        "Method":     0.7,
-        "Class":      0.75,
-        "Interface":  0.75,
-        "Variable":   0.5,
-        "Comment":    0.2,
-        "unknown":    0.4,
+        "Import": 0.8,
+        "Method": 0.7,
+        "Class": 0.75,
+        "Interface": 0.75,
+        "Variable": 0.5,
+        "Comment": 0.2,
+        "unknown": 0.4,
     }
 
     STRENGTH_WEIGHTS = {
-        EvidenceStrength.PRIMARY:    1.0,
-        EvidenceStrength.SECONDARY:  0.7,
+        EvidenceStrength.PRIMARY: 1.0,
+        EvidenceStrength.SECONDARY: 0.7,
         EvidenceStrength.SUPPORTING: 0.4,
     }
 
@@ -101,7 +101,8 @@ class EvidenceQualityAssessor:
             quality_label=quality_label,
         )
 
-    def assess_all(self, chains: List[EvidenceChain]) -> List[EvidenceQualityResult]:
+    def assess_all(self, chains: List[EvidenceChain]
+                   ) -> List[EvidenceQualityResult]:
         return [self.assess(chain) for chain in chains]
 
     def aggregate_quality(self, results: List[EvidenceQualityResult]) -> float:
@@ -113,7 +114,7 @@ class EvidenceQualityAssessor:
             return 0.0
         return round(sum(r.quality_score for r in results) / len(results), 4)
 
-    # ─── Internal helpers ─────────────────────────────────────────────────────
+    # ─── Internal helpers ───────────────────────────────────────────────────
 
     def _compute_completeness(self, chain: EvidenceChain) -> float:
         """Ratio of non-empty/non-default fields across all items."""
@@ -148,9 +149,11 @@ class EvidenceQualityAssessor:
             scores.append(filled / 5.0)
         return round(sum(scores) / len(scores), 4)
 
-    def _classify(self, chain: EvidenceChain, quality_score: float) -> EvidenceStrength:
+    def _classify(self, chain: EvidenceChain,
+                  quality_score: float) -> EvidenceStrength:
         """Classify the chain as PRIMARY / SECONDARY / SUPPORTING."""
-        # A chain with high graph coverage and a strong ranking score is PRIMARY
+        # A chain with high graph coverage and a strong ranking score is
+        # PRIMARY
         has_graph_path = bool(chain.graph_path and chain.graph_path != "")
         has_high_rank = chain.ranking_score >= 0.8
         if has_graph_path and has_high_rank and quality_score >= 0.7:

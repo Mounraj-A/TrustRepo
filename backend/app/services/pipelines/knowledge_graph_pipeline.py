@@ -53,23 +53,29 @@ class KnowledgeGraphPipeline:
             print("  [KGPipeline] No code context — skipping graph build.")
             return context
 
-        # ── Step 1: Build In-Memory Graph Model ───────────────────────────────
+        # ── Step 1: Build In-Memory Graph Model ──────────────────────────────
         graph = self.builder.build(context.code_context)
         graph.metadata = context.repository_context.metadata
         context.graph_context.graph = graph
-        print(f"  Graph Built: {len(graph.nodes)} nodes, {len(graph.edges)} edges.")
+        print(
+            f"  Graph Built: {len(graph.nodes)} nodes, {len(graph.edges)} edges.")
 
-        # ── Step 1b: Schema Validation ─────────────────────────────────────────
+        # ── Step 1b: Schema Validation ───────────────────────────────────────
         validation = self.schema_validator.validate(graph)
-        context.graph_context.analytics["schema_validation"] = validation.to_dict()
+        context.graph_context.analytics["schema_validation"] = validation.to_dict(
+        )
         if validation.errors:
             for err in validation.errors:
                 print(f"  [GraphSchema] ERROR: {err}")
         for warn in validation.warnings:
             print(f"  [GraphSchema] WARN: {warn}")
-        print(f"  Graph Integrity: {validation.integrity_score:.2f} | Nodes: {validation.node_count} | Edges: {validation.edge_count}")
+        print(
+            f"  Graph Integrity: {
+                validation.integrity_score:.2f} | Nodes: {
+                validation.node_count} | Edges: {
+                validation.edge_count}")
 
-        # ── Step 2: Persist to Neo4j ──────────────────────────────────────────
+        # ── Step 2: Persist to Neo4j ─────────────────────────────────────────
         try:
             self.repo.clear_graph()
             self.repo.save_graph(graph)
@@ -77,22 +83,28 @@ class KnowledgeGraphPipeline:
         except Exception as e:
             print(f"  [KGPipeline] Neo4j persistence failed: {e}")
 
-        # ── Step 3: Run Graph Algorithm Suite ─────────────────────────────────
+        # ── Step 3: Run Graph Algorithm Suite ────────────────────────────────
         for algo in self.graph_algorithms:
             try:
                 if hasattr(algo, 'build'):
                     algo.build()
             except Exception as e:
-                print(f"  [KGPipeline] Algorithm {algo.__class__.__name__} failed: {e}")
+                print(
+                    f"  [KGPipeline] Algorithm {
+                        algo.__class__.__name__} failed: {e}")
         print("  Graph algorithms completed.")
 
-        # ── Step 4: Technology Detection (EvidenceChain-backed) ───────────────
+        # ── Step 4: Technology Detection (EvidenceChain-backed) ──────────────
         try:
             tech_results = self.tech_detection.detect(graph)
-            context.semantic_context.technologies = tech_results.get("technologies", [])
-            context.semantic_context.technology_categories = tech_results.get("technology_categories", {})
-            context.semantic_context.capabilities.extend(tech_results.get("capabilities", []))
-            context.semantic_context.evidence_chains.extend(tech_results.get("evidence_chains", []))
+            context.semantic_context.technologies = tech_results.get(
+                "technologies", [])
+            context.semantic_context.technology_categories = tech_results.get(
+                "technology_categories", {})
+            context.semantic_context.capabilities.extend(
+                tech_results.get("capabilities", []))
+            context.semantic_context.evidence_chains.extend(
+                tech_results.get("evidence_chains", []))
         except Exception as e:
             print(f"  [KGPipeline] Technology detection failed: {e}")
 
@@ -101,7 +113,20 @@ class KnowledgeGraphPipeline:
         # Now uses detected technologies to infer semantic features.
         try:
             features = self.feature_extractor.extract(graph, tech_results)
-            context.semantic_context.features = [f.canonical_name for f in features]
+            
+            # Fetch concrete evidence for these features
+            from app.services.analysis.feature_evidence_retriever import FeatureEvidenceRetriever
+            feature_retriever = FeatureEvidenceRetriever(self.repo)
+            for feature in features:
+                chains = feature_retriever.retrieve_evidence(feature)
+                if chains:
+                    feature.evidence = chains
+                    context.semantic_context.evidence_chains.extend(chains)
+                else:
+                    feature.evidence = []
+                    
+            context.semantic_context.features = [
+                f.canonical_name for f in features]
         except Exception as e:
             print(f"  [KGPipeline] Feature extraction failed: {e}")
             features = []
@@ -111,41 +136,45 @@ class KnowledgeGraphPipeline:
             detected_caps = self.capability_detector.detect(features)
             context.semantic_context.capabilities.extend(detected_caps)
             # Deduplicate
-            context.semantic_context.capabilities = sorted(list(set(context.semantic_context.capabilities)))
+            context.semantic_context.capabilities = sorted(
+                list(set(context.semantic_context.capabilities)))
         except Exception as e:
             print(f"  [KGPipeline] Capability detection failed: {e}")
-            
+
         # ── Step 7: Architecture Detection
         try:
-            detected_arch = self.arch_detection.detect(features)
-            context.semantic_context.architectures = detected_arch
+            findings = self.arch_detection.detect_findings(features)
+            context.semantic_context.architecture_findings = findings
+            context.semantic_context.architectures = [f.name for f in findings]
         except Exception as e:
             print(f"  [KGPipeline] Architecture detection failed: {e}")
-            
+
         # ── Step 8: Graph Enrichment
         try:
             self.enrichment_engine.enrich(features)
         except Exception as e:
             print(f"  [KGPipeline] Graph enrichment failed: {e}")
 
-        # ── Step 9: Graph Analytics Engine ────────────────────────────────────
+        # ── Step 9: Graph Analytics Engine ───────────────────────────────────
         try:
             analytics_report = self.analytics_engine.run_full_analytics()
             context.graph_context.analytics = {
-                "total_nodes":        analytics_report.total_nodes,
+                "total_nodes": analytics_report.total_nodes,
                 "total_relationships": analytics_report.total_relationships,
-                "graph_density":      analytics_report.graph_density,
-                "critical_nodes":     [
-                    {"name": n.name, "degree": n.degree, "importance": n.structural_importance}
+                "graph_density": analytics_report.graph_density,
+                "critical_nodes": [
+                    {"name": n.name, "degree": n.degree,
+                        "importance": n.structural_importance}
                     for n in analytics_report.critical_nodes
                 ],
-                "cycle_detected":     analytics_report.cycle_report.has_cycles,
-                "cycle_count":        analytics_report.cycle_report.total_cycle_count,
+                "cycle_detected": analytics_report.cycle_report.has_cycles,
+                "cycle_count": analytics_report.cycle_report.total_cycle_count,
             }
             print(
                 f"  Analytics: {analytics_report.total_nodes} nodes, "
                 f"{len(analytics_report.critical_nodes)} critical, "
-                f"cycles={'YES' if analytics_report.cycle_report.has_cycles else 'NO'}"
+                f"cycles={
+                    'YES' if analytics_report.cycle_report.has_cycles else 'NO'}"
             )
         except Exception as e:
             print(f"  [KGPipeline] Graph analytics failed: {e}")

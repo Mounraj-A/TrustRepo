@@ -43,10 +43,11 @@ class FeatureExtractor:
         self.validation_layer = FeatureValidationLayer()
         self.confidence_engine = FeatureConfidenceEngine()
 
-    def extract(self, graph: RepositoryKnowledgeGraph, tech_results: dict = None) -> List[FeatureInstance]:
+    def extract(self, graph: RepositoryKnowledgeGraph,
+                tech_results: dict = None) -> List[FeatureInstance]:
         """
         Extract features from the Knowledge Graph based on detected technologies.
-        
+
         Parameters
         ----------
         graph : RepositoryKnowledgeGraph
@@ -61,27 +62,35 @@ class FeatureExtractor:
         """
         raw_features: List[FeatureInstance] = []
         tech_results = tech_results or {}
-        
+
         # 1. Derive features from detected technologies
         for tech_name in tech_results.get("technologies", []):
-            # Find the tech in KB to get its category/capabilities, or map to features
+            # Find the tech in KB to get its category/capabilities, or map to
+            # features
             for tech_def in TECHNOLOGY_KB.values():
                 if tech_def.display_name == tech_name:
                     # Resolve features that this technology implies via SEMANTIC_REGISTRY
                     # e.g., 'Spring MVC' -> 'MVC Architecture', 'REST API'
                     # Currently SEMANTIC_REGISTRY has features like 'feat_rest_api'
-                    # We can use the capability -> feature mapping or string matching for now
-                    
-                    # Look up features in semantic registry that match this technology's capabilities
-                    caps = [cap for cap in CAPABILITY_KB.values() if tech_def.category in cap.category_triggers]
+                    # We can use the capability -> feature mapping or string
+                    # matching for now
+
+                    # Look up features in semantic registry that match this
+                    # technology's capabilities
+                    caps = [cap for cap in CAPABILITY_KB.values(
+                    ) if tech_def.category in cap.category_triggers]
                     cap_names = [c.display_name for c in caps]
-                    
+
                     for feature_def in SEMANTIC_REGISTRY.get_all():
-                        if any(c in feature_def.capabilities for c in cap_names) or feature_def.category == tech_def.category:
-                            
+                        if any(
+                                c in feature_def.capabilities for c in cap_names) or feature_def.category == tech_def.category:
+
                             # Find the evidence chain for this tech
-                            tech_chains = [c for c in tech_results.get("evidence_chains", []) if tech_name in c.chain_type]
-                            
+                            tech_chains = [
+                                c for c in tech_results.get(
+                                    "evidence_chains",
+                                    []) if tech_name in c.chain_type]
+
                             raw_features.append(FeatureInstance(
                                 id=f"inst_{uuid.uuid4().hex[:8]}",
                                 definition_id=feature_def.id,
@@ -99,5 +108,8 @@ class FeatureExtractor:
         # 4. Score confidence
         final_features = self.confidence_engine.calculate(validated_features)
 
-        print(f"  Extracted {len(final_features)} validated features from {len(raw_features)} raw detections.")
+        print(
+            f"  Extracted {
+                len(final_features)} validated features from {
+                len(raw_features)} raw detections.")
         return final_features

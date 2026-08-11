@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import {
   FileCode2, GitGraph, Cpu, ShieldCheck, Clock, AlertTriangle,
-  CheckCircle2, XCircle, HelpCircle, ArrowRight, Activity, Layers, Zap
+  CheckCircle2, XCircle, HelpCircle, ArrowRight, Activity, Layers, Zap,
+  BookOpen
 } from 'lucide-react';
 import { useAnalysisStore } from '@/store';
 import MetricsCard from '@/components/MetricsCard';
@@ -9,7 +10,6 @@ import TrustScoreGauge from '@/components/TrustScoreGauge';
 import PipelineTimeline from '@/components/PipelineTimeline';
 import EmptyState from '@/components/EmptyState';
 import { cn, formatDuration, formatNumber } from '@/lib/utils';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function Dashboard() {
   const { analysisResult, isAnalyzing } = useAnalysisStore();
@@ -19,40 +19,31 @@ export default function Dashboard() {
   const r = analysisResult;
   const code = r?.code_metrics;
   const graph = r?.graph_metrics;
-  const verify = r?.verification_summary;
   const report = r?.report;
   const trace = r?.execution_trace ?? [];
-
-  const verificationData = verify ? [
-    { name: 'Verified', value: verify.verified, color: '#10b981' },
-    { name: 'Partial', value: verify.partially_verified, color: '#f59e0b' },
-    { name: 'Refuted', value: verify.refuted, color: '#ef4444' },
-    { name: 'Insufficient', value: verify.insufficient, color: '#64748b' },
-  ].filter(d => d.value > 0) : [];
+  const summary = report?.summary;
 
   return (
     <div className="p-6 space-y-8 animate-in">
-      {/* ── Header ─────────────────────────────────────────────── */}
+      {/* ── 1. Repository Header ──────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">
-            {report?.repository_name ?? 'Repository Analysis'}
+            {report?.metadata?.repository_url?.split(/[\/\\]/).pop() ?? 'Repository Analysis'}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {report?.analysis_timestamp
-              ? new Date(report.analysis_timestamp).toLocaleString()
+            {report?.metadata?.analysis_date
+              ? new Date(report.metadata.analysis_date).toLocaleString()
               : 'Analysis Complete'}
             {r?.processing_time_seconds && (
               <span className="ml-2">· {formatDuration(r.processing_time_seconds)}</span>
             )}
           </p>
         </div>
-        {report?.trust_score !== undefined && (
-          <TrustScoreGauge score={report.trust_score} size="sm" showLabel={false} />
-        )}
+        {/* Analyze button is in global header */}
       </div>
 
-      {/* ── Key Metrics ─────────────────────────────────────────── */}
+      {/* ── 3. Repository Metrics ─────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <MetricsCard label="Source Files" value={code?.source_files} icon={FileCode2} color="primary" loading={isAnalyzing} />
         <MetricsCard label="AST Nodes" value={code?.ast_nodes} icon={GitGraph} color="violet" loading={isAnalyzing} />
@@ -63,45 +54,22 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ── Trust Score + Verification ──────────────────────── */}
-        <div className="glass rounded-2xl p-6 flex flex-col items-center gap-6">
-          {report?.trust_score !== undefined && (
-            <TrustScoreGauge score={report.trust_score} size="lg" />
+        {/* ── 2. Trust Assessment ─────────────────────────────────────── */}
+        <div className="glass rounded-2xl p-6 flex flex-col items-center gap-6 text-center">
+          {report?.trust_assessment?.score !== undefined && (
+            <TrustScoreGauge score={report.trust_assessment.score} size="lg" showLabel={false} />
           )}
-
-          {/* Verification breakdown */}
-          {verify && verify.total_claims > 0 && (
-            <div className="w-full space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Claim Verification ({verify.total_claims} claims)
+          {report?.trust_assessment && (
+            <div className="space-y-2">
+              <h3 className="font-semibold text-lg">{report.trust_assessment.status}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {report.trust_assessment.details}
               </p>
-              {[
-                { label: 'Verified', count: verify.verified, color: 'bg-emerald-500', Icon: CheckCircle2 },
-                { label: 'Partial', count: verify.partially_verified, color: 'bg-amber-500', Icon: AlertTriangle },
-                { label: 'Refuted', count: verify.refuted, color: 'bg-red-500', Icon: XCircle },
-                { label: 'Insufficient', count: verify.insufficient, color: 'bg-slate-500', Icon: HelpCircle },
-              ].map(({ label, count, color, Icon }) => count > 0 && (
-                <div key={label} className="flex items-center gap-2 text-sm">
-                  <Icon size={12} className={cn(
-                    label === 'Verified' ? 'text-emerald-400' :
-                      label === 'Partial' ? 'text-amber-400' :
-                        label === 'Refuted' ? 'text-red-400' : 'text-slate-400'
-                  )} />
-                  <span className="text-muted-foreground flex-1">{label}</span>
-                  <span className="font-mono font-semibold">{count}</span>
-                  <div className="w-16 h-1.5 bg-border rounded-full overflow-hidden">
-                    <div
-                      className={cn('h-full rounded-full', color)}
-                      style={{ width: `${(count / verify.total_claims) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
             </div>
           )}
         </div>
 
-        {/* ── Technologies + Architecture ─────────────────────── */}
+        {/* ── 4, 5, 6. Tech, Architecture, Features ───────────────────── */}
         <div className="glass rounded-2xl p-6 space-y-4">
           <h2 className="text-sm font-semibold">Technology Stack</h2>
           {graph?.technologies?.length ? (
@@ -133,7 +101,7 @@ export default function Dashboard() {
           {graph?.features?.length ? (
             <>
               <hr className="border-border" />
-              <h2 className="text-sm font-semibold">Features</h2>
+              <h2 className="text-sm font-semibold">Semantic Features</h2>
               <div className="flex flex-wrap gap-1.5">
                 {graph.features.map((f) => (
                   <span key={f} className="status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -145,7 +113,7 @@ export default function Dashboard() {
           ) : null}
         </div>
 
-        {/* ── Pipeline Summary ────────────────────────────────── */}
+        {/* ── 7. Pipeline Execution ───────────────────────────────────── */}
         <div className="glass rounded-2xl p-6">
           <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
             <Activity size={14} className="text-primary" />
@@ -155,15 +123,41 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Assessment ──────────────────────────────────────────── */}
-      {report?.overall_assessment && (
+      {/* ── 8. Overall Assessment ─────────────────────────────────────── */}
+      {summary && (
         <div className="glass rounded-2xl p-6">
-          <h2 className="text-sm font-semibold mb-3">Overall Assessment</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">{report.overall_assessment}</p>
+          <h2 className="text-sm font-semibold mb-4">Overall Assessment</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center">
+              <BookOpen size={20} className="text-indigo-500 mb-2" />
+              <span className="text-2xl font-bold text-slate-900">{Math.round(summary.coverage_percentage ?? 0)}%</span>
+              <span className="text-xs text-muted-foreground mt-1">Documentation Coverage</span>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center">
+              <CheckCircle2 size={20} className="text-emerald-500 mb-2" />
+              <span className="text-2xl font-bold text-slate-900">{summary.verified_claims ?? 0}</span>
+              <span className="text-xs text-muted-foreground mt-1">Verified Claims</span>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center">
+              <AlertTriangle size={20} className="text-amber-500 mb-2" />
+              <span className="text-2xl font-bold text-slate-900">{summary.missing_documentation ?? 0}</span>
+              <span className="text-xs text-muted-foreground mt-1">Missing Documentation</span>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center">
+              <XCircle size={20} className="text-red-500 mb-2" />
+              <span className="text-2xl font-bold text-slate-900">{summary.contradicted ?? 0}</span>
+              <span className="text-xs text-muted-foreground mt-1">Contradictions</span>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center">
+              <HelpCircle size={20} className="text-slate-400 mb-2" />
+              <span className="text-2xl font-bold text-slate-900">{summary.insufficient_evidence ?? 0}</span>
+              <span className="text-xs text-muted-foreground mt-1">Insufficient Evidence</span>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* ── Recommendations ─────────────────────────────────────── */}
+      {/* ── 9. Recommendations ────────────────────────────────────────── */}
       {report?.recommendations?.length ? (
         <div className="glass rounded-2xl p-6">
           <h2 className="text-sm font-semibold mb-3">Recommendations</h2>

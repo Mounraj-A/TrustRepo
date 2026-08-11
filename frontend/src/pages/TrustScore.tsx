@@ -13,13 +13,13 @@ export default function TrustScore() {
   const graph = analysisResult?.graph_metrics;
   const verify = analysisResult?.verification_summary;
 
-  const docScore    = report?.documentation_coverage ?? 0;
+  const docScore    = (report?.summary?.coverage_percentage ?? 0) / 100;
   const techCount   = graph?.technologies?.length ?? 0;
   const featCount   = graph?.features?.length ?? 0;
   const capCount    = graph?.capabilities?.length ?? 0;
   const total       = verify?.total_claims ?? 0;
   const verifyScore = total > 0 ? (verify?.verified ?? 0) / total : 0;
-  const overall     = report?.trust_score ?? 0;
+  const overall     = report?.trust_assessment?.score ?? 0;
 
   const radarData = [
     { subject: 'Documentation', value: Math.round(docScore * 100) },
@@ -40,9 +40,9 @@ export default function TrustScore() {
         {/* Main gauge */}
         <div className="glass rounded-2xl p-8 flex flex-col items-center gap-4 col-span-1">
           <TrustScoreGauge score={overall} size="lg" />
-          {report?.overall_assessment && (
+          {report?.trust_assessment?.details && (
             <p className="text-xs text-muted-foreground text-center leading-relaxed max-w-xs">
-              {report.overall_assessment}
+              {report.trust_assessment.details}
             </p>
           )}
         </div>
@@ -71,29 +71,15 @@ export default function TrustScore() {
         <MetricsCard label="Verification Rate"        value={`${Math.round(verifyScore * 100)}%`} icon={ShieldCheck} color="emerald" loading={isAnalyzing} />
       </div>
 
-      {/* Risk factors & strengths */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {report?.strengths?.length ? (
+      {/* Recommendations */}
+      <div className="grid grid-cols-1 gap-6">
+        {report?.recommendations?.length ? (
           <div className="glass rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-emerald-400 mb-3">Strengths</h2>
+            <h2 className="text-sm font-semibold text-primary mb-3">Recommendations</h2>
             <ul className="space-y-2">
-              {report.strengths.map((s, i) => (
+              {report.recommendations.map((r, i) => (
                 <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
-                  <ShieldCheck size={12} className="text-emerald-400 mt-0.5 shrink-0" />
-                  {typeof s === 'string' ? s : (s as any).message ?? JSON.stringify(s)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-
-        {report?.risk_factors?.length ? (
-          <div className="glass rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-red-400 mb-3">Risk Factors</h2>
-            <ul className="space-y-2">
-              {report.risk_factors.map((r, i) => (
-                <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-400 mt-1.5 shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
                   {typeof r === 'string' ? r : (r as any).message ?? JSON.stringify(r)}
                 </li>
               ))}

@@ -11,10 +11,12 @@ from app.models.report.trust_report import ClaimReport, VerificationCategory
 class ExplanationGenerator:
     """Translates VerificationResult into a readable ClaimReport."""
 
-    def generate(self, result: VerificationResult, claim_text: str) -> ClaimReport:
+    def generate(self, result: VerificationResult,
+                 claim_text: str) -> ClaimReport:
         # 1. Format explanation from the deterministic reasoning trace
         explanation_lines = [
-            f"The verification engine reached a verdict of **{result.verdict.value}** "
+            f"The verification engine reached a verdict of **{
+                result.verdict.value}** "
             f"with a trust score of {result.trust_score}/100.",
             "",
             "### Verification Reasoning Trace:",

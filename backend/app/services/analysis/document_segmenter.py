@@ -65,5 +65,4 @@ class DocumentSegmenter:
                     )
                 )
 
-
         return document_context

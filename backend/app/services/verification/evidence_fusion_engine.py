@@ -41,11 +41,12 @@ class FusionResult:
     aggregate_ranking_score: float = 0.0
 
 
-# Stream weights: how strongly each evidence source contributes to overall confidence
+# Stream weights: how strongly each evidence source contributes to overall
+# confidence
 STREAM_WEIGHTS = {
-    "graph":         0.90,   # Graph traversal paths — strongest evidence
-    "ast":           0.80,   # AST parser output — structural
-    "semantic":      0.75,   # UIR semantic symbols — contextual
+    "graph": 0.90,   # Graph traversal paths — strongest evidence
+    "ast": 0.80,   # AST parser output — structural
+    "semantic": 0.75,   # UIR semantic symbols — contextual
     "documentation": 0.60,   # Documentation claims — weakest alone
 }
 
@@ -69,10 +70,16 @@ class EvidenceFusionEngine:
         Graph + AST + Semantic + Documentation → Deduplication → Ranking → Unified Context
         """
         streams = [
-            FusionStream("graph",         graph_chains,     STREAM_WEIGHTS["graph"]),
-            FusionStream("ast",           ast_chains,       STREAM_WEIGHTS["ast"]),
-            FusionStream("semantic",      semantic_chains,  STREAM_WEIGHTS["semantic"]),
-            FusionStream("documentation", doc_chains,       STREAM_WEIGHTS["documentation"]),
+            FusionStream("graph", graph_chains, STREAM_WEIGHTS["graph"]),
+            FusionStream("ast", ast_chains, STREAM_WEIGHTS["ast"]),
+            FusionStream(
+                "semantic",
+                semantic_chains,
+                STREAM_WEIGHTS["semantic"]),
+            FusionStream(
+                "documentation",
+                doc_chains,
+                STREAM_WEIGHTS["documentation"]),
         ]
 
         # Step 1: Collect and tag chains by stream
@@ -81,7 +88,8 @@ class EvidenceFusionEngine:
         for stream in streams:
             for chain in stream.chains:
                 # Apply stream weight to ranking score
-                chain.ranking_score = round(chain.ranking_score * stream.weight, 4)
+                chain.ranking_score = round(
+                    chain.ranking_score * stream.weight, 4)
             all_chains.extend(stream.chains)
             stream_contributions[stream.name] = len(stream.chains)
 
@@ -127,12 +135,16 @@ class EvidenceFusionEngine:
                     chain=chain,
                 ))
 
-        context = EvidenceContext(claim=claim, candidates=candidates, chains=ranked)
+        context = EvidenceContext(
+            claim=claim,
+            candidates=candidates,
+            chains=ranked)
         return context, fusion_result
 
-    # ─── Internal algorithms ──────────────────────────────────────────────────
+    # ─── Internal algorithms ────────────────────────────────────────────────
 
-    def _deduplicate(self, chains: List[EvidenceChain]) -> Tuple[List[EvidenceChain], int]:
+    def _deduplicate(
+            self, chains: List[EvidenceChain]) -> Tuple[List[EvidenceChain], int]:
         """
         Removes duplicate chains by graph_path + snippet fingerprint.
         Keeps the chain with the highest ranking_score when duplicates exist.
@@ -161,11 +173,15 @@ class EvidenceFusionEngine:
         """
         return sorted(
             chains,
-            key=lambda c: (c.ranking_score, len(c.sequence), len(c.graph_path)),
+            key=lambda c: (
+                c.ranking_score, len(
+                    c.sequence), len(
+                    c.graph_path)),
             reverse=True,
         )
 
-    def build_doc_chains(self, doc_texts: List[str], claim: Claim) -> List[EvidenceChain]:
+    def build_doc_chains(
+            self, doc_texts: List[str], claim: Claim) -> List[EvidenceChain]:
         """
         Constructs minimal EvidenceChains from raw documentation text.
         Used when no structured graph evidence is available for claims.
@@ -174,7 +190,9 @@ class EvidenceFusionEngine:
         for text in doc_texts:
             if not text.strip():
                 continue
-            source = EvidenceSource(file_path="README.md", parser_used="DocumentParser")
+            source = EvidenceSource(
+                file_path="README.md",
+                parser_used="DocumentParser")
             item = EvidenceItem(
                 source=source,
                 node_type="Statement",

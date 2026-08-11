@@ -4,7 +4,7 @@ Specialization: code symbols, annotations, imports, method calls.
 """
 from typing import List
 from app.services.agents.base_agent import BaseAgent, AgentMessage, AgentRole
-from app.models.knowledge.evidence import EvidenceCandidate, EvidenceChain, EvidenceItem, EvidenceSource, EvidenceStrength
+from app.models.knowledge.evidence import EvidenceChain, EvidenceItem, EvidenceSource, EvidenceStrength
 from app.repositories.graph_repository import GraphRepository
 
 
@@ -20,8 +20,10 @@ class CodeAgent(BaseAgent):
 
     def process(self, message: AgentMessage) -> AgentMessage:
         features = message.expected_features
-        self._log(message, f"Searching code graph for feature instances: {features}")
-        
+        self._log(
+            message,
+            f"Searching code graph for feature instances: {features}")
+
         evidence_chains = []
         for feat in features:
             results = self._query_feature_instances(feat)
@@ -29,8 +31,11 @@ class CodeAgent(BaseAgent):
 
         message.evidence.extend(evidence_chains)
         message.payload["code_evidence"] = [e.dict() for e in evidence_chains]
-        message.confidence = min(0.3 + (len(evidence_chains) * 0.15), 0.95) if evidence_chains else 0.1
-        self._log(message, f"Found {len(evidence_chains)} code evidence chains from semantic features.")
+        message.confidence = min(
+            0.3 + (len(evidence_chains) * 0.15), 0.95) if evidence_chains else 0.1
+        self._log(
+            message, f"Found {
+                len(evidence_chains)} code evidence chains from semantic features.")
         message.route_to_next()
         return message
 
@@ -52,10 +57,11 @@ class CodeAgent(BaseAgent):
                     if node.get('name'):
                         items.append(
                             EvidenceItem(
-                                source=EvidenceSource(file_path=node.get('file') or "unknown"),
+                                source=EvidenceSource(
+                                    file_path=node.get('file') or "unknown"),
                                 context_type=node.get('label') or "Code",
-                                code_snippet=f"[{node.get('label')}] {node.get('name')} (Line {node.get('line') or '?'})",
-                                evidence_strength=EvidenceStrength.PRIMARY if r.get('confidence', 0) > 0.8 else EvidenceStrength.SECONDARY
+                                evidence_strength=EvidenceStrength.PRIMARY if r.get(
+                                    'confidence', 0) > 0.8 else EvidenceStrength.SECONDARY
                             )
                         )
                 if items:

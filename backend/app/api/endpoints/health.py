@@ -3,6 +3,7 @@ import psutil
 
 router = APIRouter()
 
+
 @router.get("/health")
 def health_check():
     memory = psutil.virtual_memory()

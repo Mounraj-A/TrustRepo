@@ -10,7 +10,7 @@ Every node added by a semantic pass becomes a Knowledge Graph node,
 ensuring all evidence is traceable to parser output.
 """
 import ast as pyast
-from typing import List, Optional
+from typing import Optional
 from app.models.code.ast_node import ASTNode
 from app.models.code.source_file import SourceFile
 
@@ -85,7 +85,8 @@ class InheritancePass:
         except SyntaxError:
             return root
 
-        class_nodes = {child.name: child for child in root.children if child.node_type == "Class"}
+        class_nodes = {
+            child.name: child for child in root.children if child.node_type == "Class"}
 
         for node in pyast.walk(tree):
             if isinstance(node, pyast.ClassDef):

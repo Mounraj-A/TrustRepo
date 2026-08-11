@@ -1,9 +1,11 @@
 from app.repositories.graph_repository import GraphRepository
 
+
 class InheritanceGraphBuilder:
     """
     Calculates OOP metrics like Depth of Inheritance Tree (DIT).
     """
+
     def __init__(self, repo: GraphRepository = None):
         self.repo = repo or GraphRepository()
 

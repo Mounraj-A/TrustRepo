@@ -34,9 +34,9 @@ class ClaimNormalizer:
 
             claim.normalized_text = normalized
             # Metadata has been deprecated (Phase 3 Single Source of Truth)
-            # The pipeline now relies on NormalizedClaim objects rather than mutating Claim.
+            # The pipeline now relies on NormalizedClaim objects rather than
+            # mutating Claim.
 
             document_context.normalized_claims.append(claim)
-
 
         return document_context

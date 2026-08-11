@@ -62,7 +62,8 @@ class CodeUnderstandingPipeline:
         for source_file in code_context.source_files:
             ast_root = self.parser_manager.parse(source_file)
             if ast_root:
-                # Semantic passes enrich the AST with Call, Inherits, TypeAnnotation nodes
+                # Semantic passes enrich the AST with Call, Inherits,
+                # TypeAnnotation nodes
                 ast_root = self.semantic_passes.run(ast_root, source_file)
                 code_context.parsed_files.append(source_file.path)
                 code_context.ast_nodes.append(ast_root)
@@ -72,7 +73,8 @@ class CodeUnderstandingPipeline:
                 code_context.intermediate_representation.append(ir)
 
         print("Parsed ASTs            :", len(code_context.ast_nodes))
-        print("UIRs Built             :", len(code_context.intermediate_representation))
+        print("UIRs Built             :", len(
+            code_context.intermediate_representation))
 
         # ── Stage 6: Dependency Parsing ────────────────────────────────────
         # Parse build files and package manifests to extract Dependency nodes

@@ -11,44 +11,257 @@ export interface AnalysisRequest {
 export interface AnalysisResponse {
   status: 'completed' | 'error' | 'running';
   processing_time_seconds: number;
-  report: TrustReport;
+  report: RepositoryReport;
   markdown: string;
   code_metrics: CodeMetrics;
   graph_metrics: GraphMetrics;
   verification_summary: VerificationSummary;
   execution_trace: LayerTrace[];
   code_intelligence: CodeIntelligence;
+  file_tree?: FileTreeNode[];
   detail?: string;
   message?: string;
 }
 
-// ── Trust Report ─────────────────────────────────────────────
-export interface TrustReport {
-  repository_name: string;
+export interface FileTreeNode {
+  name: string;
+  type: 'file' | 'directory';
+  path?: string;
+  language?: string;
+  size?: number;
+  children?: FileTreeNode[];
+}
+
+export interface DocumentationCoverage {
+  detected_features: number;
+  documented_features: number;
+  verified_features: number;
+  contradicted_features: number;
+  missing_features: number;
+  coverage_percentage: number;
+}
+
+export interface UndocumentedFeature {
+  feature_name: string;
+  status: string;
+  evidence_chain?: EvidenceChain;
+  reason: string;
+  documentation_analysis: string;
+  verdict: string;
+  confidence: number;
+  recommendation: string;
+}
+
+export interface DocumentationSummary {
+  documentation_sources: string[];
+  total_candidates: number;
+  confirmed_features: number;
+  documented_features: number;
+  missing_documentation: number;
+  contradicted: number;
+  insufficient_evidence: number;
+  total_claims: number;
+  verified_claims: number;
+  contradicted_claims: number;
+  coverage_percentage: number;
+  coverage_score: number | null;
+}
+
+export interface Recommendation {
+  priority: string;
+  message: string;
+}
+
+export interface TrustAssessment {
+  score: number;
+  status: string;
+  details: string;
+}
+
+export interface RepositoryMetadata {
   repository_url: string;
-  analysis_timestamp: string;
-  trust_score: number;
-  overall_assessment: string;
-  documentation_coverage: number;
-  claims?: ClaimVerification[];
-  technology_summary?: string;
-  feature_summary?: string;
-  architecture_summary?: string;
-  recommendations?: Array<string | { priority?: string; message?: string; [key: string]: any }>;
-  risk_factors?: Array<string | { severity?: string; message?: string; [key: string]: any }>;
-  strengths?: Array<string | { message?: string; [key: string]: any }>;
+  commit_sha: string;
+  branch: string;
+  languages: string[];
+  frameworks: string[];
+  source_files_count: number;
+  documentation_sources: string[];
+  claims_analyzed: number;
+  features_investigated: number;
+  analysis_date: string;
+  verification_version: string;
+}
+
+export interface UnifiedEvidenceItem {
+  evidence_id: string;
+  evidence_type: string;
+  source_file?: string;
+  line_range?: string;
+  snippet?: string;
+  linked_claim?: {
+    claim_id: string;
+    claim_text: string;
+    verdict: string;
+  };
+  reasoning?: string;
+  provenance_chain?: EvidenceChain | null;
+}
+
+export interface EvidenceSummary {
+  total_evidence: number;
+  linked_claims: number;
+  source_files: number;
+}
+
+export interface RepositoryReport {
+  metadata: RepositoryMetadata;
+  summary: DocumentationSummary;
+  documentation_claims: DocumentationClaim[];
+  feature_findings: FeatureFinding[];
+  architecture_findings?: ArchitectureFinding[];
+  contradictions: any[]; // Map if needed
+  recommendations: Recommendation[];
+  trust_assessment: TrustAssessment | null;
+  evidence_summary: EvidenceSummary;
+  unified_evidence: UnifiedEvidenceItem[];
+}
+
+export interface FeatureReference {
+  id: string;
+  name: string;
+}
+
+export interface ArchitectureFinding {
+  id: string;
+  name: string;
+  status: string;
+  supporting_features: FeatureReference[];
+  evidence: EvidenceChain[];
+  reasoning?: string;
+  provenance_chain?: EvidenceChain;
 }
 
 // ── Verification ─────────────────────────────────────────────
-export interface ClaimVerification {
+export interface EvidenceSource {
+  repository_id: string;
+  repository_relative_path: string;
+  file_path: string;
+  line_number?: number;
+  column?: number;
+}
+
+export interface EvidenceItem {
+  id: string;
+  source: EvidenceSource;
+  node_type: string;
+  symbol_kind: string;
+  symbol: string;
+  qualified_name: string;
+  evidence_type: string;
+  code_snippet: string;
+  evidence_strength: string;
+}
+
+export interface EvidenceChain {
+  chain_id: string;
+  chain_type: string;
+  sequence: EvidenceItem[];
+  graph_path: string;
+  confidence: number;
+  reasoning_trace: string;
+}
+
+export interface EvidenceSearchStep {
+  strategy: string;
+  source: string;
+  query_description?: string;
+  matches: number;
+  status: string;
+  explanation?: string;
+}
+
+export interface EvidenceRetrievalTrace {
+  strategies_attempted: string[];
+  strategies_succeeded: string[];
+  strategies_failed: string[];
+  searches: EvidenceSearchStep[];
+  candidate_count: number;
+  matched_entities: number;
+  evidence_items_created: number;
+  evidence_items_rejected: number;
+  rejection_reasons: string[];
+  conclusion?: string;
+}
+
+export interface DocumentationSearchResult {
+  searched_sources: string[];
+  searched_terms: string[];
+  matches: string[];
+  search_method: string;
+  found: boolean;
+  search_timestamp: string;
+}
+
+export interface ReasoningStep {
+  step_id: string;
+  step_type: string;
+  title: string;
+  description?: string;
+  source?: string;
+  source_file?: string;
+  line_start?: number;
+  line_end?: number;
+  evidence_ids?: string[];
+  result?: string;
+}
+
+export interface ReasoningTrace {
+  claim_id: string;
+  steps: ReasoningStep[];
+  final_verdict?: string;
+  explanation?: string;
+}
+
+export interface DocumentationClaim {
   claim_id: string;
   claim_text: string;
-  verdict: 'VERIFIED' | 'CONTRADICTION' | 'MISSING_DOCUMENTATION' | 'UNSUPPORTED_DOCUMENTATION' | 'PARTIAL_DOCUMENTATION';
-  trust_score: number;
-  confidence: number;
-  reasoning_trace: string[];
+  verdict: string;
+  verification_category?: string;
+  source_file?: string;
+  line_range?: string;
+  trust_score?: number;
+  confidence?: number;
+  confidence_breakdown?: Record<string, number>;
   evidence_count?: number;
+  evidence_quality?: number;
+  evidence_diversity?: number;
+  expected_features?: string[];
+  observed_features?: string[];
+  missing_features?: string[];
+  unsupported_features?: string[];
+  contradicted_features?: string[];
+  reasoning?: string;
+  reasoning_trace?: ReasoningTrace | null;
+  provenance_chain?: EvidenceChain | null;
   recommendation?: string;
+}
+
+export interface FeatureFinding {
+  feature: string;
+  category: string;
+  candidate_source: string;
+  status: 'VERIFIED' | 'CONTRADICTED' | 'MISSING_DOCUMENTATION' | 'UNSUPPORTED' | 'INSUFFICIENT_EVIDENCE';
+  evidence: EvidenceChain[];
+  evidence_count: number;
+  evidence_quality: number;
+  evidence_diversity: number;
+  documentation_search: DocumentationSearchResult | null;
+  retrieval_trace: EvidenceRetrievalTrace | null;
+  confidence: number | null;
+  reasoning: string;
+  reasoning_trace: string[];
+  provenance_chain: EvidenceChain | null;
+  recommendation: string | null;
 }
 
 export interface VerificationSummary {

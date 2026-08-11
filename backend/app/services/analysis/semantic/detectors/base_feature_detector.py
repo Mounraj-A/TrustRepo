@@ -47,15 +47,16 @@ class BaseFeatureDetector(ABC):
         List[FeatureInstance]
             Detected features with evidence. Never None — return [] if empty.
         """
-        pass
 
-    # ── Shared Graph Query Helpers ────────────────────────────────────────────
+    # ── Shared Graph Query Helpers ──────────────────────────────────────────
 
-    def _get_nodes_by_label(self, graph: RepositoryKnowledgeGraph, label: str) -> list:
+    def _get_nodes_by_label(
+            self, graph: RepositoryKnowledgeGraph, label: str) -> list:
         """Return all nodes matching a specific label."""
         return [n for n in graph.nodes if n.label == label]
 
-    def _get_nodes_by_labels(self, graph: RepositoryKnowledgeGraph, labels: set) -> list:
+    def _get_nodes_by_labels(
+            self, graph: RepositoryKnowledgeGraph, labels: set) -> list:
         """Return all nodes whose label is in the given set."""
         return [n for n in graph.nodes if n.label in labels]
 

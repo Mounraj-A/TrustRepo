@@ -5,7 +5,7 @@ Queries the RepositoryKnowledgeGraph for Annotation, Import, and
 Dependency nodes that indicate database/ORM usage.
 """
 import uuid
-from typing import List, Optional
+from typing import List
 
 from app.models.knowledge.repository_knowledge_graph import RepositoryKnowledgeGraph
 from app.models.knowledge.feature_instance import FeatureInstance
@@ -44,31 +44,37 @@ class DatabaseDetector(BaseFeatureDetector):
     def detect(self, graph: RepositoryKnowledgeGraph) -> List[FeatureInstance]:
         features = []
 
-        # ── ORM ───────────────────────────────────────────────────────────────
-        orm_ann_nodes = self._get_annotation_nodes_matching(graph, ORM_ANNOTATIONS)
+        # ── ORM ──────────────────────────────────────────────────────────────
+        orm_ann_nodes = self._get_annotation_nodes_matching(
+            graph, ORM_ANNOTATIONS)
         orm_imp_nodes = self._get_import_nodes_matching(graph, ORM_IMPORTS)
         orm_dep_nodes = self._get_dependency_nodes_matching(graph, ORM_IMPORTS)
         orm_nodes = orm_ann_nodes[:3] + orm_imp_nodes[:3] + orm_dep_nodes[:2]
         if orm_nodes:
-            chain = self._build_chain(orm_nodes, "ORM / Database Persistence", "ORM detected via annotations and imports.")
+            chain = self._build_chain(
+                orm_nodes,
+                "ORM / Database Persistence",
+                "ORM detected via annotations and imports.")
             self._append_feature(features, "feat_orm", [chain])
 
-        # ── Graph Database ────────────────────────────────────────────────────
+        # ── Graph Database ───────────────────────────────────────────────────
         graph_db_nodes = (
             self._get_import_nodes_matching(graph, GRAPH_DB_IMPORTS) +
             self._get_dependency_nodes_matching(graph, GRAPH_DB_IMPORTS)
         )
         if graph_db_nodes:
-            chain = self._build_chain(graph_db_nodes[:5], "Graph Database", "Graph database imports/dependencies detected.")
+            chain = self._build_chain(
+                graph_db_nodes[:5], "Graph Database", "Graph database imports/dependencies detected.")
             self._append_feature(features, "feat_graph_database", [chain])
 
-        # ── Caching ───────────────────────────────────────────────────────────
+        # ── Caching ──────────────────────────────────────────────────────────
         cache_nodes = (
             self._get_import_nodes_matching(graph, CACHE_IMPORTS) +
             self._get_dependency_nodes_matching(graph, CACHE_IMPORTS)
         )
         if cache_nodes:
-            chain = self._build_chain(cache_nodes[:5], "Caching", "Caching library imports/dependencies detected.")
+            chain = self._build_chain(
+                cache_nodes[:5], "Caching", "Caching library imports/dependencies detected.")
             self._append_feature(features, "feat_caching", [chain])
 
         return features
@@ -83,10 +89,13 @@ class DatabaseDetector(BaseFeatureDetector):
                 evidence=chains,
             ))
 
-    def _build_chain(self, nodes: list, context_type: str, reasoning: str) -> EvidenceChain:
+    def _build_chain(self, nodes: list, context_type: str,
+                     reasoning: str) -> EvidenceChain:
         items = [
             EvidenceItem(
-                source=EvidenceSource(file_path=n.properties.get("file_path", "unknown")),
+                source=EvidenceSource(
+                    file_path=n.properties.get(
+                        "file_path", "unknown")),
                 node_type=n.label,
                 symbol=n.properties.get("name", ""),
                 context_type=context_type,

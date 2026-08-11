@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+from typing import Dict, Optional
+
 
 class Symbol(BaseModel):
     name: str

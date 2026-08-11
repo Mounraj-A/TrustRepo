@@ -26,17 +26,17 @@ from app.models.knowledge.repository_knowledge_graph import RepositoryKnowledgeG
 
 # Required properties per node label
 REQUIRED_PROPERTIES: Dict[str, List[str]] = {
-    "File":         ["path"],
-    "Class":        ["name", "file_path"],
-    "Method":       ["name", "file_path"],
-    "Function":     ["name", "file_path"],
-    "Import":       ["name"],
-    "Dependency":   ["name"],
-    "Annotation":   ["name"],
-    "Package":      ["name"],
-    "Interface":    ["name", "file_path"],
-    "Inherits":     ["name"],
-    "Call":         ["name"],
+    "File": ["path"],
+    "Class": ["name", "file_path"],
+    "Method": ["name", "file_path"],
+    "Function": ["name", "file_path"],
+    "Import": ["name"],
+    "Dependency": ["name"],
+    "Annotation": ["name"],
+    "Package": ["name"],
+    "Interface": ["name", "file_path"],
+    "Inherits": ["name"],
+    "Call": ["name"],
     "TypeAnnotation": ["name"],
 }
 
@@ -78,7 +78,8 @@ class GraphSchemaValidator:
     are distinguished so the caller can decide on severity.
     """
 
-    def validate(self, graph: RepositoryKnowledgeGraph) -> GraphValidationReport:
+    def validate(
+            self, graph: RepositoryKnowledgeGraph) -> GraphValidationReport:
         report = GraphValidationReport()
 
         if not graph or not graph.nodes:
@@ -97,7 +98,9 @@ class GraphSchemaValidator:
                 val = node.properties.get(prop)
                 if not val:
                     report.missing_props.append(
-                        f"{node.label}[id={getattr(node, 'id', '?')}] missing '{prop}'"
+                        f"{node.label}[id={getattr(node,
+                                                   'id',
+                                                   '?')}] missing '{prop}'"
                     )
                     missing_count += 1
 
@@ -107,11 +110,11 @@ class GraphSchemaValidator:
                 "Graph may produce incomplete evidence."
             )
 
-        # ── 2. Duplicate Detection ────────────────────────────────────────────
+        # ── 2. Duplicate Detection ───────────────────────────────────────────
         seen: Set[str] = set()
         dup_count = 0
         for node in graph.nodes:
-            key = f"{node.label}:{node.properties.get('name', '')}:{node.properties.get('file_path', '')}"
+            key = node.properties.get("qualname") or f"{node.label}:{node.properties.get('name', '')}:{node.properties.get('file_path', '')}"
             if key in seen:
                 dup_count += 1
             seen.add(key)
@@ -123,13 +126,13 @@ class GraphSchemaValidator:
                 "Technology detection may double-count evidence."
             )
 
-        # ── 3. Isolated Node Detection ────────────────────────────────────────
+        # ── 3. Isolated Node Detection ───────────────────────────────────────
         connected_ids: Set = set()
         for edge in graph.edges:
-            connected_ids.add(id(edge.source) if hasattr(edge, 'source') else None)
-            connected_ids.add(id(edge.target) if hasattr(edge, 'target') else None)
+            connected_ids.add(edge.source_qualname)
+            connected_ids.add(edge.target_qualname)
 
-        isolated = [n for n in graph.nodes if id(n) not in connected_ids]
+        isolated = [n for n in graph.nodes if n.properties.get('qualname', n.label) not in connected_ids]
         report.isolated_nodes = len(isolated)
         if report.isolated_nodes > report.node_count * 0.5:
             report.warnings.append(
@@ -146,7 +149,7 @@ class GraphSchemaValidator:
         else:
             report.density_score = 0.0
 
-        # ── 5. Integrity Score ────────────────────────────────────────────────
+        # ── 5. Integrity Score ───────────────────────────────────────────────
         penalty = 0.0
         if missing_count > 0:
             penalty += min(0.3, missing_count / max(1, report.node_count) * 2)
@@ -154,13 +157,14 @@ class GraphSchemaValidator:
             penalty += min(0.2, dup_count / max(1, report.node_count))
         report.integrity_score = max(0.0, 1.0 - penalty)
 
-        # ── 6. Final Validity ─────────────────────────────────────────────────
+        # ── 6. Final Validity ────────────────────────────────────────────────
         if report.errors:
             report.is_valid = False
         elif report.integrity_score < 0.5:
             report.is_valid = False
             report.errors.append(
-                f"Integrity score {report.integrity_score:.2f} below threshold 0.5. "
+                f"Integrity score {
+                    report.integrity_score:.2f} below threshold 0.5. "
                 "Graph quality is too low for reliable evidence detection."
             )
 

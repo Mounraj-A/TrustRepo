@@ -42,11 +42,14 @@ class RepositoryIngestionPipeline:
         if os.path.exists(repository_url) and os.path.isdir(repository_url):
             repository_path = repository_url
         else:
-            clone_result = self.repository_service.clone_repository(repository_url)
+            clone_result = self.repository_service.clone_repository(
+                repository_url)
 
             if clone_result["status"] not in ("cloned", "already_exists"):
                 raise Exception(
-                    f"Repository cloning failed: {clone_result.get('message', 'Unknown error')}"
+                    f"Repository cloning failed: {
+                        clone_result.get(
+                            'message', 'Unknown error')}"
                 )
 
             repository_path = clone_result["local_path"]

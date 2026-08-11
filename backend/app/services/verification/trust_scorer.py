@@ -40,7 +40,7 @@ class TrustScorer:
     for both claim-level and repository-level scoring.
     """
 
-    # ── Claim-Level Weights ────────────────────────────────────────────────────
+    # ── Claim-Level Weights ─────────────────────────────────────────────────
     CLAIM_WEIGHTS = {
         "evidence_quality": 0.25,
         "evidence_diversity": 0.20,
@@ -48,11 +48,11 @@ class TrustScorer:
         "feature_coverage": 0.25,
     }
 
-    # ── Claim-Level Penalties ──────────────────────────────────────────────────
+    # ── Claim-Level Penalties ───────────────────────────────────────────────
     CONTRADICTION_PENALTY = 20.0
     NO_EVIDENCE_PENALTY = 30.0
 
-    # ── Repository-Level Weights ───────────────────────────────────────────────
+    # ── Repository-Level Weights ────────────────────────────────────────────
     REPO_WEIGHTS = {
         "documentation_coverage": 0.30,
         "avg_evidence_quality": 0.25,
@@ -60,7 +60,7 @@ class TrustScorer:
         "claim_coverage": 0.20,
     }
 
-    # ── Repository-Level Penalties ─────────────────────────────────────────────
+    # ── Repository-Level Penalties ──────────────────────────────────────────
     CONTRADICTION_REPO_PENALTY = 10.0   # per contradiction
     MISSING_DOC_PENALTY = 5.0           # per missing documented feature
     FALSE_DOC_PENALTY = 7.0             # per dead/false documentation claim
@@ -68,14 +68,15 @@ class TrustScorer:
     def calculate_claim_score(
         self,
         verdict: "VerificationVerdict",
-        evidence_sources: list,  # list of dicts with source_weight, evidence_quality, parser_confidence
+        # list of dicts with source_weight, evidence_quality, parser_confidence
+        evidence_sources: list,
         graph_connectivity: float,
         agreement_score: float,
         freshness_score: float,
         conflict_count: int
     ) -> float:
         """
-        Claim-Level: Confidence = Σ(SourceWeight × EvidenceQuality × ParserConfidence) 
+        Claim-Level: Confidence = Σ(SourceWeight × EvidenceQuality × ParserConfidence)
                      × GraphConnectivity × AgreementScore × FreshnessScore ÷ ConflictPenalty
         """
         sigma_evidence = 0.0
@@ -84,25 +85,25 @@ class TrustScorer:
             eq = ev.get("evidence_quality", 0.5)
             pc = ev.get("parser_confidence", 1.0)
             sigma_evidence += (sw * eq * pc)
-            
+
         if sigma_evidence == 0:
-            sigma_evidence = 0.1 # prevent zero multiplication if no evidence
-            
+            sigma_evidence = 0.1  # prevent zero multiplication if no evidence
+
         conflict_penalty = max(1.0, conflict_count * 1.5)
-        
+
         raw_score = (
-            sigma_evidence * 
-            max(graph_connectivity, 0.1) * 
-            max(agreement_score, 0.1) * 
+            sigma_evidence *
+            max(graph_connectivity, 0.1) *
+            max(agreement_score, 0.1) *
             max(freshness_score, 0.1)
         ) / conflict_penalty
-        
+
         # Normalize to 0-100
         normalized = min(raw_score * 100.0, 100.0)
-        
+
         if len(evidence_sources) == 0:
             normalized -= self.NO_EVIDENCE_PENALTY
-            
+
         return round(max(normalized, 0.0), 2)
 
     def calculate_repository_score(
@@ -130,7 +131,7 @@ class TrustScorer:
             "verification": 0.15,
             "graph": 0.05
         }
-        
+
         raw_score = (
             (doc_score * weights["doc"]) +
             (tech_score * weights["tech"]) +
@@ -141,7 +142,7 @@ class TrustScorer:
             (verification_score * weights["verification"]) +
             (graph_score * weights["graph"])
         )
-        
+
         return round(max(min(raw_score, 100.0), 0.0), 2)
 
     # Backward-compatible alias (used by old callers)
@@ -149,8 +150,9 @@ class TrustScorer:
         evidence_count = len(investigation.evidence_context.candidates)
         from app.models.knowledge.investigation import VerificationVerdict
         # Map old signature to new formula inputs for backwards compatibility
-        evidences = [{"source_weight": 1.0, "evidence_quality": 0.5, "parser_confidence": investigation.confidence} for _ in range(evidence_count)]
-        
+        evidences = [{"source_weight": 1.0, "evidence_quality": 0.5,
+                      "parser_confidence": investigation.confidence} for _ in range(evidence_count)]
+
         return self.calculate_claim_score(
             verdict=verdict,
             evidence_sources=evidences,

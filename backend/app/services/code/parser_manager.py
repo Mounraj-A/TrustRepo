@@ -1,4 +1,4 @@
-from typing import Dict, Any, Type, Optional
+from typing import Dict, Optional
 from app.models.code.source_file import SourceFile
 from app.models.code.ast_node import ASTNode
 
@@ -8,11 +8,13 @@ from app.services.code.parsers.python_parser import PythonParser
 from app.services.code.parsers.javascript_parser import JavaScriptParser
 from app.services.code.parsers.dependency_parser import DependencyParser
 
+
 class ParserManager:
     """
     Registry for language-specific parsers.
     Uses Lightweight Language Parsers that yield common ASTNodes.
     """
+
     def __init__(self):
         self._parsers: Dict[str, BaseParser] = {
             "java": JavaParser(),

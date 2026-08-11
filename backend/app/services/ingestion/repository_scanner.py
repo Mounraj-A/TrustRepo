@@ -84,7 +84,7 @@ class RepositoryScanner:
     }
     INFRASTRUCTURE_EXTENSIONS = {".dockerfile"}
 
-    # ── CI/CD ─────────────────────────────────────────────────────────────────
+    # ── CI/CD ───────────────────────────────────────────────────────────────
     CICD_NAMES = {
         "Jenkinsfile", ".travis.yml", ".travis.yaml",
         "appveyor.yml", "appveyor.yaml",
@@ -101,12 +101,25 @@ class RepositoryScanner:
         ".azure",
     }
 
-    # ── Infrastructure as Code ────────────────────────────────────────────────
+    # ── Infrastructure as Code ──────────────────────────────────────────────
     IAC_EXTENSIONS = {".tf", ".tfvars"}
-    IAC_DIRS = {"terraform", "helm", "charts", "k8s", "kubernetes", "infra", "infrastructure", "deploy", "deployment"}
-    IAC_NAMES = {"Chart.yaml", "values.yaml", "kustomization.yaml", "kustomization.yml"}
+    IAC_DIRS = {
+        "terraform",
+        "helm",
+        "charts",
+        "k8s",
+        "kubernetes",
+        "infra",
+        "infrastructure",
+        "deploy",
+        "deployment"}
+    IAC_NAMES = {
+        "Chart.yaml",
+        "values.yaml",
+        "kustomization.yaml",
+        "kustomization.yml"}
 
-    # ── Configuration ─────────────────────────────────────────────────────────
+    # ── Configuration ───────────────────────────────────────────────────────
     CONFIG_NAMES = {
         ".env", ".env.example", ".env.sample", ".env.local",
         "config.json", "config.yaml", "config.yml",
@@ -124,11 +137,26 @@ class RepositoryScanner:
     CONFIG_EXTENSIONS = {".ini", ".cfg", ".conf", ".toml", ".properties"}
 
     # ── Scripts ──────────────────────────────────────────────────────────────
-    SCRIPT_EXTENSIONS = {".sh", ".bash", ".zsh", ".fish", ".ps1", ".bat", ".cmd"}
+    SCRIPT_EXTENSIONS = {
+        ".sh",
+        ".bash",
+        ".zsh",
+        ".fish",
+        ".ps1",
+        ".bat",
+        ".cmd"}
     SCRIPT_DIRS = {"scripts", "bin", "tools"}
 
     # ── Generated ────────────────────────────────────────────────────────────
-    GENERATED_DIRS = {"migrations", "migration", "generated", "__generated__", "dist", "build", ".next", "out"}
+    GENERATED_DIRS = {
+        "migrations",
+        "migration",
+        "generated",
+        "__generated__",
+        "dist",
+        "build",
+        ".next",
+        "out"}
 
     # ── Assets ───────────────────────────────────────────────────────────────
     ASSET_EXTENSIONS = {
@@ -159,8 +187,9 @@ class RepositoryScanner:
         """
         root = Path(repository_path)
         if not root.exists():
-            raise FileNotFoundError(f"Repository path does not exist: {repository_path}")
-            
+            raise FileNotFoundError(
+                f"Repository path does not exist: {repository_path}")
+
         import subprocess
         commit_sha = "HEAD"
         branch = "main"
